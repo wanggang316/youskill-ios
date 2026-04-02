@@ -44,9 +44,6 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
     sources:
       - path: Sources
-    resources:
-      - path: Assets.xcassets
-      - path: Sources/Resources
     info:
       path: Sources/App/Info.plist
       properties:
