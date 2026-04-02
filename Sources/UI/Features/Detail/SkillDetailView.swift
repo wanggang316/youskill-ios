@@ -139,10 +139,7 @@ struct SkillDetailView: View {
                         baseURL: viewModel.rawFileURL?.deletingLastPathComponent()
                     )
                 case .code:
-                    CodeContentView(
-                        path: viewModel.activePath ?? viewModel.displayTitle,
-                        content: viewModel.displayedContent
-                    )
+                    CodeContentView(content: viewModel.displayedContent)
                 case .image:
                     imageContent
                 case .unsupported:

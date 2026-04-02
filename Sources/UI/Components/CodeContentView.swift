@@ -1,76 +1,29 @@
 import HighlightSwift
 import SwiftUI
-#if canImport(AppKit)
-import AppKit
-#elseif canImport(UIKit)
-import UIKit
-#endif
 
 struct CodeContentView: View {
-    let path: String
     let content: String
 
     @State private var highlightedContent: AttributedString?
-    @State private var isCopied = false
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                header
-                codeBlock
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-        }
+        codeBlock
         .background(AppTheme.groupedBackground)
         .task(id: highlightKey) {
             await renderHighlightedContent()
         }
     }
 
-    private var header: some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(fileName)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-
-                Text("\(languageLabel) · \(lineCount) 行")
-                    .font(.footnote)
-                    .foregroundStyle(AppTheme.secondaryText)
-            }
-
-            Spacer(minLength: 12)
-
-            Button {
-                copyContent()
-            } label: {
-                Label(isCopied ? "已复制" : "复制", systemImage: isCopied ? "checkmark" : "doc.on.doc")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(isCopied ? Color.green : AppTheme.accent)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(AppTheme.cardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(AppTheme.divider, lineWidth: 1)
-                    )
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
     private var codeBlock: some View {
-        ScrollView(.horizontal, showsIndicators: true) {
+        ScrollView([.vertical, .horizontal], showsIndicators: true) {
             HStack(alignment: .top, spacing: 0) {
                 Text(lineNumbersText)
                     .font(.system(.footnote, design: .monospaced))
                     .foregroundStyle(AppTheme.secondaryText)
                     .multilineTextAlignment(.trailing)
                     .padding(.vertical, 16)
-                    .padding(.leading, 16)
-                    .padding(.trailing, 12)
+                    .padding(.leading, 12)
+                    .padding(.trailing, 10)
                     .overlay(alignment: .trailing) {
                         Rectangle()
                             .fill(AppTheme.divider)
@@ -90,25 +43,12 @@ struct CodeContentView: View {
                 .textSelection(.enabled)
                 .fixedSize(horizontal: true, vertical: false)
                 .padding(.vertical, 16)
-                .padding(.horizontal, 16)
+                .padding(.leading, 12)
+                .padding(.trailing, 16)
             }
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(AppTheme.cardBackground)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(AppTheme.divider, lineWidth: 1)
-            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AppTheme.cardBackground)
         }
-    }
-
-    private var fileName: String {
-        URL(fileURLWithPath: path).lastPathComponent
-    }
-
-    private var fileExtension: String {
-        URL(fileURLWithPath: path).pathExtension.lowercased()
     }
 
     private var lineCount: Int {
@@ -120,7 +60,7 @@ struct CodeContentView: View {
     }
 
     private var highlightLanguage: String? {
-        switch fileExtension {
+        switch inferredFileExtension {
         case "js", "jsx":
             "javascript"
         case "ts", "tsx":
@@ -142,70 +82,23 @@ struct CodeContentView: View {
         case "h":
             "c"
         default:
-            fileExtension.isEmpty ? nil : fileExtension
+            nil
         }
     }
 
-    private var languageLabel: String {
-        switch highlightLanguage {
-        case "bash":
-            "Shell"
-        case "cpp":
-            "C++"
-        case "cs":
-            "C#"
-        case "css":
-            "CSS"
-        case "dart":
-            "Dart"
-        case "go":
-            "Go"
-        case "html":
-            "HTML"
-        case "java":
-            "Java"
-        case "javascript":
-            "JavaScript"
-        case "json":
-            "JSON"
-        case "kotlin", "kt":
-            "Kotlin"
-        case "lua":
-            "Lua"
-        case "markdown":
-            "Markdown"
-        case "php":
-            "PHP"
-        case "python":
-            "Python"
-        case "ruby":
-            "Ruby"
-        case "rust":
-            "Rust"
-        case "sql":
-            "SQL"
-        case "swift":
-            "Swift"
-        case "toml":
-            "TOML"
-        case "typescript":
-            "TypeScript"
-        case "xml":
-            "XML"
-        case "yaml":
-            "YAML"
-        case let language?:
-            language
-                .split(separator: "-")
-                .map { $0.capitalized }
-                .joined(separator: " ")
-        default:
-            "Text"
+    private var inferredFileExtension: String {
+        let firstLine = content.split(separator: "\n", maxSplits: 1, omittingEmptySubsequences: false).first ?? ""
+        if firstLine.hasPrefix("#!/usr/bin/env ") || firstLine.hasPrefix("#!/bin/") {
+            return "sh"
         }
+        if firstLine.hasPrefix("{") || firstLine.hasPrefix("[") {
+            return "json"
+        }
+        return ""
     }
 
     private var highlightKey: String {
-        "\(path)|\(content)"
+        content
     }
 
     @MainActor
@@ -219,23 +112,6 @@ struct CodeContentView: View {
             }
         } catch {
             highlightedContent = nil
-        }
-    }
-
-    @MainActor
-    private func copyContent() {
-        #if canImport(UIKit)
-        UIPasteboard.general.string = content
-        #elseif canImport(AppKit)
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(content, forType: .string)
-        #endif
-
-        isCopied = true
-
-        Task { @MainActor in
-            try? await Task.sleep(for: .seconds(1.2))
-            isCopied = false
         }
     }
 }
