@@ -32,6 +32,7 @@
 		7BD689746926490B0BDCAC56 /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65521201A7BC78895A1D5846 /* MockURLProtocol.swift */; };
 		7C96AF9D84F3178FF0CC775B /* ParsedMarkdownDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE271A9853140EE6260D7964 /* ParsedMarkdownDocument.swift */; };
 		8D37B2EA936E1B338364E0FD /* Skill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89969F5901D74B214D92CF59 /* Skill.swift */; };
+		9227A47D2FB35B1A2842C43D /* TranslationValidationErrorFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30C59A8DB95794444FA8746 /* TranslationValidationErrorFormatter.swift */; };
 		9773672E6164C62253B3C1B3 /* SkillQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAE919A4D23D96D3AF30230 /* SkillQuery.swift */; };
 		97B339C57226FF2679090244 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911D5F4A50B56B275C62D648 /* SettingsView.swift */; };
 		97BE8E83ADA59C10F7BB9734 /* GitHubContentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F819D471EE138E2777A8B3 /* GitHubContentRepository.swift */; };
@@ -95,6 +96,7 @@
 		BEB18BF57F306ADF27CD4263 /* CodeContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeContentView.swift; sourceTree = "<group>"; };
 		BF913DBB882CD882E21A8D30 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		DCB0551558FC0B909AD91227 /* YouSkillTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = YouSkillTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E30C59A8DB95794444FA8746 /* TranslationValidationErrorFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationValidationErrorFormatter.swift; sourceTree = "<group>"; };
 		E47066EBB05D95FF45C89206 /* SkillDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillDetailView.swift; sourceTree = "<group>"; };
 		E5B4E4184BCC942CDF469237 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ED2CFCD0D4D755A2E8976016 /* LocalStores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStores.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 				6AE79DCF198A8C744463205C /* SkillCatalogService.swift */,
 				1F4CC340319F6D8EA6FD4FE0 /* SkillContentService.swift */,
 				0973DC8F51D5234BCD7A9AE1 /* TranslationService.swift */,
+				E30C59A8DB95794444FA8746 /* TranslationValidationErrorFormatter.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -426,6 +429,7 @@
 				9773672E6164C62253B3C1B3 /* SkillQuery.swift in Sources */,
 				D2FB1C3B3133EB02335B1D8A /* TranslationService.swift in Sources */,
 				64D947C5C0EBF0E80D1F7E4B /* TranslationSettings.swift in Sources */,
+				9227A47D2FB35B1A2842C43D /* TranslationValidationErrorFormatter.swift in Sources */,
 				FFBE98F29D72339402AA2635 /* YouSkillApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
