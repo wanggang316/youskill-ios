@@ -82,16 +82,17 @@ struct SkillListView: View {
                     Button {
                         isShowingSettings = true
                     } label: {
-                        Image(systemName: "gearshape.fill")
+                        Image(systemName: "gearshape")
                     }
                 }
             }
-            .confirmationDialog("选择排序", isPresented: $isShowingSortDialog) {
-                ForEach(SkillSortOption.allCases) { option in
-                    Button(option.title) {
-                        viewModel.selectedSort = option
-                    }
+            .sheet(isPresented: $isShowingSortDialog) {
+                SkillFilterSheet(selectedSort: $viewModel.selectedSort) {
+                    isShowingSortDialog = false
                 }
+                .presentationDetents([.height(332)])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
             }
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView(container: container)
