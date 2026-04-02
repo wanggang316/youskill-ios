@@ -3,8 +3,10 @@
 ## Quick Start
 
 ```bash
-# TODO: add build command
-# TODO: add test command
+xcodegen generate
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test
+# requires iOS platform/runtime installed in Xcode
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project YouSkill.xcodeproj -scheme YouSkill -destination 'generic/platform=iOS Simulator' build
 ```
 
 ## Architecture Overview
@@ -18,6 +20,11 @@ This project follows a layered domain architecture. See [Architecture](docs/arch
 
 ```
 youskill-ios/
+├── Sources/               # Swift source organized by architecture layers
+├── Tests/                 # Shared logic and repository tests
+├── Assets.xcassets/       # App colors and icons
+├── project.yml            # XcodeGen project manifest
+├── YouSkill.xcodeproj/    # Generated Xcode project
 ├── docs/                  # System of record for all project knowledge
 │   ├── architecture.md    # Domain model, layers, dependency rules
 │   ├── golden-rules.md    # Numbered principles (enforced by harness check)
@@ -66,8 +73,10 @@ All project knowledge lives in `docs/`. Start with the area relevant to your tas
 ## Build & Test Commands
 
 ```bash
-# TODO: add build command
-# TODO: add test command
+xcodegen generate
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test
+# requires iOS platform/runtime installed in Xcode
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project YouSkill.xcodeproj -scheme YouSkill -destination 'generic/platform=iOS Simulator' build
 ```
 
 ## Code Style & Conventions

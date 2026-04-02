@@ -1,6 +1,6 @@
 # ExecPlan: YouSkill iOS MVP
 
-**Status:** Active
+**Status:** Completed
 **Author:** Codex
 **Created:** 2026-04-02
 **Last Updated:** 2026-04-02
@@ -39,7 +39,10 @@
 - [x] 2026-04-02 产出产品规格文档
 - [x] 2026-04-02 产出技术设计文档
 - [x] 2026-04-02 产出执行计划文档
-- [ ] 后续根据文档开始 SwiftUI 项目初始化与模块落地
+- [x] 2026-04-02 初始化 SwiftUI/XcodeGen 工程结构与项目清单
+- [x] 2026-04-02 实现列表、详情、目录抽屉、设置、模型检测与翻译流程
+- [x] 2026-04-02 实现 API、GitHub 内容读取、本地收藏、设置持久化与缓存
+- [x] 2026-04-02 增加仓储/翻译/收藏相关自动化测试并通过 `swift test`
 
 ## Surprises & Discoveries
 
@@ -47,6 +50,8 @@
 - `/api/skills` 的正确鉴权头是 `X-API-Key`，不是 `Authorization: Bearer`。
 - Skill 列表返回中已包含 `skill_path_sha`，这个字段对 GitHub 文件树缓存非常有价值，可直接作为缓存版本戳。
 - 既有 `you-skill` 项目并未通过 `git clone` 拉取远程内容，而是使用 GitHub Trees API 和 Raw URL 直接读取，这很适合移动端首版。
+- 当前机器已安装完整 `Xcode.app`，但默认 developer dir 指向 Command Line Tools；需要显式设置 `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` 才能拿到完整 Swift/Xcode toolchain。
+- 当前 Xcode 环境缺少 iOS platform/runtime，因此本次无法执行真正的 `xcodebuild ... build/test` 到模拟器，只能完成项目生成验证和共享代码层测试。
 
 ## Decision Log
 
@@ -68,4 +73,4 @@
 
 ## Outcomes & Retrospective
 
-本轮工作完成了需求收敛和文档落位，已经把产品目标、页面要求、技术边界、GitHub 策略和 TODO 路线沉淀到仓库。剩余缺口主要在实现阶段：需要初始化 SwiftUI 工程结构、落地数据层、页面和缓存能力，并补充可执行的 build/test 命令。
+本轮工作已完成从文档到代码的闭环：SwiftUI 首页、详情页、设置页、目录抽屉、翻译流、本地收藏、仓储层、缓存层和测试层都已落位。共享代码通过了 `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test`，Xcode project 也可被 `xcodebuild -list` 正确识别。剩余风险仅在当前机器缺少 iOS platform/runtime，导致无法在本地完成模拟器构建与界面级验证。
