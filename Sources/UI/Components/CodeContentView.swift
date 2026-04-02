@@ -3,6 +3,7 @@ import SwiftUI
 
 struct CodeContentView: View {
     let content: String
+    var fileExtension: String = ""
 
     @State private var highlightedContent: AttributedString?
     private let codeFont = Font.system(size: 12, design: .monospaced)
@@ -35,8 +36,9 @@ struct CodeContentView: View {
         }
     }
 
+    // Resolved highlight language: file extension takes priority over content inference.
     private var highlightLanguage: String? {
-        switch inferredFileExtension {
+        switch fileExtension.isEmpty ? inferredFileExtension : fileExtension {
         case "js", "jsx":
             "javascript"
         case "ts", "tsx":
@@ -57,6 +59,8 @@ struct CodeContentView: View {
             "cpp"
         case "h":
             "c"
+        case "html", "xml", "svg":
+            "xml"
         default:
             nil
         }

@@ -139,7 +139,10 @@ struct SkillDetailView: View {
                         baseURL: viewModel.rawFileURL?.deletingLastPathComponent()
                     )
                 case .code:
-                    CodeContentView(content: viewModel.displayedContent)
+                    CodeContentView(
+                        content: viewModel.displayedContent,
+                        fileExtension: URL(fileURLWithPath: viewModel.activePath ?? "").pathExtension.lowercased()
+                    )
                 case .image:
                     imageContent
                 case .unsupported:
@@ -147,6 +150,7 @@ struct SkillDetailView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     @ViewBuilder
