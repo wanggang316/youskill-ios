@@ -32,6 +32,8 @@ Every exec plan MUST contain:
 
 <!-- List active plans here -->
 
+- [YouSkill iOS MVP](2026-04-02-youskill-ios-mvp.md)
+
 ## Completed Plans
 
 <!-- Move completed plans here -->

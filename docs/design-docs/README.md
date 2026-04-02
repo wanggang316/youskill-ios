@@ -17,3 +17,5 @@ Use [_template.md](_template.md) as a starting point.
 
 <!-- List design docs here as they are created -->
 <!-- Format: [Title](filename.md) — one-line summary -->
+
+- [YouSkill iOS MVP](youskill-ios-mvp.md) — 移动端 Skill 浏览、详情阅读、翻译与设置的首版技术设计
