@@ -14,6 +14,9 @@ final class SkillDetailViewModel {
     private(set) var activePath: String?
     private(set) var originalContent: String = ""
     private(set) var translatedContent: String?
+    private(set) var originalDescription: String?
+    private(set) var translatedDescription: String?
+    private(set) var rawOriginalMarkdown: String = ""
     private(set) var isShowingTranslated = false
     private(set) var fileKind: SkillFileKind = .markdown
     private(set) var rawFileURL: URL?
@@ -37,12 +40,19 @@ final class SkillDetailViewModel {
         return originalContent
     }
 
+    var displayedDescription: String? {
+        if isShowingTranslated {
+            return translatedDescription
+        }
+        return originalDescription
+    }
+
     var displayTitle: String {
         skill.name
     }
 
     var canTranslate: Bool {
-        fileKind.supportsTranslation && !originalContent.isEmpty
+        fileKind.supportsTranslation && !rawOriginalMarkdown.isEmpty
     }
 
     func loadIfNeeded() async {
@@ -78,10 +88,13 @@ final class SkillDetailViewModel {
         activePath = path
         fileKind = SkillFileKind(path: path)
         translatedContent = nil
+        translatedDescription = nil
         isShowingTranslated = false
         rawFileURL = try? contentService.rawURL(for: skill, relativePath: path)
         errorMessage = nil
         isDrawerOpen = false
+        rawOriginalMarkdown = ""
+        originalDescription = nil
 
         if fileKind == .image || fileKind == .unsupported {
             originalContent = ""
@@ -89,7 +102,15 @@ final class SkillDetailViewModel {
         }
 
         do {
-            originalContent = try await contentService.fetchTextFile(for: skill, relativePath: path)
+            let fetchedContent = try await contentService.fetchTextFile(for: skill, relativePath: path)
+            if fileKind == .markdown {
+                rawOriginalMarkdown = fetchedContent
+                let parsed = MarkdownFrontmatterParser.parse(fetchedContent)
+                originalDescription = parsed.frontmatterDescription
+                originalContent = parsed.body
+            } else {
+                originalContent = fetchedContent
+            }
         } catch {
             originalContent = ""
             errorMessage = error.localizedDescription
@@ -119,12 +140,14 @@ final class SkillDetailViewModel {
 
         do {
             let translated = try await translationService.translate(
-                markdown: originalContent,
+                markdown: rawOriginalMarkdown,
                 skillID: skill.id,
                 relativePath: activePath,
                 settings: settings
             )
-            translatedContent = translated
+            let parsed = MarkdownFrontmatterParser.parse(translated)
+            translatedDescription = parsed.frontmatterDescription
+            translatedContent = parsed.body
             isShowingTranslated = true
         } catch {
             errorMessage = error.localizedDescription

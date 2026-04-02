@@ -13,6 +13,7 @@
 		0A6FBFE85C854EFE46A10A9F /* SkillCatalogRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736C28816247E99C57916CB6 /* SkillCatalogRepositoryTests.swift */; };
 		0B46AFF27437E992DA10F35B /* SkillDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C455AC362EBB04EAE0ECE6E /* SkillDetailViewModel.swift */; };
 		0C88BC910C4F352A99406C57 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C7FD5F5E1B150CAE01E6BF /* EmptyStateView.swift */; };
+		1B2F774A4644F148BFD965AE /* MarkdownFrontmatterParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818A491FE67F06FD8F321CCC /* MarkdownFrontmatterParserTests.swift */; };
 		2294B575D8A1B8F7B0F56FB3 /* SkillListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F122E9AA54D38F9BBEFFF123 /* SkillListViewModel.swift */; };
 		2DAB7D5A210FDBB6E030036F /* OpenAICompatibleTranslationRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F4C730F5C234CE37B11A4 /* OpenAICompatibleTranslationRepositoryTests.swift */; };
 		30FC5084F769B7D93E1A7DCF /* SkillDirectoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090D7267E694FD2EA44BE7AC /* SkillDirectoryEntry.swift */; };
@@ -27,6 +28,7 @@
 		735DAFD2D6EF8C07EF655480 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 851606F96BC85C62B7BE8FB3 /* HTTPClient.swift */; };
 		77FCE99FFA451CE17B130179 /* FavoritesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BC0490574FFDDEC9CBDF11 /* FavoritesStoreTests.swift */; };
 		7BD689746926490B0BDCAC56 /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65521201A7BC78895A1D5846 /* MockURLProtocol.swift */; };
+		7C96AF9D84F3178FF0CC775B /* ParsedMarkdownDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE271A9853140EE6260D7964 /* ParsedMarkdownDocument.swift */; };
 		8D37B2EA936E1B338364E0FD /* Skill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89969F5901D74B214D92CF59 /* Skill.swift */; };
 		9773672E6164C62253B3C1B3 /* SkillQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAE919A4D23D96D3AF30230 /* SkillQuery.swift */; };
 		97B339C57226FF2679090244 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911D5F4A50B56B275C62D648 /* SettingsView.swift */; };
@@ -72,6 +74,7 @@
 		6AE79DCF198A8C744463205C /* SkillCatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCatalogService.swift; sourceTree = "<group>"; };
 		736C28816247E99C57916CB6 /* SkillCatalogRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCatalogRepositoryTests.swift; sourceTree = "<group>"; };
 		759D3D1AC6696F40B7DA30AB /* YouSkillApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouSkillApp.swift; sourceTree = "<group>"; };
+		818A491FE67F06FD8F321CCC /* MarkdownFrontmatterParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFrontmatterParserTests.swift; sourceTree = "<group>"; };
 		818D638749C1F99A1A99A68E /* GitHubContentRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubContentRepositoryTests.swift; sourceTree = "<group>"; };
 		851606F96BC85C62B7BE8FB3 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		861F0B1BF6D728817CE5FD5C /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
@@ -83,15 +86,16 @@
 		A1C7FD5F5E1B150CAE01E6BF /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		A1E44FFE6A1CB43E22BEB18A /* OpenAICompatibleTranslationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAICompatibleTranslationRepository.swift; sourceTree = "<group>"; };
 		AA455691FCDC4EF941E60D96 /* SkillCatalogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCatalogRepository.swift; sourceTree = "<group>"; };
+		BE271A9853140EE6260D7964 /* ParsedMarkdownDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsedMarkdownDocument.swift; sourceTree = "<group>"; };
 		BEB18BF57F306ADF27CD4263 /* CodeContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeContentView.swift; sourceTree = "<group>"; };
 		BF913DBB882CD882E21A8D30 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
-		DCB0551558FC0B909AD91227 /* YouSkillTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = YouSkillTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCB0551558FC0B909AD91227 /* YouSkillTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = file; name = YouSkillTests.xctest; path = YouSkill.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E47066EBB05D95FF45C89206 /* SkillDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillDetailView.swift; sourceTree = "<group>"; };
 		E5B4E4184BCC942CDF469237 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ED2CFCD0D4D755A2E8976016 /* LocalStores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStores.swift; sourceTree = "<group>"; };
 		EFAE919A4D23D96D3AF30230 /* SkillQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillQuery.swift; sourceTree = "<group>"; };
 		F122E9AA54D38F9BBEFFF123 /* SkillListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillListViewModel.swift; sourceTree = "<group>"; };
-		FE4054C7686DE3CA6FBD9193 /* YouSkill.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = YouSkill.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE4054C7686DE3CA6FBD9193 /* YouSkill.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YouSkill.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -138,6 +142,7 @@
 		640D8C99C59050FA2BBFDBC9 /* Types */ = {
 			isa = PBXGroup;
 			children = (
+				BE271A9853140EE6260D7964 /* ParsedMarkdownDocument.swift */,
 				89969F5901D74B214D92CF59 /* Skill.swift */,
 				090D7267E694FD2EA44BE7AC /* SkillDirectoryEntry.swift */,
 				EFAE919A4D23D96D3AF30230 /* SkillQuery.swift */,
@@ -180,6 +185,7 @@
 				93BC0490574FFDDEC9CBDF11 /* FavoritesStoreTests.swift */,
 				818D638749C1F99A1A99A68E /* GitHubContentRepositoryTests.swift */,
 				E5B4E4184BCC942CDF469237 /* Info.plist */,
+				818A491FE67F06FD8F321CCC /* MarkdownFrontmatterParserTests.swift */,
 				1F9F4C730F5C234CE37B11A4 /* OpenAICompatibleTranslationRepositoryTests.swift */,
 				736C28816247E99C57916CB6 /* SkillCatalogRepositoryTests.swift */,
 			);
@@ -321,8 +327,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 2600;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 24B879E6427E15AD79BF4E00 /* Build configuration list for PBXProject "YouSkill" */;
 			developmentRegion = en;
@@ -351,6 +355,7 @@
 			files = (
 				77FCE99FFA451CE17B130179 /* FavoritesStoreTests.swift in Sources */,
 				E48B8E60AB7CBB962AD02F87 /* GitHubContentRepositoryTests.swift in Sources */,
+				1B2F774A4644F148BFD965AE /* MarkdownFrontmatterParserTests.swift in Sources */,
 				7BD689746926490B0BDCAC56 /* MockURLProtocol.swift in Sources */,
 				2DAB7D5A210FDBB6E030036F /* OpenAICompatibleTranslationRepositoryTests.swift in Sources */,
 				0A6FBFE85C854EFE46A10A9F /* SkillCatalogRepositoryTests.swift in Sources */,
@@ -373,6 +378,7 @@
 				F30E5111395C259DB563CF58 /* LocalStores.swift in Sources */,
 				68BE7BA206B283F51E2641AC /* MarkdownContentView.swift in Sources */,
 				3452A6E3C459BE750A04A092 /* OpenAICompatibleTranslationRepository.swift in Sources */,
+				7C96AF9D84F3178FF0CC775B /* ParsedMarkdownDocument.swift in Sources */,
 				3C4B4B0B983FD7EEE3D1D977 /* PlatformViewModifiers.swift in Sources */,
 				07AEFE5D2F5A0F9808D37471 /* RootView.swift in Sources */,
 				97B339C57226FF2679090244 /* SettingsView.swift in Sources */,
@@ -426,6 +432,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = HC438T2B8P;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -508,6 +515,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = HC438T2B8P;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

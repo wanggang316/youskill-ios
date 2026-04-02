@@ -117,7 +117,10 @@ struct SkillDetailView: View {
             } else {
                 switch viewModel.fileKind {
                 case .markdown:
-                    MarkdownContentView(markdown: viewModel.displayedContent)
+                    MarkdownContentView(
+                        description: viewModel.displayedDescription,
+                        markdown: viewModel.displayedContent
+                    )
                 case .code:
                     CodeContentView(content: viewModel.displayedContent)
                 case .image:
