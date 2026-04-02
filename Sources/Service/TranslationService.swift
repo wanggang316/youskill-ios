@@ -14,7 +14,7 @@ struct TranslationService: Sendable {
 
     func validate(settings: TranslationSettings) async throws -> String {
         guard settings.isComplete else {
-            throw HTTPClientError.emptyResponse
+            throw TranslationRepositoryError.incompleteSettings
         }
         return try await repository.validate(settings: settings)
     }

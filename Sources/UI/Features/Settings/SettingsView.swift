@@ -135,9 +135,9 @@ private struct ModelSettingsView: View {
 
         do {
             let result = try await translationService.validate(settings: draft)
-            checkState = .success("检测成功：\(result)")
+            checkState = .success(result)
         } catch {
-            checkState = .failure(error.localizedDescription)
+            checkState = .failure(TranslationValidationErrorFormatter.message(for: error))
         }
     }
 }

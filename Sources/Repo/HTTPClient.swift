@@ -30,9 +30,31 @@ struct HTTPClient: Sendable {
             throw HTTPClientError.invalidResponse
         }
         guard 200 ..< 300 ~= httpResponse.statusCode else {
-            let message = String(data: data, encoding: .utf8) ?? ""
+            let message = extractErrorMessage(from: data)
             throw HTTPClientError.badStatusCode(httpResponse.statusCode, message)
         }
         return data
     }
+
+    private func extractErrorMessage(from data: Data) -> String {
+        if let parsed = try? JSONDecoder().decode(ErrorEnvelope.self, from: data) {
+            if let nested = parsed.error?.message, !nested.isEmpty {
+                return nested
+            }
+            if let message = parsed.message, !message.isEmpty {
+                return message
+            }
+        }
+
+        return String(data: data, encoding: .utf8) ?? ""
+    }
+}
+
+private struct ErrorEnvelope: Decodable {
+    struct APIError: Decodable {
+        let message: String?
+    }
+
+    let error: APIError?
+    let message: String?
 }

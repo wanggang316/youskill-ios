@@ -5,6 +5,20 @@ protocol TranslationRepositoryProtocol: Sendable {
     func translate(markdown: String, settings: TranslationSettings) async throws -> String
 }
 
+enum TranslationRepositoryError: LocalizedError, Equatable {
+    case incompleteSettings
+    case modelNotFound(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .incompleteSettings:
+            "请先填写 BASE_URL、API_KEY 和 Model。"
+        case let .modelNotFound(model):
+            "在当前服务端未找到模型 `\(model)`。"
+        }
+    }
+}
+
 private struct ChatCompletionRequest: Codable {
     struct Message: Codable {
         let role: String
@@ -65,6 +79,14 @@ private struct ChatCompletionResponse: Decodable {
     let choices: [Choice]
 }
 
+private struct ModelListResponse: Decodable {
+    struct ModelSummary: Decodable {
+        let id: String
+    }
+
+    let data: [ModelSummary]
+}
+
 struct OpenAICompatibleTranslationRepository: TranslationRepositoryProtocol, Sendable {
     private let httpClient: HTTPClient
 
@@ -73,8 +95,39 @@ struct OpenAICompatibleTranslationRepository: TranslationRepositoryProtocol, Sen
     }
 
     func validate(settings: TranslationSettings) async throws -> String {
+        do {
+            let modelListRequest = try makeRequest(
+                settings: settings,
+                endpoint: .models,
+                timeoutInterval: 15
+            )
+            let models = try await send(modelListRequest, as: ModelListResponse.self)
+            let matchesSelectedModel = models.data.contains {
+                $0.id.compare(settings.trimmedModel, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame
+            }
+
+            guard matchesSelectedModel else {
+                throw TranslationRepositoryError.modelNotFound(settings.trimmedModel)
+            }
+
+            return "检测成功，模型可用。"
+        } catch let error as TranslationRepositoryError {
+            throw error
+        } catch let error as HTTPClientError {
+            switch error {
+            case let .badStatusCode(code, _) where [404, 405, 501].contains(code):
+                break
+            default:
+                throw error
+            }
+        } catch is DecodingError {
+            // Some OpenAI-compatible providers do not expose a standard /models response.
+        }
+
         let request = try makeRequest(
             settings: settings,
+            endpoint: .chatCompletions,
+            timeoutInterval: 20,
             messages: [
                 .init(role: "system", content: "You verify API connectivity. Reply with OK."),
                 .init(role: "user", content: "Reply with the single word OK.")
@@ -82,18 +135,20 @@ struct OpenAICompatibleTranslationRepository: TranslationRepositoryProtocol, Sen
             maxTokens: 8
         )
 
-        let response = try await send(request)
+        let response = try await send(request, as: ChatCompletionResponse.self)
         guard let content = response.choices.first?.message.content.trimmingCharacters(in: .whitespacesAndNewlines),
               !content.isEmpty else {
             throw HTTPClientError.emptyResponse
         }
-        return content
+        return "检测成功，响应正常。"
     }
 
     func translate(markdown: String, settings: TranslationSettings) async throws -> String {
         let language = settings.targetLanguage.promptValue
         let request = try makeRequest(
             settings: settings,
+            endpoint: .chatCompletions,
+            timeoutInterval: 90,
             messages: [
                 .init(
                     role: "system",
@@ -109,7 +164,7 @@ struct OpenAICompatibleTranslationRepository: TranslationRepositoryProtocol, Sen
             maxTokens: 4000
         )
 
-        let response = try await send(request)
+        let response = try await send(request, as: ChatCompletionResponse.self)
         guard let translated = response.choices.first?.message.content.trimmingCharacters(in: .whitespacesAndNewlines),
               !translated.isEmpty else {
             throw HTTPClientError.emptyResponse
@@ -119,39 +174,93 @@ struct OpenAICompatibleTranslationRepository: TranslationRepositoryProtocol, Sen
 
     private func makeRequest(
         settings: TranslationSettings,
-        messages: [ChatCompletionRequest.Message],
-        maxTokens: Int
+        endpoint: Endpoint,
+        timeoutInterval: TimeInterval,
+        messages: [ChatCompletionRequest.Message]? = nil,
+        maxTokens: Int? = nil
     ) throws -> URLRequest {
+        let url = try makeEndpoint(settings: settings, endpoint: endpoint)
+        var request = URLRequest(url: url)
+        request.httpMethod = endpoint.httpMethod
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(settings.trimmedAPIKey)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = timeoutInterval
+
+        if url.host?.contains("openrouter.ai") == true {
+            request.setValue(AppConfiguration.githubURL.absoluteString, forHTTPHeaderField: "HTTP-Referer")
+            request.setValue("YouSkill iOS", forHTTPHeaderField: "X-Title")
+        }
+
+        if endpoint == .chatCompletions {
+            let body = ChatCompletionRequest(
+                model: settings.trimmedModel,
+                messages: messages ?? [],
+                temperature: 0,
+                maxTokens: maxTokens ?? 8
+            )
+            request.httpBody = try JSONEncoder().encode(body)
+        }
+
+        return request
+    }
+
+    private func makeEndpoint(settings: TranslationSettings, endpoint: Endpoint) throws -> URL {
         let trimmedBaseURL = settings.trimmedBaseURL.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         guard let baseURL = URL(string: trimmedBaseURL) else {
             throw URLError(.badURL)
         }
 
-        let endpoint: URL
-        if baseURL.absoluteString.hasSuffix("/chat/completions") {
-            endpoint = baseURL
+        let normalizedPath = baseURL.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        let rootPath: String
+        if normalizedPath.hasSuffix("chat/completions") {
+            rootPath = String(normalizedPath.dropLast("chat/completions".count)).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        } else if normalizedPath.hasSuffix("models") {
+            rootPath = String(normalizedPath.dropLast("models".count)).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         } else {
-            endpoint = baseURL.appending(path: "chat/completions")
+            rootPath = normalizedPath
         }
 
-        let body = ChatCompletionRequest(
-            model: settings.trimmedModel,
-            messages: messages,
-            temperature: 0,
-            maxTokens: maxTokens
-        )
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
+        let joinedPath = [rootPath, endpoint.path]
+            .filter { !$0.isEmpty }
+            .joined(separator: "/")
+        components?.path = "/" + joinedPath
+        components?.query = nil
+        components?.fragment = nil
 
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("Bearer \(settings.trimmedAPIKey)", forHTTPHeaderField: "Authorization")
-        request.httpBody = try JSONEncoder().encode(body)
-        return request
+        guard let url = components?.url else {
+            throw URLError(.badURL)
+        }
+
+        return url
     }
 
-    private func send(_ request: URLRequest) async throws -> ChatCompletionResponse {
+    private func send<Response: Decodable>(_ request: URLRequest, as responseType: Response.Type) async throws -> Response {
         let data = try await httpClient.send(request)
-        return try JSONDecoder().decode(ChatCompletionResponse.self, from: data)
+        return try JSONDecoder().decode(Response.self, from: data)
+    }
+}
+
+private enum Endpoint {
+    case chatCompletions
+    case models
+
+    var path: String {
+        switch self {
+        case .chatCompletions:
+            "chat/completions"
+        case .models:
+            "models"
+        }
+    }
+
+    var httpMethod: String {
+        switch self {
+        case .chatCompletions:
+            "POST"
+        case .models:
+            "GET"
+        }
     }
 }
