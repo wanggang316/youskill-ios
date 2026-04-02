@@ -81,10 +81,16 @@ struct CodeContentView: View {
     private func renderHighlightedContent() async {
         let highlighter = Highlight()
         do {
+            let highlighted: AttributedString
             if let highlightLanguage {
-                highlightedContent = try await highlighter.attributedText(content, language: highlightLanguage)
+                highlighted = try await highlighter.attributedText(content, language: highlightLanguage)
             } else {
-                highlightedContent = try await highlighter.attributedText(content)
+                highlighted = try await highlighter.attributedText(content)
+            }
+            if highlighted.characters.isEmpty {
+                highlightedContent = nil
+            } else {
+                highlightedContent = highlighted
             }
         } catch {
             highlightedContent = nil
