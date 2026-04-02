@@ -1,4 +1,33 @@
-.build/
-DerivedData/
+# macOS metadata
+.DS_Store
+
+# Xcode user-specific files
 xcuserdata/
+**/xcuserdata/
 *.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Build products
+DerivedData/
+build/
+.build/
+
+# Swift Package Manager
+.swiftpm/
+Packages/
+
+# Coverage and profiling
+*.profdata
+*.xccovreport
+*.xccovarchive
+
+# Common iOS dependency managers
+Carthage/Build/
+Pods/
+
+# fastlane artifacts
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
