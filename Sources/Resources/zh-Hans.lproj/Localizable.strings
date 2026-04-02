@@ -49,13 +49,15 @@
 "settings.base_url" = "BASE_URL";
 "settings.check" = "检测";
 "settings.checking" = "正在检测配置…";
-"settings.github" = "GitHub";
+"settings.website" = "官网";
+"settings.source_code" = "项目源码";
+"settings.desktop_app" = "YouSkill 桌面端";
 "settings.model" = "Model";
 "settings.model_settings.title" = "翻译模型";
 "settings.openai_compatible" = "OpenAI-compatible";
 "settings.section.about" = "关于";
 "settings.section.general" = "通用";
-"settings.section.model" = "模型设置";
+"settings.section.model" = "翻译设置";
 "settings.target_language" = "目标语言";
 "settings.title" = "设置";
 "settings.translation_model" = "翻译模型";

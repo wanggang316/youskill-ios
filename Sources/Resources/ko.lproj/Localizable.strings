@@ -49,13 +49,15 @@
 "settings.base_url" = "BASE_URL";
 "settings.check" = "검사";
 "settings.checking" = "설정을 검사하는 중…";
-"settings.github" = "GitHub";
+"settings.website" = "공식 사이트";
+"settings.source_code" = "소스 코드";
+"settings.desktop_app" = "YouSkill 데스크톱";
 "settings.model" = "Model";
 "settings.model_settings.title" = "번역 모델";
 "settings.openai_compatible" = "OpenAI-compatible";
 "settings.section.about" = "정보";
 "settings.section.general" = "일반";
-"settings.section.model" = "모델 설정";
+"settings.section.model" = "번역 설정";
 "settings.target_language" = "목표 언어";
 "settings.title" = "설정";
 "settings.translation_model" = "번역 모델";

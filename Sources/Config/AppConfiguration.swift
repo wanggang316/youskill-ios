@@ -3,8 +3,10 @@ import Foundation
 enum AppConfiguration {
     static let apiBaseURL = URL(string: "https://api.youskill.cc")!
     static let skillsAPIKey = "4586a151c7950fa482a099dfa916ff9d616d02d9f10e710c31819607aabb9fff"
-    static let githubURL = URL(string: "https://github.com/wanggang316/youskill-ios")!
-    static let bundleIdentifier = "cc.youskill.app"
+    static let websiteURL = URL(string: "https://youskill.cc")!
+    static let githubURL = URL(string: "https://github.com/wanggang316/you-skill-ios")!
+    static let desktopGithubURL = URL(string: "https://github.com/wanggang316/you-skill")!
+    static let bundleIdentifier = "com.gumpw.youskill"
 
     static var versionDescription: String {
         let info = Bundle.main.infoDictionary

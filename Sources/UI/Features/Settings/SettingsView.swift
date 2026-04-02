@@ -32,7 +32,7 @@ private struct SettingsFormView: View {
 
     var body: some View {
         Form {
-            Section(L10n.string("settings.section.general")) {
+            Section {
                 Picker(L10n.string("settings.app_language"), selection: Binding(
                     get: { settingsStore.appLanguage },
                     set: { settingsStore.updateAppLanguage($0) }
@@ -41,9 +41,11 @@ private struct SettingsFormView: View {
                         Text(language.localizedTitle).tag(language)
                     }
                 }
+            } header: {
+                sectionHeader(L10n.string("settings.section.general"))
             }
 
-            Section(L10n.string("settings.section.model")) {
+            Section {
                 NavigationLink(L10n.string("settings.translation_model")) {
                     ModelSettingsView(
                         settingsStore: container.settingsStore,
@@ -59,17 +61,44 @@ private struct SettingsFormView: View {
                         Text(language.localizedTitle).tag(language)
                     }
                 }
+            } header: {
+                sectionHeader(L10n.string("settings.section.model"))
             }
 
-            Section(L10n.string("settings.section.about")) {
-                Link(destination: AppConfiguration.githubURL) {
-                    Label(L10n.string("settings.github"), systemImage: "link")
-                }
+            Section {
+                externalLink(
+                    L10n.string("settings.website"),
+                    icon: { Image(systemName: "globe") },
+                    url: AppConfiguration.websiteURL
+                )
+
 
                 LabeledContent(L10n.string("settings.version"), value: AppConfiguration.versionDescription)
+            } header: {
+                sectionHeader(L10n.string("settings.section.about"))
             }
         }
     }
+}
+
+private func sectionHeader(_ title: String) -> some View {
+    Text(title)
+        .font(.subheadline)
+        .fontWeight(.regular)
+        .textCase(nil)
+}
+
+private func externalLink<Icon: View>(_ title: String, icon: @Sendable () -> Icon, url: URL) -> some View {
+    Link(destination: url) {
+        HStack {
+            Label { Text(title) } icon: { icon() }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Color(.tertiaryLabel))
+        }
+    }
+    .foregroundStyle(.primary)
 }
 
 private struct ModelSettingsView: View {

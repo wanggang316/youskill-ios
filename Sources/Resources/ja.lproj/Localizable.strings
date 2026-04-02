@@ -49,13 +49,15 @@
 "settings.base_url" = "BASE_URL";
 "settings.check" = "検証";
 "settings.checking" = "設定を検証中…";
-"settings.github" = "GitHub";
+"settings.website" = "公式サイト";
+"settings.source_code" = "ソースコード";
+"settings.desktop_app" = "YouSkill デスクトップ版";
 "settings.model" = "Model";
 "settings.model_settings.title" = "翻訳モデル";
 "settings.openai_compatible" = "OpenAI-compatible";
 "settings.section.about" = "情報";
 "settings.section.general" = "一般";
-"settings.section.model" = "モデル設定";
+"settings.section.model" = "翻訳設定";
 "settings.target_language" = "翻訳先言語";
 "settings.title" = "設定";
 "settings.translation_model" = "翻訳モデル";

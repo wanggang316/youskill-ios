@@ -40,7 +40,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: HC438T2B8P
-        CODE_SIGN_IDENTITY[sdk=iphoneos*]: Apple Development
+        CODE_SIGN_IDENTITY[sdk=iphoneos*]: Apple Distribution
         TARGETED_DEVICE_FAMILY: "1"
     sources:
       - path: Sources

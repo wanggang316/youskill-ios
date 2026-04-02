@@ -47,6 +47,7 @@
 		B5C4A5440ACEC6F706711D64 /* DiskCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3825FFA8D5A50FF2275B6DC0 /* DiskCache.swift */; };
 		B6CD0D66A549BF86DC024D87 /* AppSettingsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 986B38B1022ECC189222AC1E /* AppSettingsStoreTests.swift */; };
 		B8ED8901737D89486E351837 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 774B6C132F31A5B3856ABDF5 /* MarkdownUI */; };
+		C943244A30E576BF83386716 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E3350BE47569A8F0F6C83A78 /* PrivacyInfo.xcprivacy */; };
 		D02F394FA1A8B4EBA82F184F /* SkillFileRenderingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A14C9C626C4D640ED21B831 /* SkillFileRenderingTests.swift */; };
 		D04BCC59695822C41D8B20C9 /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF913DBB882CD882E21A8D30 /* AppContainer.swift */; };
 		D2FB1C3B3133EB02335B1D8A /* TranslationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0973DC8F51D5234BCD7A9AE1 /* TranslationService.swift */; };
@@ -115,14 +116,15 @@
 		C7524C3E31356E871583876B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C7D4AEFF6029F7E209247B61 /* LocalizedDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedDisplay.swift; sourceTree = "<group>"; };
 		D05776CB8729D838A66D38AA /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
-		DCB0551558FC0B909AD91227 /* YouSkillTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = YouSkillTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCB0551558FC0B909AD91227 /* YouSkillTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = file; name = YouSkillTests.xctest; path = YouSkill.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E30C59A8DB95794444FA8746 /* TranslationValidationErrorFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationValidationErrorFormatter.swift; sourceTree = "<group>"; };
+		E3350BE47569A8F0F6C83A78 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E47066EBB05D95FF45C89206 /* SkillDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillDetailView.swift; sourceTree = "<group>"; };
 		E5B4E4184BCC942CDF469237 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		ED2CFCD0D4D755A2E8976016 /* LocalStores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStores.swift; sourceTree = "<group>"; };
 		EFAE919A4D23D96D3AF30230 /* SkillQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillQuery.swift; sourceTree = "<group>"; };
 		F122E9AA54D38F9BBEFFF123 /* SkillListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillListViewModel.swift; sourceTree = "<group>"; };
-		FE4054C7686DE3CA6FBD9193 /* YouSkill.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = YouSkill.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE4054C7686DE3CA6FBD9193 /* YouSkill.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YouSkill.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -215,6 +217,7 @@
 			isa = PBXGroup;
 			children = (
 				9F5AE37559D1C0028EFDC222 /* Info.plist */,
+				E3350BE47569A8F0F6C83A78 /* PrivacyInfo.xcprivacy */,
 				759D3D1AC6696F40B7DA30AB /* YouSkillApp.swift */,
 			);
 			path = App;
@@ -389,12 +392,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 2600;
-				TargetAttributes = {
-					85DAE59FA7B7D174B6AC2E03 = {
-						DevelopmentTeam = HC438T2B8P;
-						ProvisioningStyle = Automatic;
-					};
-				};
 			};
 			buildConfigurationList = 24B879E6427E15AD79BF4E00 /* Build configuration list for PBXProject "YouSkill" */;
 			developmentRegion = en;
@@ -430,6 +427,7 @@
 			files = (
 				92647D4AE1FF807F1E7FD60F /* Assets.xcassets in Resources */,
 				540786074A9379E31415D0F6 /* Localizable.strings in Resources */,
+				C943244A30E576BF83386716 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -545,9 +543,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HC438T2B8P;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = HC438T2B8P;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -555,6 +554,8 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.gumpw.youskill;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "youskill-ios-dev";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -627,9 +628,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HC438T2B8P;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = HC438T2B8P;
 				INFOPLIST_FILE = Sources/App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -637,6 +639,8 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.gumpw.youskill;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "youskill-ios-dev";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
