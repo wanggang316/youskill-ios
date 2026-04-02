@@ -9,9 +9,15 @@ let package = Package(
     products: [
         .library(name: "YouSkill", targets: ["YouSkill"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/gonzalezreal/swift-markdown-ui", from: "2.4.1")
+    ],
     targets: [
         .target(
             name: "YouSkill",
+            dependencies: [
+                .product(name: "MarkdownUI", package: "swift-markdown-ui")
+            ],
             path: "Sources",
             exclude: ["App"],
             sources: ["Config", "Repo", "Runtime", "Service", "Types", "UI"]

@@ -35,6 +35,7 @@
 		97BE8E83ADA59C10F7BB9734 /* GitHubContentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F819D471EE138E2777A8B3 /* GitHubContentRepository.swift */; };
 		AA11AC25F3A49CB639547E50 /* SkillCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55511A2184C00DC81B764CCB /* SkillCard.swift */; };
 		B5C4A5440ACEC6F706711D64 /* DiskCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3825FFA8D5A50FF2275B6DC0 /* DiskCache.swift */; };
+		B8ED8901737D89486E351837 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 774B6C132F31A5B3856ABDF5 /* MarkdownUI */; };
 		D04BCC59695822C41D8B20C9 /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF913DBB882CD882E21A8D30 /* AppContainer.swift */; };
 		D2FB1C3B3133EB02335B1D8A /* TranslationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0973DC8F51D5234BCD7A9AE1 /* TranslationService.swift */; };
 		D3DF950E4F622270D176800E /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861F0B1BF6D728817CE5FD5C /* AppTheme.swift */; };
@@ -97,6 +98,17 @@
 		F122E9AA54D38F9BBEFFF123 /* SkillListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillListViewModel.swift; sourceTree = "<group>"; };
 		FE4054C7686DE3CA6FBD9193 /* YouSkill.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = YouSkill.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AAD83888C0737CDFC18C0794 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8ED8901737D89486E351837 /* MarkdownUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		01B7D4E92C364D677C2F3194 /* Components */ = {
@@ -307,6 +319,7 @@
 			buildConfigurationList = 7A4C974D57C20C0C6AD67A18 /* Build configuration list for PBXNativeTarget "YouSkill" */;
 			buildPhases = (
 				D254F7223785EC57FEB616F6 /* Sources */,
+				AAD83888C0737CDFC18C0794 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -314,6 +327,7 @@
 			);
 			name = YouSkill;
 			packageProductDependencies = (
+				774B6C132F31A5B3856ABDF5 /* MarkdownUI */,
 			);
 			productName = YouSkill;
 			productReference = FE4054C7686DE3CA6FBD9193 /* YouSkill.app */;
@@ -343,6 +357,9 @@
 			);
 			mainGroup = 02CBD97B3DB56DA7B86EB336;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				417E1D75036D1A55070DE57A /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F8589CA258AD9FD920C73E55 /* Products */;
 			projectDirPath = "";
@@ -658,6 +675,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		417E1D75036D1A55070DE57A /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		774B6C132F31A5B3856ABDF5 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 417E1D75036D1A55070DE57A /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3F75F054946D9828926146AE /* Project object */;
 }

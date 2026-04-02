@@ -8,6 +8,11 @@ options:
   groupSortPosition: top
   createIntermediateGroups: true
 
+packages:
+  MarkdownUI:
+    url: https://github.com/gonzalezreal/swift-markdown-ui
+    from: 2.4.1
+
 settings:
   base:
     PRODUCT_NAME: YouSkill
@@ -24,6 +29,8 @@ targets:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
+    dependencies:
+      - package: MarkdownUI
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill

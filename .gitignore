@@ -16,6 +16,7 @@ build/
 # Swift Package Manager
 .swiftpm/
 Packages/
+.xcode-source-packages/
 
 # Coverage and profiling
 *.profdata

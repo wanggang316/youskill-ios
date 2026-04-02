@@ -1,8 +1,10 @@
+import MarkdownUI
 import SwiftUI
 
 struct MarkdownContentView: View {
     let description: String?
     let markdown: String
+    let baseURL: URL?
 
     var body: some View {
         ScrollView {
@@ -17,17 +19,9 @@ struct MarkdownContentView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
 
-                if let attributed = try? AttributedString(
-                    markdown: markdown,
-                    options: AttributedString.MarkdownParsingOptions(
-                        interpretedSyntax: .full,
-                        failurePolicy: .returnPartiallyParsedIfPossible
-                    )
-                ) {
-                    Text(attributed)
-                } else {
-                    Text(markdown)
-                }
+                Markdown(markdown, baseURL: baseURL, imageBaseURL: baseURL)
+                    .markdownTheme(.gitHub)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             .font(.body)
             .frame(maxWidth: .infinity, alignment: .leading)

@@ -119,7 +119,8 @@ struct SkillDetailView: View {
                 case .markdown:
                     MarkdownContentView(
                         description: viewModel.displayedDescription,
-                        markdown: viewModel.displayedContent
+                        markdown: viewModel.displayedContent,
+                        baseURL: viewModel.rawFileURL?.deletingLastPathComponent()
                     )
                 case .code:
                     CodeContentView(content: viewModel.displayedContent)
