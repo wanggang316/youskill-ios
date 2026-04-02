@@ -1,0 +1,89 @@
+"app_language.system" = "システムに従う";
+"app_language.zh_hans" = "简体中文";
+"app_language.en" = "English";
+"app_language.ja" = "日本語";
+"app_language.ko" = "한국어";
+
+"common.cancel" = "キャンセル";
+"common.done" = "完了";
+"common.retry" = "再試行";
+"common.save" = "保存";
+"common.unknown" = "不明";
+
+"detail.content_load_failed" = "コンテンツを読み込めませんでした";
+"detail.directory" = "目次";
+"detail.file_label" = "ファイル";
+"detail.go_to_settings" = "設定へ";
+"detail.image_load_failed" = "画像を読み込めませんでした";
+"detail.image_load_failed_message" = "現在この画像はプレビューできません。";
+"detail.image_unavailable" = "画像を利用できません";
+"detail.image_unavailable_message" = "しばらくしてからもう一度お試しください。";
+"detail.no_files_message" = "この Skill には表示できるファイルがありません。";
+"detail.no_files_title" = "ファイルがありません";
+"detail.no_readable_files" = "この Skill には読めるファイルがありません。";
+"detail.open_source" = "ソースファイルを開く";
+"detail.read_failed" = "読み込みに失敗しました";
+"detail.translation_required_message" = "翻訳するには BASE_URL、API_KEY、Model を入力する必要があります。";
+"detail.translation_required_title" = "先に翻訳モデルを設定してください";
+"detail.type_label" = "種類";
+"detail.unsupported.message" = "このファイル形式用のビューアはまだありません。ソースファイルを開いて元の内容を確認できます。";
+"detail.unsupported.title" = "このファイルは直接プレビューできません";
+
+"filter.favorites.description" = "お気に入り登録した Skill のみを表示します";
+"filter.install_count.description" = "インストール数の多い Skill を優先して表示します";
+"filter.star_count.description" = "Star 数の多い Skill を優先して表示します";
+
+"home.empty.no_favorites_message" = "気になる Skill をお気に入りに追加すると、ここに表示されます。";
+"home.empty.no_favorites_title" = "まだお気に入りがありません";
+"home.empty.no_results_message" = "短いキーワードで検索するか、並び替えを変更してください。";
+"home.empty.no_results_title" = "一致する結果がありません";
+"home.load_failed" = "Skill を読み込めませんでした";
+"home.search_placeholder" = "Skill を検索";
+
+"http.bad_status" = "リクエストに失敗しました。ステータスコード: %ld。";
+"http.empty_response" = "サーバーから空のレスポンスが返されました。";
+"http.invalid_response" = "サーバーから無効なレスポンスが返されました。";
+
+"settings.api_key" = "API_KEY";
+"settings.app_language" = "アプリの言語";
+"settings.base_url" = "BASE_URL";
+"settings.check" = "検証";
+"settings.checking" = "設定を検証中…";
+"settings.github" = "GitHub";
+"settings.model" = "Model";
+"settings.model_settings.title" = "翻訳モデル";
+"settings.openai_compatible" = "OpenAI-compatible";
+"settings.section.about" = "情報";
+"settings.section.general" = "一般";
+"settings.section.model" = "モデル設定";
+"settings.target_language" = "翻訳先言語";
+"settings.title" = "設定";
+"settings.translation_model" = "翻訳モデル";
+"settings.version" = "バージョン";
+
+"skill.sort.favorites" = "お気に入り";
+"skill.sort.install_count" = "インストール順";
+"skill.sort.star_count" = "Star順";
+
+"target_language.chinese" = "中国語（簡体字）";
+"target_language.english" = "英語";
+"target_language.japanese" = "日本語";
+"target_language.korean" = "韓国語";
+
+"translation.error.incomplete_settings" = "先に BASE_URL、API Key、Model を入力してください。";
+"translation.error.model_not_found" = "モデル「%@」はこのエンドポイントでは利用できません。";
+"translation.validation.success.models" = "検証に成功しました。モデルを利用できます。";
+"translation.validation.success.response" = "検証に成功しました。エンドポイントは正常に応答しました。";
+
+"validation.bad_request" = "リクエストが正しくありません。BASE_URL と Model を確認してください。";
+"validation.cannot_connect" = "サーバーに接続できませんでした。";
+"validation.empty_response" = "サービスから空のレスポンスが返されました。";
+"validation.endpoint_not_found" = "エンドポイントが見つかりません。BASE_URL が正しいか確認してください。";
+"validation.invalid_key" = "API Key が無効か期限切れです。";
+"validation.invalid_response" = "サービスから無効なレスポンスが返されました。";
+"validation.network_lost" = "ネットワーク接続が中断されました。";
+"validation.offline" = "オフラインのようです。";
+"validation.rate_limited" = "リクエスト数が制限されました。しばらくしてから再試行してください。";
+"validation.server_error" = "サービスは一時的に利用できません（HTTP %ld）。";
+"validation.timeout" = "リクエストがタイムアウトしました。ネットワークを確認して再試行してください。";
+"validation.tls_failed" = "安全な接続を確立できませんでした。証明書やプロキシ設定を確認してください。";

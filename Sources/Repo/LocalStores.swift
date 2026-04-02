@@ -61,19 +61,21 @@ final class FavoritesStore {
 @MainActor
 @Observable
 final class AppSettingsStore {
-    private let storageKey = "translation-settings"
+    private let translationSettingsStorageKey = "translation-settings"
     private let userDefaults: UserDefaults
 
     var translationSettings: TranslationSettings
+    var appLanguage: AppLanguage
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
-        if let data = userDefaults.data(forKey: storageKey),
+        if let data = userDefaults.data(forKey: translationSettingsStorageKey),
            let decoded = try? AppJSONCoders.decoder.decode(TranslationSettings.self, from: data) {
             translationSettings = decoded
         } else {
             translationSettings = .default
         }
+        appLanguage = AppLanguage.current(userDefaults: userDefaults)
     }
 
     func update(_ settings: TranslationSettings) {
@@ -86,8 +88,13 @@ final class AppSettingsStore {
         persist()
     }
 
+    func updateAppLanguage(_ language: AppLanguage) {
+        appLanguage = language
+        userDefaults.set(language.rawValue, forKey: AppLanguage.storageKey)
+    }
+
     private func persist() {
         guard let data = try? AppJSONCoders.encoder.encode(translationSettings) else { return }
-        userDefaults.set(data, forKey: storageKey)
+        userDefaults.set(data, forKey: translationSettingsStorageKey)
     }
 }

@@ -76,7 +76,7 @@ final class SkillDetailViewModel {
             if let file = firstFile {
                 await loadFile(at: file.path)
             } else {
-                errorMessage = "当前 Skill 没有可读文件。"
+                errorMessage = L10n.string("detail.no_readable_files")
             }
         } catch {
             errorMessage = error.localizedDescription

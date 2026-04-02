@@ -30,9 +30,9 @@ struct SkillDetailView: View {
                 } else if let errorMessage = viewModel.errorMessage, viewModel.activePath == nil {
                     EmptyStateView(
                         systemImage: "exclamationmark.triangle",
-                        title: "读取失败",
+                        title: L10n.string("detail.read_failed"),
                         message: errorMessage,
-                        actionTitle: "重试",
+                        actionTitle: L10n.string("common.retry"),
                         action: { Task { await viewModel.load() } }
                     )
                 } else {
@@ -75,13 +75,13 @@ struct SkillDetailView: View {
                 .disabled(viewModel.fileTree.isEmpty)
             }
         }
-        .alert("请先配置翻译模型", isPresented: $viewModel.needsTranslationSettings) {
-            Button("去设置") {
+        .alert(L10n.string("detail.translation_required_title"), isPresented: $viewModel.needsTranslationSettings) {
+            Button(L10n.string("detail.go_to_settings")) {
                 isShowingSettings = true
             }
-            Button("取消", role: .cancel) {}
+            Button(L10n.string("common.cancel"), role: .cancel) {}
         } message: {
-            Text("需要填写 BASE_URL、API_KEY 和 Model 后才能翻译。")
+            Text(L10n.string("detail.translation_required_message"))
         }
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(container: container)
@@ -121,9 +121,9 @@ struct SkillDetailView: View {
             if let errorMessage = viewModel.errorMessage, !errorMessage.isEmpty, viewModel.activePath != nil {
                 EmptyStateView(
                     systemImage: "exclamationmark.triangle",
-                    title: "内容加载失败",
+                    title: L10n.string("detail.content_load_failed"),
                     message: errorMessage,
-                    actionTitle: "重试",
+                    actionTitle: L10n.string("common.retry"),
                     action: {
                         if let activePath = viewModel.activePath {
                             Task { await viewModel.loadFile(at: activePath) }
@@ -166,14 +166,14 @@ struct SkillDetailView: View {
                     case .failure:
                         EmptyStateView(
                             systemImage: "photo",
-                            title: "图片加载失败",
-                            message: "当前图片无法预览。"
+                            title: L10n.string("detail.image_load_failed"),
+                            message: L10n.string("detail.image_load_failed_message")
                         )
                     @unknown default:
                         EmptyStateView(
                             systemImage: "photo",
-                            title: "图片暂不可用",
-                            message: "请稍后重试。"
+                            title: L10n.string("detail.image_unavailable"),
+                            message: L10n.string("detail.image_unavailable_message")
                         )
                     }
                 }
@@ -187,29 +187,29 @@ struct SkillDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Label("暂不支持直接预览", systemImage: "doc.text.magnifyingglass")
+                    Label(L10n.string("detail.unsupported.title"), systemImage: "doc.text.magnifyingglass")
                         .font(.headline)
                         .foregroundStyle(.primary)
 
-                    Text("当前文件类型还没有预览器，你仍然可以打开源文件查看原始内容。")
+                    Text(L10n.string("detail.unsupported.message"))
                         .font(.subheadline)
                         .foregroundStyle(AppTheme.secondaryText)
                 }
 
                 if let activePath = viewModel.activePath {
-                    fileInfoRow(title: "文件", value: activePath)
+                    fileInfoRow(title: L10n.string("detail.file_label"), value: activePath)
                 }
 
                 fileInfoRow(
-                    title: "类型",
-                    value: URL(fileURLWithPath: viewModel.activePath ?? "").pathExtension.uppercased().ifEmpty("Unknown")
+                    title: L10n.string("detail.type_label"),
+                    value: URL(fileURLWithPath: viewModel.activePath ?? "").pathExtension.uppercased().ifEmpty(L10n.string("common.unknown"))
                 )
 
                 if let sourceURL = viewModel.browserFileURL ?? viewModel.rawFileURL {
                     Button {
                         openURL(sourceURL)
                     } label: {
-                        Label("打开源文件", systemImage: "arrow.up.forward.square")
+                        Label(L10n.string("detail.open_source"), systemImage: "arrow.up.forward.square")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(AppTheme.accent)
                             .padding(.horizontal, 14)

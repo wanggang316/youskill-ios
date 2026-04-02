@@ -1,0 +1,89 @@
+"app_language.system" = "Follow System";
+"app_language.zh_hans" = "Simplified Chinese";
+"app_language.en" = "English";
+"app_language.ja" = "Japanese";
+"app_language.ko" = "Korean";
+
+"common.cancel" = "Cancel";
+"common.done" = "Done";
+"common.retry" = "Retry";
+"common.save" = "Save";
+"common.unknown" = "Unknown";
+
+"detail.content_load_failed" = "Couldn't load content";
+"detail.directory" = "Catalog";
+"detail.file_label" = "File";
+"detail.go_to_settings" = "Open Settings";
+"detail.image_load_failed" = "Couldn't load image";
+"detail.image_load_failed_message" = "This image can't be previewed right now.";
+"detail.image_unavailable" = "Image unavailable";
+"detail.image_unavailable_message" = "Please try again later.";
+"detail.no_files_message" = "This skill doesn't have any files to display.";
+"detail.no_files_title" = "No files";
+"detail.no_readable_files" = "This skill doesn't have any readable files.";
+"detail.open_source" = "Open source file";
+"detail.read_failed" = "Failed to load";
+"detail.translation_required_message" = "Fill in BASE_URL, API_KEY, and Model before translating.";
+"detail.translation_required_title" = "Set up a translation model first";
+"detail.type_label" = "Type";
+"detail.unsupported.message" = "This file type doesn't have a viewer yet. You can still open the source file.";
+"detail.unsupported.title" = "Preview not available";
+
+"filter.favorites.description" = "Show only the skills you bookmarked";
+"filter.install_count.description" = "Show skills with the highest installation count first";
+"filter.star_count.description" = "Show skills with the highest star count first";
+
+"home.empty.no_favorites_message" = "Favorited skills will appear here.";
+"home.empty.no_favorites_title" = "No favorites yet";
+"home.empty.no_results_message" = "Try a shorter keyword or switch the sort.";
+"home.empty.no_results_title" = "No results";
+"home.load_failed" = "Couldn't load skills";
+"home.search_placeholder" = "Search skills";
+
+"http.bad_status" = "The request failed with status code %ld.";
+"http.empty_response" = "The server returned an empty response.";
+"http.invalid_response" = "The server returned an invalid response.";
+
+"settings.api_key" = "API_KEY";
+"settings.app_language" = "App Language";
+"settings.base_url" = "BASE_URL";
+"settings.check" = "Validate";
+"settings.checking" = "Validating...";
+"settings.github" = "GitHub";
+"settings.model" = "Model";
+"settings.model_settings.title" = "Translation Model";
+"settings.openai_compatible" = "OpenAI-compatible";
+"settings.section.about" = "About";
+"settings.section.general" = "General";
+"settings.section.model" = "Model Settings";
+"settings.target_language" = "Target Language";
+"settings.title" = "Settings";
+"settings.translation_model" = "Translation Model";
+"settings.version" = "Version";
+
+"skill.sort.favorites" = "Favorites";
+"skill.sort.install_count" = "Most Installed";
+"skill.sort.star_count" = "Most Starred";
+
+"target_language.chinese" = "Simplified Chinese";
+"target_language.english" = "English";
+"target_language.japanese" = "Japanese";
+"target_language.korean" = "Korean";
+
+"translation.error.incomplete_settings" = "Please complete BASE_URL, API Key, and Model first.";
+"translation.error.model_not_found" = "Model \"%@\" is not available on this endpoint.";
+"translation.validation.success.models" = "Validation succeeded. The model is available.";
+"translation.validation.success.response" = "Validation succeeded. The endpoint responded normally.";
+
+"validation.bad_request" = "The request is invalid. Please check BASE_URL and Model.";
+"validation.cannot_connect" = "The connection to the server could not be established.";
+"validation.empty_response" = "The service returned an empty response.";
+"validation.endpoint_not_found" = "The endpoint was not found. Check whether BASE_URL is correct.";
+"validation.invalid_key" = "The API key is invalid or has expired.";
+"validation.invalid_response" = "The service returned an invalid response.";
+"validation.network_lost" = "The network connection was interrupted.";
+"validation.offline" = "You appear to be offline.";
+"validation.rate_limited" = "The request was rate limited. Please try again later.";
+"validation.server_error" = "The service is temporarily unavailable (HTTP %ld).";
+"validation.timeout" = "The request timed out. Check your network and try again.";
+"validation.tls_failed" = "A secure connection could not be established. Check your certificate or proxy settings.";

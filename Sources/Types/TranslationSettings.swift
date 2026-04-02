@@ -8,16 +8,16 @@ enum TargetLanguage: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var titleKey: String {
         switch self {
         case .chinese:
-            "中文"
+            "target_language.chinese"
         case .english:
-            "English"
+            "target_language.english"
         case .japanese:
-            "日本語"
+            "target_language.japanese"
         case .korean:
-            "한국어"
+            "target_language.korean"
         }
     }
 

@@ -29,16 +29,20 @@ struct SkillListView: View {
                 } else if let errorMessage = viewModel.errorMessage, viewModel.displayedSkills.isEmpty {
                     EmptyStateView(
                         systemImage: "wifi.exclamationmark",
-                        title: "加载失败",
+                        title: L10n.string("home.load_failed"),
                         message: errorMessage,
-                        actionTitle: "重试",
+                        actionTitle: L10n.string("common.retry"),
                         action: { Task { await viewModel.refresh() } }
                     )
                 } else if viewModel.displayedSkills.isEmpty {
                     EmptyStateView(
                         systemImage: "magnifyingglass",
-                        title: viewModel.selectedSort == .favorites ? "还没有收藏" : "没有匹配结果",
-                        message: viewModel.selectedSort == .favorites ? "把感兴趣的 Skill 加入收藏后，会在这里集中展示。" : "试试更短的关键词或切换排序。"
+                        title: viewModel.selectedSort == .favorites
+                            ? L10n.string("home.empty.no_favorites_title")
+                            : L10n.string("home.empty.no_results_title"),
+                        message: viewModel.selectedSort == .favorites
+                            ? L10n.string("home.empty.no_favorites_message")
+                            : L10n.string("home.empty.no_results_message")
                     )
                 } else {
                     ScrollView {
@@ -74,7 +78,7 @@ struct SkillListView: View {
             .animation(.interactiveSpring(response: 0.32, dampingFraction: 0.86), value: isShowingSortDialog)
             .navigationTitle("YouSkill")
             .platformInlineNavigationTitle()
-            .searchable(text: $searchDraft, prompt: "Search skills")
+            .searchable(text: $searchDraft, prompt: L10n.string("home.search_placeholder"))
             .onSubmit(of: .search) {
                 viewModel.applySearch(searchDraft)
             }
@@ -94,7 +98,7 @@ struct SkillListView: View {
                     Button {
                         isShowingSettings = true
                     } label: {
-                        Image(systemName: "gearshape")
+                        Image(systemName: "globe")
                     }
                 }
             }

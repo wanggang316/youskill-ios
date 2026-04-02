@@ -7,14 +7,14 @@ enum SkillSortOption: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var titleKey: String {
         switch self {
         case .installCount:
-            "安装最多"
+            "skill.sort.install_count"
         case .starCount:
-            "Star 最多"
+            "skill.sort.star_count"
         case .favorites:
-            "我的收藏"
+            "skill.sort.favorites"
         }
     }
 

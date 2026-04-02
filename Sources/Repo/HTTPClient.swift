@@ -8,11 +8,11 @@ enum HTTPClientError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .invalidResponse:
-            "Invalid server response."
+            L10n.string("http.invalid_response")
         case let .badStatusCode(code, message):
-            message.isEmpty ? "Request failed with status \(code)." : message
+            message.isEmpty ? L10n.format("http.bad_status", code) : message
         case .emptyResponse:
-            "The server returned an empty response."
+            L10n.string("http.empty_response")
         }
     }
 }

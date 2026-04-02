@@ -12,9 +12,9 @@ enum TranslationRepositoryError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .incompleteSettings:
-            "请先填写 BASE_URL、API_KEY 和 Model。"
+            L10n.string("translation.error.incomplete_settings")
         case let .modelNotFound(model):
-            "在当前服务端未找到模型 `\(model)`。"
+            L10n.format("translation.error.model_not_found", model)
         }
     }
 }
@@ -110,7 +110,7 @@ struct OpenAICompatibleTranslationRepository: TranslationRepositoryProtocol, Sen
                 throw TranslationRepositoryError.modelNotFound(settings.trimmedModel)
             }
 
-            return "检测成功，模型可用。"
+            return L10n.string("translation.validation.success.models")
         } catch let error as TranslationRepositoryError {
             throw error
         } catch let error as HTTPClientError {
@@ -140,7 +140,7 @@ struct OpenAICompatibleTranslationRepository: TranslationRepositoryProtocol, Sen
               !content.isEmpty else {
             throw HTTPClientError.emptyResponse
         }
-        return "检测成功，响应正常。"
+        return L10n.string("translation.validation.success.response")
     }
 
     func translate(markdown: String, settings: TranslationSettings) async throws -> String {

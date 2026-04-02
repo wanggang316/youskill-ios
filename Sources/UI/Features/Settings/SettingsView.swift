@@ -8,11 +8,11 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             SettingsFormView(container: container)
-                .navigationTitle("设置")
+                .navigationTitle(L10n.string("settings.title"))
                 .platformInlineNavigationTitle()
                 .toolbar {
                     ToolbarItem(placement: PlatformToolbarPlacement.trailing) {
-                        Button("完成") {
+                        Button(L10n.string("common.done")) {
                             dismiss()
                         }
                     }
@@ -32,30 +32,41 @@ private struct SettingsFormView: View {
 
     var body: some View {
         Form {
-            Section("模型设置") {
-                NavigationLink("翻译模型") {
+            Section(L10n.string("settings.section.general")) {
+                Picker(L10n.string("settings.app_language"), selection: Binding(
+                    get: { settingsStore.appLanguage },
+                    set: { settingsStore.updateAppLanguage($0) }
+                )) {
+                    ForEach(AppLanguage.allCases) { language in
+                        Text(language.localizedTitle).tag(language)
+                    }
+                }
+            }
+
+            Section(L10n.string("settings.section.model")) {
+                NavigationLink(L10n.string("settings.translation_model")) {
                     ModelSettingsView(
                         settingsStore: container.settingsStore,
                         translationService: container.translationService
                     )
                 }
 
-                Picker("目标语言", selection: Binding(
+                Picker(L10n.string("settings.target_language"), selection: Binding(
                     get: { settingsStore.translationSettings.targetLanguage },
                     set: { settingsStore.updateTargetLanguage($0) }
                 )) {
                     ForEach(TargetLanguage.allCases) { language in
-                        Text(language.title).tag(language)
+                        Text(language.localizedTitle).tag(language)
                     }
                 }
             }
 
-            Section("关于") {
+            Section(L10n.string("settings.section.about")) {
                 Link(destination: AppConfiguration.githubURL) {
-                    Label("GitHub", systemImage: "link")
+                    Label(L10n.string("settings.github"), systemImage: "link")
                 }
 
-                LabeledContent("版本", value: AppConfiguration.versionDescription)
+                LabeledContent(L10n.string("settings.version"), value: AppConfiguration.versionDescription)
             }
         }
     }
@@ -77,15 +88,15 @@ private struct ModelSettingsView: View {
 
     var body: some View {
         Form {
-            Section("OpenAI-compatible") {
-                TextField("BASE_URL", text: $draft.baseURL)
+            Section(L10n.string("settings.openai_compatible")) {
+                TextField(L10n.string("settings.base_url"), text: $draft.baseURL)
                     .platformNonAutocorrectingTextInput()
                     .platformURLKeyboard()
 
-                SecureField("API_KEY", text: $draft.apiKey)
+                SecureField(L10n.string("settings.api_key"), text: $draft.apiKey)
                     .platformNonAutocorrectingTextInput()
 
-                TextField("Model", text: $draft.model)
+                TextField(L10n.string("settings.model"), text: $draft.model)
                     .platformNonAutocorrectingTextInput()
             }
 
@@ -97,7 +108,7 @@ private struct ModelSettingsView: View {
                         if checkState == .checking {
                             ProgressView()
                         }
-                        Text("检测")
+                        Text(L10n.string("settings.check"))
                     }
                 }
                 .disabled(checkState == .checking)
@@ -106,7 +117,7 @@ private struct ModelSettingsView: View {
                 case .idle:
                     EmptyView()
                 case .checking:
-                    Label("正在检测配置…", systemImage: "hourglass")
+                    Label(L10n.string("settings.checking"), systemImage: "hourglass")
                         .foregroundStyle(AppTheme.secondaryText)
                 case let .success(message):
                     Label(message, systemImage: "checkmark.circle.fill")
@@ -117,11 +128,11 @@ private struct ModelSettingsView: View {
                 }
             }
         }
-        .navigationTitle("翻译模型")
+        .navigationTitle(L10n.string("settings.model_settings.title"))
         .platformInlineNavigationTitle()
         .toolbar {
             ToolbarItem(placement: PlatformToolbarPlacement.trailing) {
-                Button("保存") {
+                Button(L10n.string("common.save")) {
                     settingsStore.update(draft)
                     dismiss()
                 }

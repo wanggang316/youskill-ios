@@ -11,33 +11,33 @@ enum TranslationValidationErrorFormatter {
             case let .badStatusCode(code, message):
                 switch code {
                 case 400:
-                    return message.isEmpty ? "请求格式无效，请检查 BASE_URL 或 Model。" : message
+                    return message.isEmpty ? L10n.string("validation.bad_request") : message
                 case 401, 403:
-                    return message.isEmpty ? "API Key 无效，或当前账号没有访问该模型的权限。" : message
+                    return message.isEmpty ? L10n.string("validation.invalid_key") : message
                 case 404:
-                    return message.isEmpty ? "接口路径不存在，请确认 BASE_URL 是否为 OpenAI-compatible 地址。" : message
+                    return message.isEmpty ? L10n.string("validation.endpoint_not_found") : message
                 case 429:
-                    return message.isEmpty ? "请求过于频繁，或当前账户额度不足。" : message
+                    return message.isEmpty ? L10n.string("validation.rate_limited") : message
                 default:
-                    return message.isEmpty ? "服务端返回错误：\(code)" : message
+                    return message.isEmpty ? L10n.format("validation.server_error", code) : message
                 }
             case .invalidResponse:
-                return "服务端响应格式异常。"
+                return L10n.string("validation.invalid_response")
             case .emptyResponse:
-                return "服务端返回了空响应。"
+                return L10n.string("validation.empty_response")
             }
         }
 
         if let error = error as? URLError {
             switch error.code {
             case .timedOut:
-                return "连接超时，请检查网络、代理、VPN，或确认 BASE_URL 是否可达。"
+                return L10n.string("validation.timeout")
             case .notConnectedToInternet:
-                return "当前网络不可用。"
+                return L10n.string("validation.offline")
             case .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed:
-                return "无法连接到服务器，请检查 BASE_URL。"
+                return L10n.string("validation.cannot_connect")
             case .networkConnectionLost:
-                return "网络连接已中断，请稍后重试。"
+                return L10n.string("validation.network_lost")
             case .secureConnectionFailed,
                  .serverCertificateHasBadDate,
                  .serverCertificateHasUnknownRoot,
@@ -45,7 +45,7 @@ enum TranslationValidationErrorFormatter {
                  .serverCertificateUntrusted,
                  .clientCertificateRejected,
                  .clientCertificateRequired:
-                return "TLS/证书握手失败，请检查代理、VPN、系统证书或 HTTPS 配置。"
+                return L10n.string("validation.tls_failed")
             default:
                 return error.localizedDescription
             }

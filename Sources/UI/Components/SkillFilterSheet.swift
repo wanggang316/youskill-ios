@@ -17,8 +17,8 @@ struct SkillFilterSheet: View {
                         onSelect()
                     } label: {
                         SkillFilterRow(
-                            title: option.title,
-                            subtitle: subtitle(for: option),
+                            title: option.localizedTitle,
+                            subtitle: option.localizedDescription,
                             iconName: iconName(for: option),
                             iconBackground: iconBackground(for: option),
                             isSelected: selectedSort == option
@@ -41,17 +41,6 @@ struct SkillFilterSheet: View {
                 .stroke(AppTheme.divider, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.08), radius: 24, y: 14)
-    }
-
-    private func subtitle(for option: SkillSortOption) -> String {
-        switch option {
-        case .installCount:
-            "优先查看安装量最高的热门 Skill"
-        case .starCount:
-            "优先查看社区 Star 数最高的 Skill"
-        case .favorites:
-            "只看你已经收藏的 Skill"
-        }
     }
 
     private func iconName(for option: SkillSortOption) -> String {

@@ -1,0 +1,89 @@
+"app_language.system" = "跟随系统";
+"app_language.zh_hans" = "简体中文";
+"app_language.en" = "English";
+"app_language.ja" = "日本語";
+"app_language.ko" = "한국어";
+
+"common.cancel" = "取消";
+"common.done" = "完成";
+"common.retry" = "重试";
+"common.save" = "保存";
+"common.unknown" = "未知";
+
+"detail.content_load_failed" = "内容加载失败";
+"detail.directory" = "目录";
+"detail.file_label" = "文件";
+"detail.go_to_settings" = "去设置";
+"detail.image_load_failed" = "图片加载失败";
+"detail.image_load_failed_message" = "当前图片无法预览。";
+"detail.image_unavailable" = "图片暂不可用";
+"detail.image_unavailable_message" = "请稍后重试。";
+"detail.no_files_message" = "当前 Skill 没有可展示的文件。";
+"detail.no_files_title" = "暂无文件";
+"detail.no_readable_files" = "当前 Skill 没有可读文件。";
+"detail.open_source" = "打开源文件";
+"detail.read_failed" = "读取失败";
+"detail.translation_required_message" = "需要填写 BASE_URL、API_KEY 和 Model 后才能翻译。";
+"detail.translation_required_title" = "请先配置翻译模型";
+"detail.type_label" = "类型";
+"detail.unsupported.message" = "当前文件类型还没有预览器，你仍然可以打开源文件查看原始内容。";
+"detail.unsupported.title" = "暂不支持直接预览";
+
+"filter.favorites.description" = "只看你已经收藏的 Skill";
+"filter.install_count.description" = "优先查看安装量最高的热门 Skill";
+"filter.star_count.description" = "优先查看社区 Star 数最高的 Skill";
+
+"home.empty.no_favorites_message" = "把感兴趣的 Skill 加入收藏后，会在这里集中展示。";
+"home.empty.no_favorites_title" = "还没有收藏";
+"home.empty.no_results_message" = "试试更短的关键词或切换排序。";
+"home.empty.no_results_title" = "没有匹配结果";
+"home.load_failed" = "加载失败";
+"home.search_placeholder" = "搜索 Skill";
+
+"http.bad_status" = "请求失败，状态码 %ld。";
+"http.empty_response" = "服务返回了空响应。";
+"http.invalid_response" = "服务返回了无效响应。";
+
+"settings.api_key" = "API_KEY";
+"settings.app_language" = "应用语言";
+"settings.base_url" = "BASE_URL";
+"settings.check" = "检测";
+"settings.checking" = "正在检测配置…";
+"settings.github" = "GitHub";
+"settings.model" = "Model";
+"settings.model_settings.title" = "翻译模型";
+"settings.openai_compatible" = "OpenAI-compatible";
+"settings.section.about" = "关于";
+"settings.section.general" = "通用";
+"settings.section.model" = "模型设置";
+"settings.target_language" = "目标语言";
+"settings.title" = "设置";
+"settings.translation_model" = "翻译模型";
+"settings.version" = "版本";
+
+"skill.sort.favorites" = "我的收藏";
+"skill.sort.install_count" = "安装最多";
+"skill.sort.star_count" = "Star 最多";
+
+"target_language.chinese" = "简体中文";
+"target_language.english" = "英文";
+"target_language.japanese" = "日语";
+"target_language.korean" = "韩语";
+
+"translation.error.incomplete_settings" = "请先完整填写 BASE_URL、API Key 和 Model。";
+"translation.error.model_not_found" = "当前端点未提供模型“%@”。";
+"translation.validation.success.models" = "检测成功，模型可用。";
+"translation.validation.success.response" = "检测成功，响应正常。";
+
+"validation.bad_request" = "请求格式有误，请检查 BASE_URL 和 Model。";
+"validation.cannot_connect" = "无法连接到服务器。";
+"validation.empty_response" = "服务返回了空响应。";
+"validation.endpoint_not_found" = "未找到接口地址，请检查 BASE_URL 是否正确。";
+"validation.invalid_key" = "API Key 无效或已过期。";
+"validation.invalid_response" = "服务返回了无效响应。";
+"validation.network_lost" = "网络连接已中断。";
+"validation.offline" = "当前似乎处于离线状态。";
+"validation.rate_limited" = "请求过于频繁，请稍后再试。";
+"validation.server_error" = "服务暂时不可用（HTTP %ld）。";
+"validation.timeout" = "请求超时，请检查网络后重试。";
+"validation.tls_failed" = "安全连接建立失败，请检查证书链、代理或网络设置。";

@@ -47,7 +47,7 @@ struct FileTreeDrawer: View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("目录")
+                    Text(L10n.string("detail.directory"))
                         .font(.headline.weight(.semibold))
                         .foregroundStyle(.primary)
 
@@ -81,8 +81,8 @@ struct FileTreeDrawer: View {
             if nodes.isEmpty {
                 EmptyStateView(
                     systemImage: "doc.on.doc",
-                    title: "暂无文件",
-                    message: "当前 Skill 没有可展示的文件。"
+                    title: L10n.string("detail.no_files_title"),
+                    message: L10n.string("detail.no_files_message")
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {

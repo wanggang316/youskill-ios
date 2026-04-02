@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "YouSkill",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v15)
     ],
@@ -22,7 +23,10 @@ let package = Package(
             ],
             path: "Sources",
             exclude: ["App"],
-            sources: ["Config", "Repo", "Runtime", "Service", "Types", "UI"]
+            sources: ["Config", "Repo", "Runtime", "Service", "Types", "UI"],
+            resources: [
+                .process("Resources")
+            ]
         ),
         .testTarget(
             name: "YouSkillTests",

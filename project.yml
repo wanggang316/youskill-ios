@@ -46,6 +46,7 @@ targets:
       - path: Sources
     resources:
       - path: Assets.xcassets
+      - path: Sources/Resources
     info:
       path: Sources/App/Info.plist
       properties:
