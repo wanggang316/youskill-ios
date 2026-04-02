@@ -22,6 +22,7 @@ final class SkillDetailViewModel {
     private(set) var rawFileURL: URL?
     private(set) var browserFileURL: URL?
     private(set) var isLoading = false
+    private(set) var isLoadingFile = false
     private(set) var isTranslating = false
     private(set) var errorMessage: String?
     private(set) var didLoad = false
@@ -101,6 +102,10 @@ final class SkillDetailViewModel {
             originalContent = ""
             return
         }
+
+        originalContent = ""
+        isLoadingFile = true
+        defer { isLoadingFile = false }
 
         do {
             let fetchedContent = try await contentService.fetchTextFile(for: skill, relativePath: path)

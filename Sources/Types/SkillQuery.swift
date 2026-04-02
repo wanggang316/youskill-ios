@@ -32,7 +32,7 @@ enum SkillSortOption: String, CaseIterable, Identifiable {
 
 struct SkillQuery: Equatable {
     var searchText: String = ""
-    var sortOption: SkillSortOption = .starCount
+    var sortOption: SkillSortOption = .installCount
     var page: Int = 1
     var pageSize: Int = 30
 

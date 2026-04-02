@@ -30,7 +30,7 @@
 "detail.unsupported.title" = "직접 미리보기를 지원하지 않습니다";
 
 "filter.favorites.description" = "북마크한 Skill 만 표시합니다";
-"filter.install_count.description" = "설치 수가 가장 높은 Skill 을 먼저 표시합니다";
+"filter.install_count.description" = "기본 순서로 모든 Skill 을 표시합니다";
 "filter.star_count.description" = "Star 수가 가장 높은 Skill 을 먼저 표시합니다";
 
 "home.empty.no_favorites_message" = "관심 있는 Skill 을 북마크하면 여기에 모아 보여줍니다.";
@@ -62,7 +62,7 @@
 "settings.version" = "버전";
 
 "skill.sort.favorites" = "북마크";
-"skill.sort.install_count" = "설치 많은 순";
+"skill.sort.install_count" = "기본";
 "skill.sort.star_count" = "Star 많은 순";
 
 "target_language.chinese" = "중국어(간체)";

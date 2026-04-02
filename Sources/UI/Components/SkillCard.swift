@@ -16,7 +16,6 @@ struct SkillCard: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     HStack(spacing: 14) {
-                        Label("\(skill.installCount)", systemImage: "arrow.down.circle")
                         Label("\(skill.starCount)", systemImage: "star")
                     }
                     .font(.footnote)

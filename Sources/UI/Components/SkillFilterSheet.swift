@@ -34,7 +34,7 @@ struct SkillFilterSheet: View {
     private func iconName(for option: SkillSortOption) -> String {
         switch option {
         case .installCount:
-            "arrow.up.forward"
+            "rectangle.stack"
         case .starCount:
             "star.fill"
         case .favorites:

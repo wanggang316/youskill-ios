@@ -30,7 +30,7 @@
 "detail.unsupported.title" = "このファイルは直接プレビューできません";
 
 "filter.favorites.description" = "お気に入り登録した Skill のみを表示します";
-"filter.install_count.description" = "インストール数の多い Skill を優先して表示します";
+"filter.install_count.description" = "デフォルト順ですべての Skill を表示します";
 "filter.star_count.description" = "Star 数の多い Skill を優先して表示します";
 
 "home.empty.no_favorites_message" = "気になる Skill をお気に入りに追加すると、ここに表示されます。";
@@ -62,7 +62,7 @@
 "settings.version" = "バージョン";
 
 "skill.sort.favorites" = "お気に入り";
-"skill.sort.install_count" = "インストール順";
+"skill.sort.install_count" = "デフォルト";
 "skill.sort.star_count" = "Star順";
 
 "target_language.chinese" = "中国語（簡体字）";

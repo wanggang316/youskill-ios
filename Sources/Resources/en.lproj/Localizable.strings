@@ -30,7 +30,7 @@
 "detail.unsupported.title" = "Preview not available";
 
 "filter.favorites.description" = "Show only the skills you bookmarked";
-"filter.install_count.description" = "Show skills with the highest installation count first";
+"filter.install_count.description" = "Browse all skills in the default order";
 "filter.star_count.description" = "Show skills with the highest star count first";
 
 "home.empty.no_favorites_message" = "Favorited skills will appear here.";
@@ -62,7 +62,7 @@
 "settings.version" = "Version";
 
 "skill.sort.favorites" = "Favorites";
-"skill.sort.install_count" = "Most Installed";
+"skill.sort.install_count" = "Default";
 "skill.sort.star_count" = "Most Starred";
 
 "target_language.chinese" = "Simplified Chinese";

@@ -115,7 +115,10 @@ struct FileTreeDrawer: View {
 
     private func selectFile(_ path: String) {
         closeDrawer()
-        onSelect(path)
+        Task {
+            try? await Task.sleep(for: .milliseconds(180))
+            onSelect(path)
+        }
     }
 
     private func closeDrawer() {

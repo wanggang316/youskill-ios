@@ -106,11 +106,15 @@ struct SkillDetailView: View {
     private var contentBody: some View {
         VStack(spacing: 0) {
             if let activePath = viewModel.activePath {
-                HStack {
+                HStack(spacing: 6) {
                     Text(activePath)
                         .font(.footnote)
                         .foregroundStyle(AppTheme.secondaryText)
                         .lineLimit(1)
+                    if viewModel.isLoadingFile {
+                        ProgressView()
+                            .controlSize(.mini)
+                    }
                     Spacer()
                 }
                 .padding(.horizontal, 20)
@@ -143,6 +147,7 @@ struct SkillDetailView: View {
                         content: viewModel.displayedContent,
                         fileExtension: URL(fileURLWithPath: viewModel.activePath ?? "").pathExtension.lowercased()
                     )
+                    .id(viewModel.activePath)
                 case .image:
                     imageContent
                 case .unsupported:

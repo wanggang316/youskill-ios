@@ -30,7 +30,7 @@
 "detail.unsupported.title" = "暂不支持直接预览";
 
 "filter.favorites.description" = "只看你已经收藏的 Skill";
-"filter.install_count.description" = "优先查看安装量最高的热门 Skill";
+"filter.install_count.description" = "按默认顺序浏览所有 Skill";
 "filter.star_count.description" = "优先查看社区 Star 数最高的 Skill";
 
 "home.empty.no_favorites_message" = "把感兴趣的 Skill 加入收藏后，会在这里集中展示。";
@@ -62,7 +62,7 @@
 "settings.version" = "版本";
 
 "skill.sort.favorites" = "我的收藏";
-"skill.sort.install_count" = "安装最多";
+"skill.sort.install_count" = "默认";
 "skill.sort.star_count" = "Star 最多";
 
 "target_language.chinese" = "简体中文";

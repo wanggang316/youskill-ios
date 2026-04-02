@@ -81,6 +81,17 @@ struct SkillListView: View {
                 viewModel.applySearch(searchDraft)
             }
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack(spacing: 6) {
+                        Text("YouSkill")
+                            .font(.headline)
+                        if viewModel.isLoading && !viewModel.displayedSkills.isEmpty {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
+                    }
+                }
+
                 ToolbarItem(placement: PlatformToolbarPlacement.leading) {
                     Button {
                         dismissSearchKeyboard()

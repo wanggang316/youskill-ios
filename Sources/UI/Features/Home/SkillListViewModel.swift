@@ -8,7 +8,7 @@ final class SkillListViewModel {
     private let favoritesStore: FavoritesStore
 
     private(set) var searchText = ""
-    var selectedSort: SkillSortOption = .starCount
+    var selectedSort: SkillSortOption = .installCount
     private(set) var skills: [Skill] = []
     private(set) var totalCount = 0
     private(set) var isLoading = false
