@@ -18,6 +18,7 @@
 		30FC5084F769B7D93E1A7DCF /* SkillDirectoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090D7267E694FD2EA44BE7AC /* SkillDirectoryEntry.swift */; };
 		3452A6E3C459BE750A04A092 /* OpenAICompatibleTranslationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E44FFE6A1CB43E22BEB18A /* OpenAICompatibleTranslationRepository.swift */; };
 		389A11732FCADC4C9A119318 /* SkillContentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F4CC340319F6D8EA6FD4FE0 /* SkillContentService.swift */; };
+		3C4B4B0B983FD7EEE3D1D977 /* PlatformViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F317E92D5FD889F90F5F36 /* PlatformViewModifiers.swift */; };
 		3D02478E027F329B5CA24349 /* SkillCatalogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA455691FCDC4EF941E60D96 /* SkillCatalogRepository.swift */; };
 		433596B25055B20B3896A8B8 /* SkillListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1711DB153A8B3913C9745A06 /* SkillListView.swift */; };
 		5BC7B61C781040EA6766AF12 /* FileTreeDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0790906A3EF286558CAC50F5 /* FileTreeDrawer.swift */; };
@@ -77,6 +78,7 @@
 		89969F5901D74B214D92CF59 /* Skill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Skill.swift; sourceTree = "<group>"; };
 		911D5F4A50B56B275C62D648 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		93BC0490574FFDDEC9CBDF11 /* FavoritesStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStoreTests.swift; sourceTree = "<group>"; };
+		97F317E92D5FD889F90F5F36 /* PlatformViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformViewModifiers.swift; sourceTree = "<group>"; };
 		9F5AE37559D1C0028EFDC222 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A1C7FD5F5E1B150CAE01E6BF /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		A1E44FFE6A1CB43E22BEB18A /* OpenAICompatibleTranslationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAICompatibleTranslationRepository.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				861F0B1BF6D728817CE5FD5C /* AppTheme.swift */,
+				97F317E92D5FD889F90F5F36 /* PlatformViewModifiers.swift */,
 			);
 			path = Theme;
 			sourceTree = "<group>";
@@ -370,6 +373,7 @@
 				F30E5111395C259DB563CF58 /* LocalStores.swift in Sources */,
 				68BE7BA206B283F51E2641AC /* MarkdownContentView.swift in Sources */,
 				3452A6E3C459BE750A04A092 /* OpenAICompatibleTranslationRepository.swift in Sources */,
+				3C4B4B0B983FD7EEE3D1D977 /* PlatformViewModifiers.swift in Sources */,
 				07AEFE5D2F5A0F9808D37471 /* RootView.swift in Sources */,
 				97B339C57226FF2679090244 /* SettingsView.swift in Sources */,
 				8D37B2EA936E1B338364E0FD /* Skill.swift in Sources */,
