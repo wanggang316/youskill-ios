@@ -5,6 +5,7 @@ struct CodeContentView: View {
     let content: String
 
     @State private var highlightedContent: AttributedString?
+    private let codeFont = Font.system(size: 12, design: .monospaced)
 
     var body: some View {
         codeBlock
@@ -21,10 +22,10 @@ struct CodeContentView: View {
                     Text(highlightedContent)
                 } else {
                     Text(verbatim: content)
-                        .font(.system(.footnote, design: .monospaced))
                         .foregroundStyle(.primary)
                 }
             }
+            .font(codeFont)
             .textSelection(.enabled)
             .fixedSize(horizontal: true, vertical: false)
             .frame(maxWidth: .infinity, alignment: .leading)
