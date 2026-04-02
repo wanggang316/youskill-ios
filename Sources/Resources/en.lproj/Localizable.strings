@@ -35,7 +35,7 @@
 
 "home.empty.no_favorites_message" = "Favorited skills will appear here.";
 "home.empty.no_favorites_title" = "No favorites yet";
-"home.empty.no_results_message" = "Try a shorter keyword or switch the sort.";
+"home.empty.no_results_message" = "Try another keyword.";
 "home.empty.no_results_title" = "No results";
 "home.load_failed" = "Couldn't load skills";
 "home.search_placeholder" = "Search skills";

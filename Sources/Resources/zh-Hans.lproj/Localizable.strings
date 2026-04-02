@@ -35,7 +35,7 @@
 
 "home.empty.no_favorites_message" = "把感兴趣的 Skill 加入收藏后，会在这里集中展示。";
 "home.empty.no_favorites_title" = "还没有收藏";
-"home.empty.no_results_message" = "试试更短的关键词或切换排序。";
+"home.empty.no_results_message" = "试试其它关键词。";
 "home.empty.no_results_title" = "没有匹配结果";
 "home.load_failed" = "加载失败";
 "home.search_placeholder" = "搜索 Skill";

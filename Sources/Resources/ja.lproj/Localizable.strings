@@ -35,7 +35,7 @@
 
 "home.empty.no_favorites_message" = "気になる Skill をお気に入りに追加すると、ここに表示されます。";
 "home.empty.no_favorites_title" = "まだお気に入りがありません";
-"home.empty.no_results_message" = "短いキーワードで検索するか、並び替えを変更してください。";
+"home.empty.no_results_message" = "別のキーワードでお試しください。";
 "home.empty.no_results_title" = "一致する結果がありません";
 "home.load_failed" = "Skill を読み込めませんでした";
 "home.search_placeholder" = "Skill を検索";

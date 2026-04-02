@@ -35,7 +35,7 @@
 
 "home.empty.no_favorites_message" = "관심 있는 Skill 을 북마크하면 여기에 모아 보여줍니다.";
 "home.empty.no_favorites_title" = "아직 북마크가 없습니다";
-"home.empty.no_results_message" = "더 짧은 키워드로 검색하거나 정렬을 바꿔 보세요.";
+"home.empty.no_results_message" = "다른 키워드로 검색해 보세요.";
 "home.empty.no_results_title" = "검색 결과가 없습니다";
 "home.load_failed" = "Skill 을 불러오지 못했습니다";
 "home.search_placeholder" = "Skill 검색";
