@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct SkillListView: View {
     let container: AppContainer
@@ -7,6 +10,7 @@ struct SkillListView: View {
     @State private var searchDraft = ""
     @State private var isShowingSortDialog = false
     @State private var isShowingSettings = false
+    @GestureState private var filterSheetDragOffset: CGFloat = 0
 
     init(container: AppContainer) {
         self.container = container
@@ -18,58 +22,52 @@ struct SkillListView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .bottom) {
-                Group {
-                    if viewModel.isLoading && viewModel.displayedSkills.isEmpty {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else if let errorMessage = viewModel.errorMessage, viewModel.displayedSkills.isEmpty {
-                        EmptyStateView(
-                            systemImage: "wifi.exclamationmark",
-                            title: "加载失败",
-                            message: errorMessage,
-                            actionTitle: "重试",
-                            action: { Task { await viewModel.refresh() } }
-                        )
-                    } else if viewModel.displayedSkills.isEmpty {
-                        EmptyStateView(
-                            systemImage: "magnifyingglass",
-                            title: viewModel.selectedSort == .favorites ? "还没有收藏" : "没有匹配结果",
-                            message: viewModel.selectedSort == .favorites ? "把感兴趣的 Skill 加入收藏后，会在这里集中展示。" : "试试更短的关键词或切换排序。"
-                        )
-                    } else {
-                        ScrollView {
-                            LazyVStack(spacing: 16) {
-                                ForEach(viewModel.displayedSkills) { skill in
-                                    NavigationLink(value: skill) {
-                                        SkillCard(
-                                            skill: skill,
-                                            isFavorite: viewModel.isFavorite(skill),
-                                            favoriteAction: { viewModel.toggleFavorite(for: skill) }
-                                        )
-                                    }
-                                    .buttonStyle(.plain)
-                                    .task {
-                                        await viewModel.loadMoreIfNeeded(currentSkill: skill)
-                                    }
+            Group {
+                if viewModel.isLoading && viewModel.displayedSkills.isEmpty {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let errorMessage = viewModel.errorMessage, viewModel.displayedSkills.isEmpty {
+                    EmptyStateView(
+                        systemImage: "wifi.exclamationmark",
+                        title: "加载失败",
+                        message: errorMessage,
+                        actionTitle: "重试",
+                        action: { Task { await viewModel.refresh() } }
+                    )
+                } else if viewModel.displayedSkills.isEmpty {
+                    EmptyStateView(
+                        systemImage: "magnifyingglass",
+                        title: viewModel.selectedSort == .favorites ? "还没有收藏" : "没有匹配结果",
+                        message: viewModel.selectedSort == .favorites ? "把感兴趣的 Skill 加入收藏后，会在这里集中展示。" : "试试更短的关键词或切换排序。"
+                    )
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(viewModel.displayedSkills) { skill in
+                                NavigationLink(value: skill) {
+                                    SkillCard(
+                                        skill: skill,
+                                        isFavorite: viewModel.isFavorite(skill),
+                                        favoriteAction: { viewModel.toggleFavorite(for: skill) }
+                                    )
                                 }
-
-                                if viewModel.isLoadingMore {
-                                    ProgressView()
-                                        .padding(.vertical, 12)
+                                .buttonStyle(.plain)
+                                .task {
+                                    await viewModel.loadMoreIfNeeded(currentSkill: skill)
                                 }
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 20)
-                        }
-                        .refreshable {
-                            await viewModel.refresh()
-                        }
-                    }
-                }
 
-                if isShowingSortDialog {
-                    filterOverlay
+                            if viewModel.isLoadingMore {
+                                ProgressView()
+                                    .padding(.vertical, 12)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 20)
+                    }
+                    .refreshable {
+                        await viewModel.refresh()
+                    }
                 }
             }
             .background(AppTheme.groupedBackground.ignoresSafeArea())
@@ -83,6 +81,7 @@ struct SkillListView: View {
             .toolbar {
                 ToolbarItem(placement: PlatformToolbarPlacement.leading) {
                     Button {
+                        dismissSearchKeyboard()
                         withAnimation {
                             isShowingSortDialog = true
                         }
@@ -113,6 +112,12 @@ struct SkillListView: View {
                 await viewModel.reloadIfNeeded(for: viewModel.reloadKey)
             }
         }
+        .overlay {
+            if isShowingSortDialog {
+                filterOverlay
+                    .zIndex(20)
+            }
+        }
     }
 
     private var filterOverlay: some View {
@@ -132,6 +137,8 @@ struct SkillListView: View {
                         isShowingSortDialog = false
                     }
                 }
+                .offset(y: filterSheetDragOffset)
+                .gesture(filterSheetDismissGesture)
                 .padding(.horizontal, 12)
                 .padding(.bottom, max(proxy.safeAreaInsets.bottom, 12))
                 .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -139,5 +146,28 @@ struct SkillListView: View {
         }
         .ignoresSafeArea()
         .transition(.opacity)
+    }
+
+    private var filterSheetDismissGesture: some Gesture {
+        DragGesture(minimumDistance: 8, coordinateSpace: .global)
+            .updating($filterSheetDragOffset) { value, state, _ in
+                guard value.translation.height > 0 else { return }
+                state = value.translation.height
+            }
+            .onEnded { value in
+                let shouldDismiss = value.translation.height > 120
+                    || value.predictedEndTranslation.height > 180
+
+                guard shouldDismiss else { return }
+                withAnimation {
+                    isShowingSortDialog = false
+                }
+            }
+    }
+
+    private func dismissSearchKeyboard() {
+        #if canImport(UIKit)
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        #endif
     }
 }
