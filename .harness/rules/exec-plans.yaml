@@ -1,0 +1,15 @@
+# Exec plan content validation rules
+rules:
+  - id: exec-plan-sections
+    description: "Exec plans must have all required sections"
+    check: required_sections
+    severity: error
+    path: "docs/exec-plans/*.md"
+    exclude:
+      - "docs/exec-plans/README.md"
+      - "docs/exec-plans/_template.md"
+    sections:
+      - "Purpose"
+      - "Progress"
+      - "Decision Log"
+    fix: "Add missing required sections to this exec plan. See docs/exec-plans/_template.md for the required format."

@@ -1,0 +1,28 @@
+name: Quality Score
+on:
+  schedule:
+    - cron: '0 10 * * 1'  # Every Monday at 10 AM UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Generate quality scorecard
+        run: npx harness-eng score -o docs/generated/quality-scorecard.md
+      - name: Commit scorecard
+        run: |
+          git config user.name "harness-bot"
+          git config user.email "harness-bot@users.noreply.github.com"
+          git add docs/generated/quality-scorecard.md
+          git diff --cached --quiet || git commit -m "chore: update quality scorecard"
+          git push

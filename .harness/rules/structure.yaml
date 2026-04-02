@@ -1,0 +1,36 @@
+# Structural validation rules
+rules:
+  - id: required-agents-md
+    description: "AGENTS.md must exist at project root"
+    check: file_exists
+    severity: error
+    path: "AGENTS.md"
+    fix: "Create AGENTS.md at the project root. Run `harness init` to generate a template."
+
+  - id: required-architecture
+    description: "Architecture documentation must exist"
+    check: file_exists
+    severity: error
+    path: "docs/architecture.md"
+    fix: "Create docs/architecture.md describing the system architecture. Run `harness init` to generate a template."
+
+  - id: required-golden-rules
+    description: "Golden rules document must exist"
+    check: file_exists
+    severity: error
+    path: "docs/golden-rules.md"
+    fix: "Create docs/golden-rules.md with numbered enforced principles. Run `harness init` to generate a template."
+
+  - id: required-design-docs
+    description: "Design docs directory must exist"
+    check: dir_exists
+    severity: error
+    path: "docs/design-docs"
+    fix: "Create the docs/design-docs/ directory for feature and system design documentation."
+
+  - id: required-exec-plans
+    description: "Exec plans directory must exist"
+    check: dir_exists
+    severity: error
+    path: "docs/exec-plans"
+    fix: "Create the docs/exec-plans/ directory for versioned execution plans."

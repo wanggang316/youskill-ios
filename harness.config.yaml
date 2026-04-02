@@ -1,0 +1,47 @@
+# Harness configuration
+# Docs: https://github.com/harness-eng/harness
+
+project:
+  name: "youskill-ios"
+
+# Structural rules: required files and directories
+structure:
+  required_files:
+    - AGENTS.md
+    - docs/architecture.md
+    - docs/golden-rules.md
+  required_dirs:
+    - docs/design-docs
+    - docs/exec-plans
+    - docs/product-specs
+    - docs/references
+    - docs/generated
+
+# Content rules: required sections in key documents
+content:
+  agents_md:
+    max_lines: 150
+    required_sections:
+      - "Quick Start"
+      - "Architecture Overview"
+      - "Repository Structure"
+      - "Golden Rules"
+      - "Documentation"
+      - "Build & Test Commands"
+  exec_plans:
+    required_sections:
+      - "Purpose"
+      - "Context and Orientation"
+      - "Plan of Work"
+      - "Progress"
+      - "Surprises & Discoveries"
+      - "Decision Log"
+      - "Outcomes & Retrospective"
+
+# Quality scoring thresholds
+scoring:
+  staleness_days: 30
+  min_coverage: 0.6
+
+# Custom rules directory
+rules_dir: ".harness/rules"

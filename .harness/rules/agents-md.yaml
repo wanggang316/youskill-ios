@@ -1,0 +1,36 @@
+# AGENTS.md content validation rules
+rules:
+  - id: agents-md-line-limit
+    description: "AGENTS.md should stay concise (map, not manual)"
+    check: max_lines
+    severity: warning
+    path: "AGENTS.md"
+    max: 150
+    fix: "AGENTS.md exceeds 150 lines. Move detailed content into docs/ and replace with links. AGENTS.md should be a map, not a manual."
+
+  - id: agents-md-quick-start
+    description: "AGENTS.md must have a Quick Start section"
+    check: required_sections
+    severity: error
+    path: "AGENTS.md"
+    sections:
+      - "Quick Start"
+    fix: "Add a '## Quick Start' section to AGENTS.md with build and test commands."
+
+  - id: agents-md-architecture
+    description: "AGENTS.md must reference architecture"
+    check: required_sections
+    severity: error
+    path: "AGENTS.md"
+    sections:
+      - "Architecture Overview"
+    fix: "Add an '## Architecture Overview' section to AGENTS.md linking to docs/architecture.md."
+
+  - id: agents-md-golden-rules
+    description: "AGENTS.md must reference golden rules"
+    check: required_sections
+    severity: error
+    path: "AGENTS.md"
+    sections:
+      - "Golden Rules"
+    fix: "Add a '## Golden Rules' section to AGENTS.md listing the top rules and linking to docs/golden-rules.md."

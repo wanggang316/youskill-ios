@@ -1,0 +1,20 @@
+name: Doc Gardening
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 9 AM UTC
+  workflow_dispatch: {}
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check documentation health
+        run: npx harness-eng check --severity warning
+      - name: Generate scorecard
+        run: npx harness-eng score
