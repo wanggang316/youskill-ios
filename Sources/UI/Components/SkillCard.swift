@@ -18,7 +18,7 @@ struct SkillCard: View {
                     Image(systemName: isFavorite ? "bookmark.fill" : "bookmark")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(isFavorite ? AppTheme.accent : AppTheme.secondaryText)
-                        .padding(8)
+                        .frame(width: 36, height: 36)
                         .background(AppTheme.accentSoft)
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
