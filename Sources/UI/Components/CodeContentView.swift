@@ -16,47 +16,22 @@ struct CodeContentView: View {
 
     private var codeBlock: some View {
         ScrollView([.vertical, .horizontal], showsIndicators: true) {
-            HStack(alignment: .top, spacing: 0) {
-                Text(lineNumbersText)
-                    .font(.system(.footnote, design: .monospaced))
-                    .foregroundStyle(AppTheme.secondaryText)
-                    .multilineTextAlignment(.trailing)
-                    .padding(.vertical, 16)
-                    .padding(.leading, 12)
-                    .padding(.trailing, 10)
-                    .overlay(alignment: .trailing) {
-                        Rectangle()
-                            .fill(AppTheme.divider)
-                            .frame(width: 1)
-                    }
-                    .accessibilityHidden(true)
-
-                Group {
-                    if let highlightedContent {
-                        Text(highlightedContent)
-                    } else {
-                        Text(verbatim: content)
-                            .font(.system(.footnote, design: .monospaced))
-                            .foregroundStyle(.primary)
-                    }
+            Group {
+                if let highlightedContent {
+                    Text(highlightedContent)
+                } else {
+                    Text(verbatim: content)
+                        .font(.system(.footnote, design: .monospaced))
+                        .foregroundStyle(.primary)
                 }
-                .textSelection(.enabled)
-                .fixedSize(horizontal: true, vertical: false)
-                .padding(.vertical, 16)
-                .padding(.leading, 12)
-                .padding(.trailing, 16)
             }
+            .textSelection(.enabled)
+            .fixedSize(horizontal: true, vertical: false)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 16)
+            .padding(.horizontal, 12)
             .background(AppTheme.cardBackground)
         }
-    }
-
-    private var lineCount: Int {
-        max(content.split(separator: "\n", omittingEmptySubsequences: false).count, 1)
-    }
-
-    private var lineNumbersText: String {
-        (1 ... lineCount).map(String.init).joined(separator: "\n")
     }
 
     private var highlightLanguage: String? {
