@@ -16,6 +16,8 @@ final class SkillListViewModel {
     private(set) var errorMessage: String?
     private var currentPage = 1
     private var favoritesRevision = UUID()
+    private var hasLoadedInitially = false
+    private var lastLoadedKey: String?
 
     init(service: SkillCatalogService, favoritesStore: FavoritesStore) {
         self.service = service
@@ -36,6 +38,32 @@ final class SkillListViewModel {
 
     var canLoadMore: Bool {
         selectedSort != .favorites && skills.count < totalCount
+    }
+
+    func loadIfNeeded() async {
+        guard !hasLoadedInitially else { return }
+        hasLoadedInitially = true
+        lastLoadedKey = reloadKey
+        await reload()
+    }
+
+    func reloadIfNeeded(for key: String) async {
+        guard hasLoadedInitially else { return }
+        guard lastLoadedKey != key else { return }
+
+        try? await Task.sleep(for: .milliseconds(250))
+        guard !Task.isCancelled else { return }
+        guard reloadKey == key else { return }
+        guard lastLoadedKey != key else { return }
+
+        lastLoadedKey = key
+        await reload()
+    }
+
+    func refresh() async {
+        hasLoadedInitially = true
+        lastLoadedKey = reloadKey
+        await reload()
     }
 
     func reload() async {

@@ -22,7 +22,9 @@
 		3C4B4B0B983FD7EEE3D1D977 /* PlatformViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F317E92D5FD889F90F5F36 /* PlatformViewModifiers.swift */; };
 		3D02478E027F329B5CA24349 /* SkillCatalogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA455691FCDC4EF941E60D96 /* SkillCatalogRepository.swift */; };
 		433596B25055B20B3896A8B8 /* SkillListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1711DB153A8B3913C9745A06 /* SkillListView.swift */; };
+		554BB8A0E0935A0AB44CAD26 /* SkillFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F54380FDB7D0672C135D43 /* SkillFilterSheet.swift */; };
 		5BC7B61C781040EA6766AF12 /* FileTreeDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0790906A3EF286558CAC50F5 /* FileTreeDrawer.swift */; };
+		5CCE27BD5091165325D0A771 /* SkillListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 823C3FD2EE006766F907BA3E /* SkillListViewModelTests.swift */; };
 		64D947C5C0EBF0E80D1F7E4B /* TranslationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25201B324B87CDA1A5DCF244 /* TranslationSettings.swift */; };
 		68BE7BA206B283F51E2641AC /* MarkdownContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F05843B030A1CB783D2DF29 /* MarkdownContentView.swift */; };
 		735DAFD2D6EF8C07EF655480 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 851606F96BC85C62B7BE8FB3 /* HTTPClient.swift */; };
@@ -77,8 +79,10 @@
 		759D3D1AC6696F40B7DA30AB /* YouSkillApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouSkillApp.swift; sourceTree = "<group>"; };
 		818A491FE67F06FD8F321CCC /* MarkdownFrontmatterParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFrontmatterParserTests.swift; sourceTree = "<group>"; };
 		818D638749C1F99A1A99A68E /* GitHubContentRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubContentRepositoryTests.swift; sourceTree = "<group>"; };
+		823C3FD2EE006766F907BA3E /* SkillListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillListViewModelTests.swift; sourceTree = "<group>"; };
 		851606F96BC85C62B7BE8FB3 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		861F0B1BF6D728817CE5FD5C /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		86F54380FDB7D0672C135D43 /* SkillFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillFilterSheet.swift; sourceTree = "<group>"; };
 		89969F5901D74B214D92CF59 /* Skill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Skill.swift; sourceTree = "<group>"; };
 		911D5F4A50B56B275C62D648 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		93BC0490574FFDDEC9CBDF11 /* FavoritesStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStoreTests.swift; sourceTree = "<group>"; };
@@ -119,6 +123,7 @@
 				0790906A3EF286558CAC50F5 /* FileTreeDrawer.swift */,
 				0F05843B030A1CB783D2DF29 /* MarkdownContentView.swift */,
 				55511A2184C00DC81B764CCB /* SkillCard.swift */,
+				86F54380FDB7D0672C135D43 /* SkillFilterSheet.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -200,6 +205,7 @@
 				818A491FE67F06FD8F321CCC /* MarkdownFrontmatterParserTests.swift */,
 				1F9F4C730F5C234CE37B11A4 /* OpenAICompatibleTranslationRepositoryTests.swift */,
 				736C28816247E99C57916CB6 /* SkillCatalogRepositoryTests.swift */,
+				823C3FD2EE006766F907BA3E /* SkillListViewModelTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -382,6 +388,7 @@
 				7BD689746926490B0BDCAC56 /* MockURLProtocol.swift in Sources */,
 				2DAB7D5A210FDBB6E030036F /* OpenAICompatibleTranslationRepositoryTests.swift in Sources */,
 				0A6FBFE85C854EFE46A10A9F /* SkillCatalogRepositoryTests.swift in Sources */,
+				5CCE27BD5091165325D0A771 /* SkillListViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +420,7 @@
 				F658A95906B136256CE26204 /* SkillDetailView.swift in Sources */,
 				0B46AFF27437E992DA10F35B /* SkillDetailViewModel.swift in Sources */,
 				30FC5084F769B7D93E1A7DCF /* SkillDirectoryEntry.swift in Sources */,
+				554BB8A0E0935A0AB44CAD26 /* SkillFilterSheet.swift in Sources */,
 				433596B25055B20B3896A8B8 /* SkillListView.swift in Sources */,
 				2294B575D8A1B8F7B0F56FB3 /* SkillListViewModel.swift in Sources */,
 				9773672E6164C62253B3C1B3 /* SkillQuery.swift in Sources */,

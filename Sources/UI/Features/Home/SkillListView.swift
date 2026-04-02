@@ -27,7 +27,7 @@ struct SkillListView: View {
                         title: "加载失败",
                         message: errorMessage,
                         actionTitle: "重试",
-                        action: { Task { await viewModel.reload() } }
+                        action: { Task { await viewModel.refresh() } }
                     )
                 } else if viewModel.displayedSkills.isEmpty {
                     EmptyStateView(
@@ -61,7 +61,7 @@ struct SkillListView: View {
                         .padding(.vertical, 20)
                     }
                     .refreshable {
-                        await viewModel.reload()
+                        await viewModel.refresh()
                     }
                 }
             }
@@ -100,10 +100,11 @@ struct SkillListView: View {
             .navigationDestination(for: Skill.self) { skill in
                 SkillDetailView(skill: skill, container: container)
             }
+            .task {
+                await viewModel.loadIfNeeded()
+            }
             .task(id: viewModel.reloadKey) {
-                try? await Task.sleep(for: .milliseconds(250))
-                guard !Task.isCancelled else { return }
-                await viewModel.reload()
+                await viewModel.reloadIfNeeded(for: viewModel.reloadKey)
             }
         }
     }
