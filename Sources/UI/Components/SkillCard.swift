@@ -8,11 +8,20 @@ struct SkillCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .top, spacing: 12) {
-                Text(skill.displaySubtitle)
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(skill.displaySubtitle)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    HStack(spacing: 14) {
+                        Label("\(skill.installCount)", systemImage: "arrow.down.circle")
+                        Label("\(skill.starCount)", systemImage: "star")
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(AppTheme.secondaryText)
+                }
 
                 Button(action: favoriteAction) {
                     Image(systemName: isFavorite ? "bookmark.fill" : "bookmark")
@@ -24,13 +33,6 @@ struct SkillCard: View {
                 }
                 .buttonStyle(.plain)
             }
-
-            HStack(spacing: 14) {
-                Label("\(skill.installCount)", systemImage: "arrow.down.circle")
-                Label("\(skill.starCount)", systemImage: "star")
-            }
-            .font(.footnote)
-            .foregroundStyle(AppTheme.secondaryText)
 
             if let description = skill.description, !description.isEmpty {
                 Text(description)
