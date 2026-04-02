@@ -20,6 +20,7 @@ final class SkillDetailViewModel {
     private(set) var isShowingTranslated = false
     private(set) var fileKind: SkillFileKind = .markdown
     private(set) var rawFileURL: URL?
+    private(set) var browserFileURL: URL?
     private(set) var isLoading = false
     private(set) var isTranslating = false
     private(set) var errorMessage: String?
@@ -91,6 +92,7 @@ final class SkillDetailViewModel {
         translatedDescription = nil
         isShowingTranslated = false
         rawFileURL = try? contentService.rawURL(for: skill, relativePath: path)
+        browserFileURL = skill.browserURL(for: path)
         errorMessage = nil
         rawOriginalMarkdown = ""
         originalDescription = nil

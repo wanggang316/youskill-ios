@@ -74,6 +74,33 @@ struct Skill: Codable, Identifiable, Hashable {
         (path ?? "")
             .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
     }
+
+    func browserURL(for relativePath: String) -> URL? {
+        guard let url, let reference = GitHubReference(urlString: url) else {
+            return nil
+        }
+
+        let relative = relativePath.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        let combinedPath = [resolvedPath, relative]
+            .filter { !$0.isEmpty }
+            .joined(separator: "/")
+
+        let encodedPath = combinedPath
+            .split(separator: "/")
+            .map { component in
+                String(component).addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+                    ?? String(component)
+            }
+            .joined(separator: "/")
+
+        guard !encodedPath.isEmpty else {
+            return URL(string: "https://github.com/\(reference.owner)/\(reference.repository)")
+        }
+
+        return URL(
+            string: "https://github.com/\(reference.owner)/\(reference.repository)/blob/\(resolvedBranch)/\(encodedPath)"
+        )
+    }
 }
 
 struct FavoriteSkill: Codable, Identifiable, Hashable {

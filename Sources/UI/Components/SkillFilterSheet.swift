@@ -5,43 +5,42 @@ struct SkillFilterSheet: View {
     let onSelect: () -> Void
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 24) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("筛选排序")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
+        VStack(spacing: 16) {
+            Capsule(style: .continuous)
+                .fill(AppTheme.divider)
+                .frame(width: 40, height: 5)
 
-                    Text("选择你想看的 Skill 排序方式。")
-                        .font(.subheadline)
-                        .foregroundStyle(AppTheme.secondaryText)
-                }
-
-                VStack(spacing: 12) {
-                    ForEach(SkillSortOption.allCases) { option in
-                        Button {
-                            selectedSort = option
-                            onSelect()
-                        } label: {
-                            SkillFilterRow(
-                                title: option.title,
-                                subtitle: subtitle(for: option),
-                                iconName: iconName(for: option),
-                                iconBackground: iconBackground(for: option),
-                                isSelected: selectedSort == option
-                            )
-                        }
-                        .buttonStyle(.plain)
+            VStack(spacing: 12) {
+                ForEach(SkillSortOption.allCases) { option in
+                    Button {
+                        selectedSort = option
+                        onSelect()
+                    } label: {
+                        SkillFilterRow(
+                            title: option.title,
+                            subtitle: subtitle(for: option),
+                            iconName: iconName(for: option),
+                            iconBackground: iconBackground(for: option),
+                            isSelected: selectedSort == option
+                        )
                     }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 18)
-            .padding(.bottom, 20)
         }
-        .safeAreaPadding(.bottom, 14)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(AppTheme.cardBackground)
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 20)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .fill(AppTheme.cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .stroke(AppTheme.divider, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.08), radius: 24, y: 14)
     }
 
     private func subtitle(for option: SkillSortOption) -> String {

@@ -23,11 +23,22 @@ struct SkillListViewModelTests {
         let viewModel = makeViewModel(repository: repository)
 
         await viewModel.loadIfNeeded()
-        viewModel.searchText = "agent"
+        viewModel.applySearch("agent")
 
         await viewModel.reloadIfNeeded(for: viewModel.reloadKey)
 
         #expect(await repository.fetchCount == 2)
+    }
+
+    @Test
+    func applySearchTrimsWhitespace() async {
+        let repository = FakeSkillCatalogRepository()
+        let viewModel = makeViewModel(repository: repository)
+
+        viewModel.applySearch("  agent skill  ")
+
+        #expect(viewModel.searchText == "agent skill")
+        #expect(viewModel.reloadKey == "\(viewModel.selectedSort.rawValue)|agent skill")
     }
 
     @Test

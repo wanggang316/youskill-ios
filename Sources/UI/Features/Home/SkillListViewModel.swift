@@ -7,7 +7,7 @@ final class SkillListViewModel {
     private let service: SkillCatalogService
     private let favoritesStore: FavoritesStore
 
-    var searchText = ""
+    private(set) var searchText = ""
     var selectedSort: SkillSortOption = .starCount
     private(set) var skills: [Skill] = []
     private(set) var totalCount = 0
@@ -64,6 +64,10 @@ final class SkillListViewModel {
         hasLoadedInitially = true
         lastLoadedKey = reloadKey
         await reload()
+    }
+
+    func applySearch(_ text: String) {
+        searchText = text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     func reload() async {

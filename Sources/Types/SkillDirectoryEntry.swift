@@ -8,7 +8,7 @@ struct SkillDirectoryEntry: Codable, Hashable, Identifiable {
     var fileName: String { path.split(separator: "/").last.map(String.init) ?? path }
 }
 
-enum SkillFileKind {
+enum SkillFileKind: Equatable {
     case markdown
     case code
     case image
@@ -21,8 +21,10 @@ enum SkillFileKind {
             self = .markdown
         case "png", "jpg", "jpeg", "gif", "webp":
             self = .image
-        case "swift", "json", "yaml", "yml", "toml", "txt", "js", "ts", "tsx", "jsx", "rs",
-             "py", "rb", "sh", "zsh", "bash", "css", "html", "xml", "kt", "java":
+        case "swift", "json", "yaml", "yml", "toml", "txt", "log", "env", "ini", "js", "ts",
+             "tsx", "jsx", "rs", "py", "rb", "go", "sh", "zsh", "bash", "css", "scss", "less",
+             "html", "xml", "svg", "kt", "java", "sql", "lua", "dart", "c", "h", "cpp", "hpp",
+             "cs", "php":
             self = .code
         default:
             self = ext.isEmpty ? .code : .unsupported

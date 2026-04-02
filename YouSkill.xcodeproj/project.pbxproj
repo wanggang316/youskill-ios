@@ -37,8 +37,10 @@
 		97B339C57226FF2679090244 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911D5F4A50B56B275C62D648 /* SettingsView.swift */; };
 		97BE8E83ADA59C10F7BB9734 /* GitHubContentRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F819D471EE138E2777A8B3 /* GitHubContentRepository.swift */; };
 		AA11AC25F3A49CB639547E50 /* SkillCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55511A2184C00DC81B764CCB /* SkillCard.swift */; };
+		B27D06D15D92E901C04F3CE6 /* HighlightSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 1FB6DA926A8394AA24AFEF6E /* HighlightSwift */; };
 		B5C4A5440ACEC6F706711D64 /* DiskCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3825FFA8D5A50FF2275B6DC0 /* DiskCache.swift */; };
 		B8ED8901737D89486E351837 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 774B6C132F31A5B3856ABDF5 /* MarkdownUI */; };
+		D02F394FA1A8B4EBA82F184F /* SkillFileRenderingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A14C9C626C4D640ED21B831 /* SkillFileRenderingTests.swift */; };
 		D04BCC59695822C41D8B20C9 /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF913DBB882CD882E21A8D30 /* AppContainer.swift */; };
 		D2FB1C3B3133EB02335B1D8A /* TranslationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0973DC8F51D5234BCD7A9AE1 /* TranslationService.swift */; };
 		D3DF950E4F622270D176800E /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861F0B1BF6D728817CE5FD5C /* AppTheme.swift */; };
@@ -75,6 +77,7 @@
 		55511A2184C00DC81B764CCB /* SkillCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCard.swift; sourceTree = "<group>"; };
 		5AB014EDC516A393225FB009 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		65521201A7BC78895A1D5846 /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
+		6A14C9C626C4D640ED21B831 /* SkillFileRenderingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillFileRenderingTests.swift; sourceTree = "<group>"; };
 		6AE79DCF198A8C744463205C /* SkillCatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCatalogService.swift; sourceTree = "<group>"; };
 		736C28816247E99C57916CB6 /* SkillCatalogRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCatalogRepositoryTests.swift; sourceTree = "<group>"; };
 		759D3D1AC6696F40B7DA30AB /* YouSkillApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouSkillApp.swift; sourceTree = "<group>"; };
@@ -111,6 +114,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B8ED8901737D89486E351837 /* MarkdownUI in Frameworks */,
+				B27D06D15D92E901C04F3CE6 /* HighlightSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,6 +212,7 @@
 				818A491FE67F06FD8F321CCC /* MarkdownFrontmatterParserTests.swift */,
 				1F9F4C730F5C234CE37B11A4 /* OpenAICompatibleTranslationRepositoryTests.swift */,
 				736C28816247E99C57916CB6 /* SkillCatalogRepositoryTests.swift */,
+				6A14C9C626C4D640ED21B831 /* SkillFileRenderingTests.swift */,
 				823C3FD2EE006766F907BA3E /* SkillListViewModelTests.swift */,
 			);
 			path = Tests;
@@ -337,6 +342,7 @@
 			name = YouSkill;
 			packageProductDependencies = (
 				774B6C132F31A5B3856ABDF5 /* MarkdownUI */,
+				1FB6DA926A8394AA24AFEF6E /* HighlightSwift */,
 			);
 			productName = YouSkill;
 			productReference = FE4054C7686DE3CA6FBD9193 /* YouSkill.app */;
@@ -367,6 +373,7 @@
 			mainGroup = 02CBD97B3DB56DA7B86EB336;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				AFD0BBB49379CE4D3076442B /* XCRemoteSwiftPackageReference "highlightswift" */,
 				417E1D75036D1A55070DE57A /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -391,6 +398,7 @@
 				7BD689746926490B0BDCAC56 /* MockURLProtocol.swift in Sources */,
 				2DAB7D5A210FDBB6E030036F /* OpenAICompatibleTranslationRepositoryTests.swift in Sources */,
 				0A6FBFE85C854EFE46A10A9F /* SkillCatalogRepositoryTests.swift in Sources */,
+				D02F394FA1A8B4EBA82F184F /* SkillFileRenderingTests.swift in Sources */,
 				5CCE27BD5091165325D0A771 /* SkillListViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -697,9 +705,22 @@
 				minimumVersion = 2.4.1;
 			};
 		};
+		AFD0BBB49379CE4D3076442B /* XCRemoteSwiftPackageReference "highlightswift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appstefan/highlightswift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1FB6DA926A8394AA24AFEF6E /* HighlightSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AFD0BBB49379CE4D3076442B /* XCRemoteSwiftPackageReference "highlightswift" */;
+			productName = HighlightSwift;
+		};
 		774B6C132F31A5B3856ABDF5 /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 417E1D75036D1A55070DE57A /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;

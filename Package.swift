@@ -10,13 +10,15 @@ let package = Package(
         .library(name: "YouSkill", targets: ["YouSkill"])
     ],
     dependencies: [
-        .package(url: "https://github.com/gonzalezreal/swift-markdown-ui", from: "2.4.1")
+        .package(url: "https://github.com/gonzalezreal/swift-markdown-ui", from: "2.4.1"),
+        .package(url: "https://github.com/appstefan/highlightswift.git", from: "1.1.0")
     ],
     targets: [
         .target(
             name: "YouSkill",
             dependencies: [
-                .product(name: "MarkdownUI", package: "swift-markdown-ui")
+                .product(name: "MarkdownUI", package: "swift-markdown-ui"),
+                .product(name: "HighlightSwift", package: "highlightswift")
             ],
             path: "Sources",
             exclude: ["App"],
