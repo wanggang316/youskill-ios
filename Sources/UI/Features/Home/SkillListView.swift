@@ -10,7 +10,6 @@ struct SkillListView: View {
     @State private var searchDraft = ""
     @State private var isShowingSortDialog = false
     @State private var isShowingSettings = false
-    @GestureState private var filterSheetDragOffset: CGFloat = 0
 
     init(container: AppContainer) {
         self.container = container
@@ -75,7 +74,6 @@ struct SkillListView: View {
                 }
             }
             .background(AppTheme.groupedBackground.ignoresSafeArea())
-            .animation(.interactiveSpring(response: 0.32, dampingFraction: 0.86), value: isShowingSortDialog)
             .navigationTitle("YouSkill")
             .platformInlineNavigationTitle()
             .searchable(text: $searchDraft, prompt: L10n.string("home.search_placeholder"))
@@ -102,6 +100,14 @@ struct SkillListView: View {
                     }
                 }
             }
+            .sheet(isPresented: $isShowingSortDialog) {
+                SkillFilterSheet(selectedSort: $viewModel.selectedSort) {
+                    isShowingSortDialog = false
+                }
+                .presentationDetents([.height(300)])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
+            }
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView(container: container)
             }
@@ -116,57 +122,6 @@ struct SkillListView: View {
                 await viewModel.reloadIfNeeded(for: viewModel.reloadKey)
             }
         }
-        .overlay {
-            if isShowingSortDialog {
-                filterOverlay
-                    .zIndex(20)
-            }
-        }
-    }
-
-    private var filterOverlay: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .bottom) {
-                Color.black.opacity(0.16)
-                    .ignoresSafeArea()
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        withAnimation {
-                            isShowingSortDialog = false
-                        }
-                    }
-
-                SkillFilterSheet(selectedSort: $viewModel.selectedSort) {
-                    withAnimation {
-                        isShowingSortDialog = false
-                    }
-                }
-                .offset(y: filterSheetDragOffset)
-                .gesture(filterSheetDismissGesture)
-                .padding(.horizontal, 12)
-                .padding(.bottom, max(proxy.safeAreaInsets.bottom, 12))
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
-        .ignoresSafeArea()
-        .transition(.opacity)
-    }
-
-    private var filterSheetDismissGesture: some Gesture {
-        DragGesture(minimumDistance: 8, coordinateSpace: .global)
-            .updating($filterSheetDragOffset) { value, state, _ in
-                guard value.translation.height > 0 else { return }
-                state = value.translation.height
-            }
-            .onEnded { value in
-                let shouldDismiss = value.translation.height > 120
-                    || value.predictedEndTranslation.height > 180
-
-                guard shouldDismiss else { return }
-                withAnimation {
-                    isShowingSortDialog = false
-                }
-            }
     }
 
     private func dismissSearchKeyboard() {

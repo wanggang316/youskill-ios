@@ -5,11 +5,7 @@ struct SkillFilterSheet: View {
     let onSelect: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            Capsule(style: .continuous)
-                .fill(AppTheme.divider)
-                .frame(width: 40, height: 5)
-
+        ScrollView(showsIndicators: false) {
             VStack(spacing: 12) {
                 ForEach(SkillSortOption.allCases) { option in
                     Button {
@@ -28,19 +24,11 @@ struct SkillFilterSheet: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
-        .padding(.bottom, 20)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .background(
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .fill(AppTheme.cardBackground)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .stroke(AppTheme.divider, lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.08), radius: 24, y: 14)
+        .contentMargins(.horizontal, 20, for: .scrollContent)
+        .contentMargins(.top, 8, for: .scrollContent)
+        .contentMargins(.bottom, 24, for: .scrollContent)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(AppTheme.cardBackground)
     }
 
     private func iconName(for option: SkillSortOption) -> String {
