@@ -98,7 +98,7 @@ struct SkillListView: View {
                     Button {
                         isShowingSettings = true
                     } label: {
-                        Image(systemName: "globe")
+                        Image(systemName: "gearshape")
                     }
                 }
             }
