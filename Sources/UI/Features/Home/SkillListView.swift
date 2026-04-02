@@ -104,7 +104,7 @@ struct SkillListView: View {
                 SkillFilterSheet(selectedSort: $viewModel.selectedSort) {
                     isShowingSortDialog = false
                 }
-                .presentationDetents([.height(300)])
+                .presentationDetents([.height(332)])
                 .presentationDragIndicator(.visible)
                 .presentationCornerRadius(28)
             }

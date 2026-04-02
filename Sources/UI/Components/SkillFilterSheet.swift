@@ -25,7 +25,7 @@ struct SkillFilterSheet: View {
             }
         }
         .contentMargins(.horizontal, 20, for: .scrollContent)
-        .contentMargins(.top, 8, for: .scrollContent)
+        .contentMargins(.top, 14, for: .scrollContent)
         .contentMargins(.bottom, 24, for: .scrollContent)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(AppTheme.cardBackground)
