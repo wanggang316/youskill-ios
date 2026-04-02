@@ -11,14 +11,10 @@ options:
 settings:
   base:
     PRODUCT_NAME: YouSkill
-    PRODUCT_BUNDLE_IDENTIFIER: cc.youskill.app
     CURRENT_PROJECT_VERSION: 1
     MARKETING_VERSION: 0.1.0
     SWIFT_VERSION: 6.0
-    CODE_SIGNING_ALLOWED: NO
-    CODE_SIGNING_REQUIRED: NO
     GENERATE_INFOPLIST_FILE: NO
-    TARGETED_DEVICE_FAMILY: "1"
     SUPPORTS_MACCATALYST: NO
     ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
@@ -28,6 +24,13 @@ targets:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: HC438T2B8P
+        CODE_SIGN_IDENTITY[sdk=iphoneos*]: Apple Development
+        TARGETED_DEVICE_FAMILY: "1"
     sources:
       - path: Sources
     resources:
@@ -51,6 +54,11 @@ targets:
     type: bundle.unit-test
     platform: iOS
     deploymentTarget: "17.0"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill.tests
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
     sources:
       - path: Tests
     dependencies:
