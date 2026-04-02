@@ -7,10 +7,7 @@ struct FileTreeDrawer: View {
     let onSelect: (String) -> Void
 
     @State private var expandedDirectories: Set<String> = []
-    @GestureState private var edgeDragTranslation: CGFloat = 0
-    @GestureState private var drawerDragTranslation: CGFloat = 0
 
-    private let edgeActivationWidth: CGFloat = 28
     private let drawerAnimation = Animation.interactiveSpring(
         response: 0.32,
         dampingFraction: 0.86,
@@ -20,20 +17,20 @@ struct FileTreeDrawer: View {
     var body: some View {
         GeometryReader { geometry in
             let drawerWidth = min(max(geometry.size.width * 0.82, 294), 336)
-            let drawerOffset = currentDrawerOffset(for: drawerWidth)
-            let presentationProgress = max(0, min(1, 1 - drawerOffset / drawerWidth))
 
             ZStack(alignment: .trailing) {
-                Color.black.opacity(0.24 * Double(presentationProgress))
-                    .allowsHitTesting(presentationProgress > 0.01)
-                    .onTapGesture(perform: closeDrawer)
+                if isPresented {
+                    Color.black.opacity(0.24)
+                        .ignoresSafeArea()
+                        .transition(.opacity)
+                        .onTapGesture(perform: closeDrawer)
 
-                edgeActivationStrip(drawerWidth: drawerWidth)
-
-                drawerPanel(width: drawerWidth)
-                    .offset(x: drawerOffset)
-                    .gesture(closeGesture(drawerWidth: drawerWidth))
+                    drawerPanel(width: drawerWidth)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
+                }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+            .animation(drawerAnimation, value: isPresented)
         }
         .onAppear {
             syncExpandedDirectories(reset: true)
@@ -44,14 +41,6 @@ struct FileTreeDrawer: View {
         .onChange(of: activePath) { _, _ in
             revealActivePath()
         }
-    }
-
-    private func currentDrawerOffset(for drawerWidth: CGFloat) -> CGFloat {
-        if isPresented {
-            return max(0, drawerDragTranslation)
-        }
-
-        return max(0, drawerWidth + min(0, edgeDragTranslation))
     }
 
     private func drawerPanel(width: CGFloat) -> some View {
@@ -118,66 +107,15 @@ struct FileTreeDrawer: View {
                 .stroke(AppTheme.divider, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.08), radius: 22, x: -6, y: 0)
-        .padding(.vertical, 10)
-        .padding(.trailing, 8)
-    }
-
-    private func edgeActivationStrip(drawerWidth: CGFloat) -> some View {
-        HStack(spacing: 0) {
-            Spacer()
-            Color.clear
-                .frame(width: edgeActivationWidth)
-                .contentShape(Rectangle())
-                .allowsHitTesting(!isPresented && !nodes.isEmpty)
-                .gesture(openGesture(drawerWidth: drawerWidth))
-        }
-    }
-
-    private func openGesture(drawerWidth: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 8, coordinateSpace: .local)
-            .updating($edgeDragTranslation) { value, state, _ in
-                guard !isPresented else { return }
-                guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                guard value.translation.width < 0 else { return }
-                state = value.translation.width
-            }
-            .onEnded { value in
-                guard !isPresented else { return }
-                let distance = max(-value.translation.width, -value.predictedEndTranslation.width)
-                if distance > drawerWidth * 0.22 {
-                    openDrawer()
-                }
-            }
-    }
-
-    private func closeGesture(drawerWidth: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 8, coordinateSpace: .local)
-            .updating($drawerDragTranslation) { value, state, _ in
-                guard isPresented else { return }
-                guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                guard value.translation.width > 0 else { return }
-                state = value.translation.width
-            }
-            .onEnded { value in
-                guard isPresented else { return }
-                let distance = max(value.translation.width, value.predictedEndTranslation.width)
-                if distance > drawerWidth * 0.24 {
-                    closeDrawer()
-                } else {
-                    openDrawer()
-                }
-            }
+        .padding(.top, 10)
+        .padding(.bottom, 0)
+        .padding(.trailing, 0)
+        .ignoresSafeArea(edges: .bottom)
     }
 
     private func selectFile(_ path: String) {
         closeDrawer()
         onSelect(path)
-    }
-
-    private func openDrawer() {
-        withAnimation(drawerAnimation) {
-            isPresented = true
-        }
     }
 
     private func closeDrawer() {
