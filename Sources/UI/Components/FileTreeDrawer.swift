@@ -169,7 +169,7 @@ private struct FileTreeList: View {
     let onSelect: (String) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             ForEach(nodes) { node in
                 FileTreeNodeView(
                     node: node,
@@ -204,7 +204,7 @@ private struct FileTreeNodeView: View {
         let isExpanded = expandedDirectories.contains(node.path)
         let isActiveBranch = activePath?.hasPrefix("\(node.path)/") == true
 
-        return VStack(alignment: .leading, spacing: 6) {
+        return VStack(alignment: .leading, spacing: 4) {
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {
                     if isExpanded {
@@ -231,17 +231,17 @@ private struct FileTreeNodeView: View {
 
                     Spacer(minLength: 0)
                 }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 10)
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(isActiveBranch ? AppTheme.accentSoft.opacity(0.75) : Color.clear)
+                        .fill(isActiveBranch ? AppTheme.accentSoft.opacity(0.48) : Color.clear)
                 )
             }
             .buttonStyle(.plain)
 
             if isExpanded, let children = node.children, !children.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 5) {
                     ForEach(children) { child in
                         FileTreeNodeView(
                             node: child,
@@ -252,21 +252,21 @@ private struct FileTreeNodeView: View {
                         )
                     }
                 }
-                .padding(.leading, 18)
+                .padding(.leading, 16)
                 .overlay(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 1, style: .continuous)
                         .fill(AppTheme.divider)
                         .frame(width: 1)
-                        .padding(.vertical, 4)
+                        .padding(.vertical, 5)
                 }
             }
         }
-        .padding(.leading, CGFloat(depth) * 4)
+        .padding(.leading, CGFloat(depth) * 3)
     }
 
     private var fileRow: some View {
         let isSelected = node.path == activePath
-        let foregroundStyle = isSelected ? Color.white : Color.primary
+        let foregroundStyle = isSelected ? AppTheme.accent : Color.primary
 
         return Button {
             onSelect(node.path)
@@ -274,7 +274,7 @@ private struct FileTreeNodeView: View {
             HStack(spacing: 10) {
                 Image(systemName: fileIconName(for: node.path))
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(isSelected ? Color.white.opacity(0.92) : AppTheme.secondaryText)
+                    .foregroundStyle(isSelected ? AppTheme.accent : AppTheme.secondaryText)
 
                 Text(node.name)
                     .font(.subheadline.weight(isSelected ? .semibold : .medium))
@@ -284,19 +284,15 @@ private struct FileTreeNodeView: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(.vertical, 11)
-            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 10)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(isSelected ? AppTheme.accent : AppTheme.cardBackground)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(isSelected ? AppTheme.accent : AppTheme.divider, lineWidth: 1)
+                    .fill(isSelected ? AppTheme.accentSoft : Color.clear)
             )
         }
         .buttonStyle(.plain)
-        .padding(.leading, CGFloat(depth) * 4)
+        .padding(.leading, CGFloat(depth) * 3)
     }
 }
 
