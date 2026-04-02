@@ -6,7 +6,7 @@ struct SkillCard: View {
     let favoriteAction: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .top, spacing: 12) {
                 Text(skill.displaySubtitle)
                     .font(.headline)
