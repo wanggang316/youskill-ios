@@ -5,40 +5,41 @@ struct SkillFilterSheet: View {
     let onSelect: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("筛选排序")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("筛选排序")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
 
-                Text("选择你想看的 Skill 排序方式。")
-                    .font(.subheadline)
-                    .foregroundStyle(AppTheme.secondaryText)
-            }
+                    Text("选择你想看的 Skill 排序方式。")
+                        .font(.subheadline)
+                        .foregroundStyle(AppTheme.secondaryText)
+                }
 
-            VStack(spacing: 12) {
-                ForEach(SkillSortOption.allCases) { option in
-                    Button {
-                        selectedSort = option
-                        onSelect()
-                    } label: {
-                        SkillFilterRow(
-                            title: option.title,
-                            subtitle: subtitle(for: option),
-                            iconName: iconName(for: option),
-                            iconBackground: iconBackground(for: option),
-                            isSelected: selectedSort == option
-                        )
+                VStack(spacing: 12) {
+                    ForEach(SkillSortOption.allCases) { option in
+                        Button {
+                            selectedSort = option
+                            onSelect()
+                        } label: {
+                            SkillFilterRow(
+                                title: option.title,
+                                subtitle: subtitle(for: option),
+                                iconName: iconName(for: option),
+                                iconBackground: iconBackground(for: option),
+                                isSelected: selectedSort == option
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
             }
-
-            Spacer(minLength: 0)
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 20)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
-        .padding(.bottom, 24)
+        .safeAreaPadding(.bottom, 14)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(AppTheme.cardBackground)
     }

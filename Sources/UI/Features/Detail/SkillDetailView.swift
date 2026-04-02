@@ -2,6 +2,11 @@ import SwiftUI
 
 struct SkillDetailView: View {
     let container: AppContainer
+    private let drawerAnimation = Animation.interactiveSpring(
+        response: 0.32,
+        dampingFraction: 0.86,
+        blendDuration: 0.12
+    )
 
     @State private var viewModel: SkillDetailViewModel
     @State private var isShowingSettings = false
@@ -36,10 +41,9 @@ struct SkillDetailView: View {
             .background(AppTheme.groupedBackground.ignoresSafeArea())
 
             FileTreeDrawer(
-                isPresented: viewModel.isDrawerOpen,
+                isPresented: drawerBinding,
                 nodes: viewModel.fileTree,
                 activePath: viewModel.activePath,
-                onClose: { viewModel.isDrawerOpen = false },
                 onSelect: { path in
                     Task { await viewModel.loadFile(at: path) }
                 }
@@ -63,7 +67,7 @@ struct SkillDetailView: View {
                 .disabled(!viewModel.canTranslate || viewModel.isTranslating)
 
                 Button {
-                    viewModel.isDrawerOpen = true
+                    drawerBinding.wrappedValue = true
                 } label: {
                     Image(systemName: "sidebar.right")
                 }
@@ -84,6 +88,17 @@ struct SkillDetailView: View {
         .task {
             await viewModel.loadIfNeeded()
         }
+    }
+
+    private var drawerBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.isDrawerOpen },
+            set: { isPresented in
+                withAnimation(drawerAnimation) {
+                    viewModel.isDrawerOpen = isPresented
+                }
+            }
+        )
     }
 
     @ViewBuilder

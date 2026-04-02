@@ -92,7 +92,6 @@ final class SkillDetailViewModel {
         isShowingTranslated = false
         rawFileURL = try? contentService.rawURL(for: skill, relativePath: path)
         errorMessage = nil
-        isDrawerOpen = false
         rawOriginalMarkdown = ""
         originalDescription = nil
 
