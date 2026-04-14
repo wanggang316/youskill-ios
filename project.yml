@@ -19,8 +19,8 @@ packages:
 settings:
   base:
     PRODUCT_NAME: YouSkill
-    CURRENT_PROJECT_VERSION: 1
-    MARKETING_VERSION: 0.1.0
+    CURRENT_PROJECT_VERSION: 20260414
+    MARKETING_VERSION: 1.0
     SWIFT_VERSION: 6.0
     GENERATE_INFOPLIST_FILE: NO
     SUPPORTS_MACCATALYST: NO
@@ -48,6 +48,8 @@ targets:
       path: Sources/App/Info.plist
       properties:
         CFBundleDisplayName: YouSkill
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UILaunchScreen: {}
