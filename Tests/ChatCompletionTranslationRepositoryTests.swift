@@ -3,12 +3,12 @@ import Testing
 @testable import YouSkill
 
 @Suite(.serialized)
-struct OpenAICompatibleTranslationRepositoryTests {
+struct ChatCompletionTranslationRepositoryTests {
     @Test
     func validateUsesModelsEndpointWhenAvailable() async throws {
         try await withAppLanguage(.simplifiedChinese) {
             let session = makeSession()
-            let repository = OpenAICompatibleTranslationRepository(httpClient: HTTPClient(session: session))
+            let repository = ChatCompletionTranslationRepository(httpClient: HTTPClient(session: session))
             let settings = TranslationSettings(
                 baseURL: "https://example.com/v1",
                 apiKey: "secret",
@@ -67,7 +67,7 @@ struct OpenAICompatibleTranslationRepositoryTests {
     func validateFallsBackToChatCompletionsWhenModelsEndpointIsUnsupported() async throws {
         try await withAppLanguage(.simplifiedChinese) {
             let session = makeSession()
-            let repository = OpenAICompatibleTranslationRepository(httpClient: HTTPClient(session: session))
+            let repository = ChatCompletionTranslationRepository(httpClient: HTTPClient(session: session))
             let settings = TranslationSettings(
                 baseURL: "https://example.com/v1",
                 apiKey: "secret",
@@ -104,7 +104,7 @@ struct OpenAICompatibleTranslationRepositoryTests {
     @Test
     func validateFailsWhenModelIsNotReturnedByModelsEndpoint() async throws {
         let session = makeSession()
-        let repository = OpenAICompatibleTranslationRepository(httpClient: HTTPClient(session: session))
+        let repository = ChatCompletionTranslationRepository(httpClient: HTTPClient(session: session))
         let settings = TranslationSettings(
             baseURL: "https://example.com/v1",
             apiKey: "secret",

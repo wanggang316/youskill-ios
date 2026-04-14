@@ -54,7 +54,6 @@
 "settings.desktop_app" = "YouSkill 桌面端";
 "settings.model" = "Model";
 "settings.model_settings.title" = "翻译模型";
-"settings.openai_compatible" = "OpenAI-compatible";
 "settings.section.about" = "关于";
 "settings.section.general" = "通用";
 "settings.section.model" = "翻译设置";

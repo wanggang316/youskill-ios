@@ -59,7 +59,7 @@
   **Rationale:** 当前后端接口已足够支撑列表，GitHub 直读能满足详情页文件树与文件内容需求，避免扩大范围。
   **Date/Author:** 2026-04-02 / Codex
 
-- **Decision:** 翻译能力采用 OpenAI-compatible 接口。
+- **Decision:** 翻译能力采用 Chat Completion API 接口。
   **Rationale:** 用户已明确确认，且设置项 `BASE_URL / API_KEY / Model` 与该策略天然一致。
   **Date/Author:** 2026-04-02 / Codex
 

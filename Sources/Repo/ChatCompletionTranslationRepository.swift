@@ -87,7 +87,7 @@ private struct ModelListResponse: Decodable {
     let data: [ModelSummary]
 }
 
-struct OpenAICompatibleTranslationRepository: TranslationRepositoryProtocol, Sendable {
+struct ChatCompletionTranslationRepository: TranslationRepositoryProtocol, Sendable {
     private let httpClient: HTTPClient
 
     init(httpClient: HTTPClient = HTTPClient()) {
@@ -121,7 +121,7 @@ struct OpenAICompatibleTranslationRepository: TranslationRepositoryProtocol, Sen
                 throw error
             }
         } catch is DecodingError {
-            // Some OpenAI-compatible providers do not expose a standard /models response.
+            // Some providers do not expose a standard /models response.
         }
 
         let request = try makeRequest(

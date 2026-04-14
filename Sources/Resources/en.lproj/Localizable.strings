@@ -54,7 +54,6 @@
 "settings.desktop_app" = "YouSkill Desktop";
 "settings.model" = "Model";
 "settings.model_settings.title" = "Translation Model";
-"settings.openai_compatible" = "OpenAI-compatible";
 "settings.section.about" = "About";
 "settings.section.general" = "General";
 "settings.section.model" = "Translation Settings";

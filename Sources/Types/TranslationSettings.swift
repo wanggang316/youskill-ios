@@ -42,9 +42,9 @@ struct TranslationSettings: Codable, Equatable {
     var targetLanguage: TargetLanguage
 
     static let `default` = TranslationSettings(
-        baseURL: "https://api.openai.com/v1",
+        baseURL: "https://openrouter.ai/api/v1",
         apiKey: "",
-        model: "gpt-4o-mini",
+        model: "",
         targetLanguage: .chinese
     )
 

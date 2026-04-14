@@ -54,7 +54,6 @@
 "settings.desktop_app" = "YouSkill 데스크톱";
 "settings.model" = "Model";
 "settings.model_settings.title" = "번역 모델";
-"settings.openai_compatible" = "OpenAI-compatible";
 "settings.section.about" = "정보";
 "settings.section.general" = "일반";
 "settings.section.model" = "번역 설정";

@@ -117,7 +117,7 @@ private struct ModelSettingsView: View {
 
     var body: some View {
         Form {
-            Section(L10n.string("settings.openai_compatible")) {
+            Section {
                 TextField(L10n.string("settings.base_url"), text: $draft.baseURL)
                     .platformNonAutocorrectingTextInput()
                     .platformURLKeyboard()

@@ -37,7 +37,7 @@ final class AppContainer {
                 repository: GitHubContentRepository(httpClient: httpClient)
             ),
             translationService: TranslationService(
-                repository: OpenAICompatibleTranslationRepository(httpClient: httpClient)
+                repository: ChatCompletionTranslationRepository(httpClient: httpClient)
             )
         )
     }

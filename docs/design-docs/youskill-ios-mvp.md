@@ -13,7 +13,7 @@
 - 提供适配 iPhone 的 Skill 浏览与阅读体验。
 - 提供最小但完整的 Skill 发现闭环：列表、搜索、排序、本地收藏。
 - 提供最小但完整的 Skill 阅读闭环：默认文档、目录抽屉、文件切换、Markdown/代码展示。
-- 提供面向用户自定义模型的 OpenAI-compatible 翻译能力。
+- 提供面向用户自定义模型的 Chat Completion API 翻译能力。
 - 将产品需求、技术方案、TODO 清单明确落位到仓库文档。
 
 ## Non-Goals
@@ -140,7 +140,7 @@
 
 #### 4.4 翻译
 
-翻译能力采用 `OpenAI-compatible` 接口，设置项包括：
+翻译能力采用 `Chat Completion` 接口，设置项包括：
 
 - `baseURL`
 - `apiKey`
@@ -289,7 +289,7 @@
   - 风险：部分仓库文件可能非 UTF-8
   - 缓解：首版仅保证 UTF-8 文本，异常文件走不可预览提示
 - `翻译模型兼容性不一致`
-  - 风险：不同 OpenAI-compatible 服务商响应格式和能力存在差异
+  - 风险：不同 Chat Completion API 服务商响应格式和能力存在差异
   - 缓解：模型检测页先做连通性校验，并在请求层统一 schema 映射
 - `代码文件显示体验不足`
   - 风险：首版若不做高亮，代码可读性一般
@@ -314,7 +314,7 @@
 - `api.youskill.cc` Skill 列表接口
 - GitHub Trees API
 - `raw.githubusercontent.com` 文件内容服务
-- OpenAI-compatible 翻译服务
+- Chat Completion API 翻译服务
 - iOS 17+ 运行环境假设（若采用 SwiftData / Observation）
 
 ## Risks

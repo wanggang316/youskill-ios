@@ -24,7 +24,7 @@ YouSkill helps you browse, search, and read MCP (Model Context Protocol) Skills 
 - Browse and search Agent Skills
 - Syntax-highlighted code preview for 30+ languages
 - Markdown rendering with rich formatting
-- Built-in translation powered by OpenAI-compatible APIs
+- Built-in translation powered by Chat Completion APIs
 - File tree navigation with directory structure
 - Bookmark your favorite Skills
 - Multi-language support: English, 简体中文, 日本語, 한국어

@@ -2,13 +2,13 @@
 
 ## System Overview
 
-YouSkill iOS is a SwiftUI application for browsing, reading, and translating Agent Skills on mobile devices. The app combines a remote skill catalog API with direct GitHub file tree and raw file reads so users can discover skills, open `SKILL.md`, inspect related files, and translate Markdown into a target language. The main user-facing interfaces are the home feed, the skill detail reader with a catalog drawer, and the settings flow for OpenAI-compatible translation configuration.
+YouSkill iOS is a SwiftUI application for browsing, reading, and translating Agent Skills on mobile devices. The app combines a remote skill catalog API with direct GitHub file tree and raw file reads so users can discover skills, open `SKILL.md`, inspect related files, and translate Markdown into a target language. The main user-facing interfaces are the home feed, the skill detail reader with a catalog drawer, and the settings flow for translation model configuration.
 
 ## Domain Model
 
 - **Skill Catalog** — Remote skill listing, search, sorting, pagination, and feed presentation.
 - **Skill Content** — GitHub repository resolution, skill directory tree construction, raw file retrieval, and file-type aware rendering.
-- **Translation** — OpenAI-compatible model configuration, connectivity validation, translation requests, and translation caching.
+- **Translation** — Chat Completion API model configuration, connectivity validation, translation requests, and translation caching.
 - **Settings** — Local persistence of translation settings, target language preference, version metadata, and external links.
 - **Favorites** — Local bookmark persistence and favorite-only filtering.
 

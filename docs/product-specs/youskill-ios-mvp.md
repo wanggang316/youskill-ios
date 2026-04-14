@@ -14,7 +14,7 @@ YouSkill iOS 是一个面向移动端的 Agent Skill 浏览与阅读应用。产
 - As a learner, I want to open a skill and read its `SKILL.md` and related files so that I can understand the complete skill implementation.
 - As a non-native reader, I want to translate Markdown files into my target language so that I can read community skills more efficiently.
 - As a returning user, I want to bookmark interesting skills locally so that I can revisit them later.
-- As a power user, I want to configure my own OpenAI-compatible translation endpoint so that I can control cost, region, and model quality.
+- As a power user, I want to configure my own Chat Completion API translation endpoint so that I can control cost, region, and model quality.
 
 ## Requirements
 
