@@ -29,6 +29,7 @@
 		64D947C5C0EBF0E80D1F7E4B /* TranslationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25201B324B87CDA1A5DCF244 /* TranslationSettings.swift */; };
 		68BE7BA206B283F51E2641AC /* MarkdownContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F05843B030A1CB783D2DF29 /* MarkdownContentView.swift */; };
 		735DAFD2D6EF8C07EF655480 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 851606F96BC85C62B7BE8FB3 /* HTTPClient.swift */; };
+		75AD5F0B399B5B47596E3220 /* SkillCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B36CD472BC9A95913ED2A2 /* SkillCatalog.swift */; };
 		77FCE99FFA451CE17B130179 /* FavoritesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BC0490574FFDDEC9CBDF11 /* FavoritesStoreTests.swift */; };
 		7BD689746926490B0BDCAC56 /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65521201A7BC78895A1D5846 /* MockURLProtocol.swift */; };
 		7C96AF9D84F3178FF0CC775B /* ParsedMarkdownDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE271A9853140EE6260D7964 /* ParsedMarkdownDocument.swift */; };
@@ -89,6 +90,7 @@
 		65521201A7BC78895A1D5846 /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
 		6A14C9C626C4D640ED21B831 /* SkillFileRenderingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillFileRenderingTests.swift; sourceTree = "<group>"; };
 		6AE79DCF198A8C744463205C /* SkillCatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCatalogService.swift; sourceTree = "<group>"; };
+		72B36CD472BC9A95913ED2A2 /* SkillCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCatalog.swift; sourceTree = "<group>"; };
 		736C28816247E99C57916CB6 /* SkillCatalogRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCatalogRepositoryTests.swift; sourceTree = "<group>"; };
 		73E88A7F1AC6EB082DD524B3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		759D3D1AC6696F40B7DA30AB /* YouSkillApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouSkillApp.swift; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				D05776CB8729D838A66D38AA /* AppLanguage.swift */,
 				BE271A9853140EE6260D7964 /* ParsedMarkdownDocument.swift */,
 				89969F5901D74B214D92CF59 /* Skill.swift */,
+				72B36CD472BC9A95913ED2A2 /* SkillCatalog.swift */,
 				090D7267E694FD2EA44BE7AC /* SkillDirectoryEntry.swift */,
 				EFAE919A4D23D96D3AF30230 /* SkillQuery.swift */,
 				25201B324B87CDA1A5DCF244 /* TranslationSettings.swift */,
@@ -482,6 +485,7 @@
 				97B339C57226FF2679090244 /* SettingsView.swift in Sources */,
 				8D37B2EA936E1B338364E0FD /* Skill.swift in Sources */,
 				AA11AC25F3A49CB639547E50 /* SkillCard.swift in Sources */,
+				75AD5F0B399B5B47596E3220 /* SkillCatalog.swift in Sources */,
 				3D02478E027F329B5CA24349 /* SkillCatalogRepository.swift in Sources */,
 				DD3E852081B2449A5BED8FD8 /* SkillCatalogService.swift in Sources */,
 				389A11732FCADC4C9A119318 /* SkillContentService.swift in Sources */,

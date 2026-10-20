@@ -10,4 +10,13 @@ struct SkillCatalogService: Sendable {
     func fetchSkills(query: SkillQuery) async throws -> SkillsPage {
         try await repository.fetchSkills(query: query)
     }
+
+    func fetchCategories() async throws -> [SkillCategory] {
+        try await repository.fetchCategories()
+    }
+
+    func fetchHotRepositories() async throws -> [FeaturedRepository] {
+        try await repository.fetchHotRepositories()
+    }
+
 }

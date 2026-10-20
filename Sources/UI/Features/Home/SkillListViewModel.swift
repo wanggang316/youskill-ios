@@ -8,7 +8,20 @@ final class SkillListViewModel {
     private let favoritesStore: FavoritesStore
 
     private(set) var searchText = ""
-    var selectedSort: SkillSortOption = .installCount
+    var selectedSort: SkillSortOption = .installCount {
+        didSet {
+            if oldValue != selectedSort { invalidateResults() }
+        }
+    }
+    private(set) var scope: CatalogScope = .all
+    private(set) var categories: [SkillCategory] = []
+    private(set) var repositories: [FeaturedRepository] = []
+    private(set) var categoriesError: String?
+    private(set) var repositoriesError: String?
+    private(set) var isNavigationLoading = false
+    private var hasLoadedNavigation = false
+    private var requestID = UUID()
+    private var reachedEnd = false
     private(set) var skills: [Skill] = []
     private(set) var totalCount = 0
     private(set) var isLoading = false
@@ -25,7 +38,7 @@ final class SkillListViewModel {
     }
 
     var reloadKey: String {
-        "\(selectedSort.rawValue)|\(searchText)"
+        "\(scope.key)|\(selectedSort.rawValue)|\(searchText)"
     }
 
     var displayedSkills: [Skill] {
@@ -37,7 +50,7 @@ final class SkillListViewModel {
     }
 
     var canLoadMore: Bool {
-        selectedSort != .favorites && skills.count < totalCount
+        selectedSort != .favorites && !reachedEnd && skills.count < totalCount
     }
 
     func loadIfNeeded() async {
@@ -67,16 +80,70 @@ final class SkillListViewModel {
     }
 
     func applySearch(_ text: String) {
-        searchText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed != searchText else { return }
+        searchText = trimmed
+        invalidateResults()
+    }
+
+    func selectScope(_ newScope: CatalogScope) {
+        guard scope.key != newScope.key else { return }
+        scope = newScope
+        searchText = ""
+        invalidateResults()
+    }
+
+    private func invalidateResults() {
+        requestID = UUID()
+        skills = []
+        totalCount = 0
+        currentPage = 1
+        reachedEnd = false
+        isLoading = false
+        isLoadingMore = false
+        errorMessage = nil
+    }
+
+    func loadNavigationIfNeeded() async {
+        guard !hasLoadedNavigation else { return }
+        await refreshNavigation()
+    }
+
+    func refreshNavigation() async {
+        guard !isNavigationLoading else { return }
+        isNavigationLoading = true
+        async let categoryLoad: Void = loadCategories()
+        async let repositoryLoad: Void = loadRepositories()
+        _ = await (categoryLoad, repositoryLoad)
+        hasLoadedNavigation = true
+        isNavigationLoading = false
+    }
+
+    private func loadCategories() async {
+        categoriesError = nil
+        do { categories = try await service.fetchCategories() }
+        catch { categoriesError = error.localizedDescription }
+    }
+
+    private func loadRepositories() async {
+        repositoriesError = nil
+        do { repositories = try await service.fetchHotRepositories() }
+        catch { repositoriesError = error.localizedDescription }
     }
 
     func reload() async {
+        requestID = UUID()
+        let id = requestID
+        let key = reloadKey
+        isLoadingMore = false
+        reachedEnd = false
         if selectedSort == .favorites {
             errorMessage = nil
             skills = []
             totalCount = favoritesStore.filteredFavorites(searchText: searchText).count
             currentPage = 1
             favoritesRevision = UUID()
+            isLoading = false
             return
         }
 
@@ -85,12 +152,15 @@ final class SkillListViewModel {
 
         do {
             let page = try await service.fetchSkills(
-                query: SkillQuery(searchText: searchText, sortOption: selectedSort, page: 1, pageSize: 30)
+                query: SkillQuery(searchText: searchText, sortOption: selectedSort, page: 1, pageSize: 30, scope: scope)
             )
+            guard id == requestID, key == reloadKey else { return }
             skills = page.skills
+            reachedEnd = page.skills.isEmpty
             totalCount = page.total
             currentPage = 1
         } catch {
+            guard id == requestID, key == reloadKey else { return }
             errorMessage = error.localizedDescription
             skills = []
             totalCount = 0
@@ -104,16 +174,23 @@ final class SkillListViewModel {
         guard displayedSkills.last?.id == currentSkill.id else { return }
 
         isLoadingMore = true
+        errorMessage = nil
+        let id = requestID
+        let key = reloadKey
 
         do {
             let nextPage = currentPage + 1
             let page = try await service.fetchSkills(
-                query: SkillQuery(searchText: searchText, sortOption: selectedSort, page: nextPage, pageSize: 30)
+                query: SkillQuery(searchText: searchText, sortOption: selectedSort, page: nextPage, pageSize: 30, scope: scope)
             )
-            skills.append(contentsOf: page.skills)
+            guard id == requestID, key == reloadKey else { return }
+            let existingIDs = Set(skills.map(\.id))
+            skills.append(contentsOf: page.skills.filter { !existingIDs.contains($0.id) })
+            reachedEnd = page.skills.isEmpty
             totalCount = page.total
             currentPage = nextPage
         } catch {
+            guard id == requestID, key == reloadKey else { return }
             errorMessage = error.localizedDescription
         }
 

@@ -35,6 +35,7 @@ struct SkillQuery: Equatable {
     var sortOption: SkillSortOption = .installCount
     var page: Int = 1
     var pageSize: Int = 30
+    var scope: CatalogScope = .all
 
     var skip: Int {
         max((page - 1) * pageSize, 0)
