@@ -16,6 +16,7 @@
 		1B2F774A4644F148BFD965AE /* MarkdownFrontmatterParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818A491FE67F06FD8F321CCC /* MarkdownFrontmatterParserTests.swift */; };
 		22571C516AC914EBD73A98CA /* CatalogIconService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD5390EA790F270DF0DE590A /* CatalogIconService.swift */; };
 		2294B575D8A1B8F7B0F56FB3 /* SkillListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F122E9AA54D38F9BBEFFF123 /* SkillListViewModel.swift */; };
+		2DE032A523D1E384865F2FB2 /* MarketplaceNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1BEF4D7D35DB210CEA91524 /* MarketplaceNavigationTests.swift */; };
 		30FC5084F769B7D93E1A7DCF /* SkillDirectoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090D7267E694FD2EA44BE7AC /* SkillDirectoryEntry.swift */; };
 		363F5AC61FB7C5F5AFE1F2CB /* CatalogIconRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6AB93BA7B9E5863FF11A97 /* CatalogIconRepository.swift */; };
 		38441EA656E780B2B3F141E2 /* SVGView in Frameworks */ = {isa = PBXBuildFile; productRef = BC38C8C3C00EC4D8972EE869 /* SVGView */; };
@@ -73,6 +74,13 @@
 			remoteGlobalIDString = 85DAE59FA7B7D174B6AC2E03;
 			remoteInfo = YouSkill;
 		};
+		E5FC1005B220623424346BE9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F75F054946D9828926146AE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85DAE59FA7B7D174B6AC2E03;
+			remoteInfo = YouSkill;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -119,6 +127,7 @@
 		AA455691FCDC4EF941E60D96 /* SkillCatalogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCatalogRepository.swift; sourceTree = "<group>"; };
 		AD5390EA790F270DF0DE590A /* CatalogIconService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogIconService.swift; sourceTree = "<group>"; };
 		AD69DEE4A905AB620BE2914B /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
+		B1BEF4D7D35DB210CEA91524 /* MarketplaceNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketplaceNavigationTests.swift; sourceTree = "<group>"; };
 		BE271A9853140EE6260D7964 /* ParsedMarkdownDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsedMarkdownDocument.swift; sourceTree = "<group>"; };
 		BEB18BF57F306ADF27CD4263 /* CodeContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeContentView.swift; sourceTree = "<group>"; };
 		BF913DBB882CD882E21A8D30 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
@@ -134,6 +143,7 @@
 		ED2CFCD0D4D755A2E8976016 /* LocalStores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStores.swift; sourceTree = "<group>"; };
 		EFAE919A4D23D96D3AF30230 /* SkillQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillQuery.swift; sourceTree = "<group>"; };
 		F122E9AA54D38F9BBEFFF123 /* SkillListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillListViewModel.swift; sourceTree = "<group>"; };
+		FACA0A309839BDD69E29C65E /* YouSkillUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = YouSkillUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FDACB211276E575C4A7A1D81 /* CatalogIconRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogIconRepositoryTests.swift; sourceTree = "<group>"; };
 		FE4054C7686DE3CA6FBD9193 /* YouSkill.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = YouSkill.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -171,8 +181,17 @@
 			children = (
 				CD7E6B988A08438B061BF670 /* Sources */,
 				9AAF10F7DB49000AF1F4E192 /* Tests */,
+				0336E766C26F8B96445821AF /* UITests */,
 				F8589CA258AD9FD920C73E55 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		0336E766C26F8B96445821AF /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				B1BEF4D7D35DB210CEA91524 /* MarketplaceNavigationTests.swift */,
+			);
+			path = UITests;
 			sourceTree = "<group>";
 		};
 		5061611B1545539D235B2B0C /* Service */ = {
@@ -344,6 +363,7 @@
 			children = (
 				FE4054C7686DE3CA6FBD9193 /* YouSkill.app */,
 				DCB0551558FC0B909AD91227 /* YouSkillTests.xctest */,
+				FACA0A309839BDD69E29C65E /* YouSkillUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -380,6 +400,24 @@
 			productReference = DCB0551558FC0B909AD91227 /* YouSkillTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		26A8172AB2CD3F3A510D5396 /* YouSkillUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CACD9421182DE33DA432B43D /* Build configuration list for PBXNativeTarget "YouSkillUITests" */;
+			buildPhases = (
+				9019C70576BE2EE34F916E0F /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4B8E85B07C48CAA82286A3CE /* PBXTargetDependency */,
+			);
+			name = YouSkillUITests;
+			packageProductDependencies = (
+			);
+			productName = YouSkillUITests;
+			productReference = FACA0A309839BDD69E29C65E /* YouSkillUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		85DAE59FA7B7D174B6AC2E03 /* YouSkill */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7A4C974D57C20C0C6AD67A18 /* Build configuration list for PBXNativeTarget "YouSkill" */;
@@ -411,6 +449,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					26A8172AB2CD3F3A510D5396 = {
+						TestTargetID = 85DAE59FA7B7D174B6AC2E03;
+					};
 					85DAE59FA7B7D174B6AC2E03 = {
 						DevelopmentTeam = HC438T2B8P;
 						ProvisioningStyle = Automatic;
@@ -441,6 +482,7 @@
 			targets = (
 				85DAE59FA7B7D174B6AC2E03 /* YouSkill */,
 				0D637A4691ECBEDF33205D09 /* YouSkillTests */,
+				26A8172AB2CD3F3A510D5396 /* YouSkillUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -474,6 +516,14 @@
 				0A6FBFE85C854EFE46A10A9F /* SkillCatalogRepositoryTests.swift in Sources */,
 				D02F394FA1A8B4EBA82F184F /* SkillFileRenderingTests.swift in Sources */,
 				5CCE27BD5091165325D0A771 /* SkillListViewModelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9019C70576BE2EE34F916E0F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DE032A523D1E384865F2FB2 /* MarketplaceNavigationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -526,6 +576,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		4B8E85B07C48CAA82286A3CE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85DAE59FA7B7D174B6AC2E03 /* YouSkill */;
+			targetProxy = E5FC1005B220623424346BE9 /* PBXContainerItemProxy */;
+		};
 		86C71556E2CC8FEBEC45FE42 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 85DAE59FA7B7D174B6AC2E03 /* YouSkill */;
@@ -562,6 +617,7 @@
 					"@loader_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.gumpw.youskill.tests;
+				PRODUCT_NAME = YouSkillTests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/YouSkill.app/YouSkill";
@@ -650,6 +706,27 @@
 			};
 			name = Release;
 		};
+		6AD29D2164D9118053124ACE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gumpw.youskill.uitests;
+				PRODUCT_NAME = YouSkillUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = YouSkill;
+			};
+			name = Debug;
+		};
 		924E1D1124BA7FAEC4136801 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -684,11 +761,33 @@
 					"@loader_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.gumpw.youskill.tests;
+				PRODUCT_NAME = YouSkillTests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/YouSkill.app/YouSkill";
 			};
 			name = Debug;
+		};
+		A545BE804D599582505ABF6B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gumpw.youskill.uitests;
+				PRODUCT_NAME = YouSkillUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = YouSkill;
+			};
+			name = Release;
 		};
 		A974577AB23EC5F776DBA962 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -776,6 +875,15 @@
 			buildConfigurations = (
 				1027F4A2B8F1733ACCD6F812 /* Debug */,
 				924E1D1124BA7FAEC4136801 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CACD9421182DE33DA432B43D /* Build configuration list for PBXNativeTarget "YouSkillUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6AD29D2164D9118053124ACE /* Debug */,
+				A545BE804D599582505ABF6B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

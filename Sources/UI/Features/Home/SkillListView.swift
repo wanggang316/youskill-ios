@@ -49,6 +49,7 @@ struct SkillListView: View {
                         Button { open(.all) } label: {
                             Label(L10n.string("catalog.all"), systemImage: "square.grid.2x2")
                         }
+                        .accessibilityIdentifier("catalog.all")
                         ForEach(viewModel.categories) { category in
                             Button { open(.category(category)) } label: {
                                 catalogRow(name: category.name, icon: category.icon,
@@ -157,6 +158,7 @@ struct SkillListView: View {
                                           favoriteAction: { viewModel.toggleFavorite(for: skill) })
                             }
                             .buttonStyle(.plain)
+                            .accessibilityIdentifier("skill.card.\(skill.id)")
                             .id(skill.id)
                             .task { await viewModel.loadMoreIfNeeded(currentSkill: skill) }
                         }
@@ -175,6 +177,7 @@ struct SkillListView: View {
                     .scrollTargetLayout()
                     .padding(16)
                 }
+                .accessibilityIdentifier("catalog.results")
                 .scrollPosition(id: $scrollPosition)
                 .refreshable { await viewModel.refresh() }
             }

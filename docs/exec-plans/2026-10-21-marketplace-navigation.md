@@ -55,3 +55,11 @@ Catalog icons use SVGView 1.0.6 (MIT) to render the backend Iconify SVGs. The ic
 The Xcode 27 simulator GUI is Device Hub, not Simulator.app. The initial GUI absence conclusion was incorrect. Live GUI testing found a catalog decoding error: `updated_at` can omit the UTC suffix. Backend timestamps use UTC. Match both timestamp forms at the JSON boundary and retain rejection of invalid input.
 
 Timestamp regression first failed at `skills[0].updated_at`, then passed after the decoder change. All 32 Swift tests (including timezone offset and malformed input cases), `harness check`, and the iOS Simulator build pass. The repaired app was installed on the running iPhone 17. Device Hub screenshots confirmed the original error, but subsequent Computer Use operations timed out even for Finder. GUI acceptance remains blocked on the control service; no successful click recovery is claimed.
+
+## Detail navigation regression
+
+The user reported an extra navigation level when opening a skill. Static inspection shows one detail destination but mixes Boolean result presentation with value-based detail navigation. This is a hypothesis, not a confirmed cause. A new UI test checks two consecutive detail entries: one back action must return to the original list, and the next back action must return to the catalog. The test uses the live catalog and keeps screenshots at each step. Accessibility identifiers do not change routing behavior.
+
+Computer Use recovered discovery after opening the internal DeviceHub executable through Finder, but later input again failed with `noWindowsAvailable` and the native pipe failed to start. The UI test bundle passes `xcodebuild build-for-testing` and `harness check`; running XCUITest awaits explicit user authorization to use an alternative UI control technology under the Computer Use tool rules. No navigation fix has been applied yet.
+
+The first Xcode test build found a pre-existing product-name collision: `YouSkillTests` inherited `PRODUCT_NAME: YouSkill`. The test target now has its own product name. UI test lifecycle methods use async XCTest overrides for Swift 6 isolation.

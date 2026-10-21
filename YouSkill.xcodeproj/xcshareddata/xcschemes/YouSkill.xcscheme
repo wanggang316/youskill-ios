@@ -43,8 +43,19 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0D637A4691ECBEDF33205D09"
-               BuildableName = "YouSkill.xctest"
+               BuildableName = "YouSkillTests.xctest"
                BlueprintName = "YouSkillTests"
+               ReferencedContainer = "container:YouSkill.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "26A8172AB2CD3F3A510D5396"
+               BuildableName = "YouSkillUITests.xctest"
+               BlueprintName = "YouSkillUITests"
                ReferencedContainer = "container:YouSkill.xcodeproj">
             </BuildableReference>
          </TestableReference>

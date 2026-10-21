@@ -65,6 +65,7 @@ targets:
     scheme:
       testTargets:
         - YouSkillTests
+        - YouSkillUITests
 
   YouSkillTests:
     type: bundle.unit-test
@@ -72,6 +73,7 @@ targets:
     deploymentTarget: "17.0"
     settings:
       base:
+        PRODUCT_NAME: YouSkillTests
         PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill.tests
         CODE_SIGNING_ALLOWED: NO
         CODE_SIGNING_REQUIRED: NO
@@ -84,3 +86,20 @@ targets:
       properties:
         CFBundleDisplayName: YouSkillTests
         UILaunchScreen: {}
+
+  YouSkillUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: UITests
+    dependencies:
+      - target: YouSkill
+    settings:
+      base:
+        PRODUCT_NAME: YouSkillUITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: YouSkill
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
