@@ -95,7 +95,7 @@ private func externalLink<Icon: View>(_ title: String, icon: @Sendable () -> Ico
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(Color(.tertiaryLabel))
+                .foregroundStyle(.tertiary)
         }
     }
     .foregroundStyle(.primary)

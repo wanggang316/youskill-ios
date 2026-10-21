@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SkillCard: View {
     let skill: Skill
+    var showsSource = true
     let isFavorite: Bool
     let favoriteAction: () -> Void
 
@@ -9,17 +10,23 @@ struct SkillCard: View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(skill.displaySubtitle)
+                    Text(skill.name)
                         .font(.headline)
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    HStack(spacing: 14) {
-                        Label("\(skill.starCount)", systemImage: "star")
+                    if showsSource {
+                        HStack(spacing: 10) {
+                            if let source = skill.source {
+                                Text(source).lineLimit(1)
+                            }
+                            Label(skill.starCount.formatted(), systemImage: "star")
+                                .fixedSize()
+                        }
+                        .font(.footnote)
+                        .foregroundStyle(AppTheme.secondaryText)
                     }
-                    .font(.footnote)
-                    .foregroundStyle(AppTheme.secondaryText)
                 }
 
                 Button(action: favoriteAction) {

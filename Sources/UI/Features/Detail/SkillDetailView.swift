@@ -50,6 +50,7 @@ struct SkillDetailView: View {
                 }
             )
         }
+        .accessibilityIdentifier("skill.detail")
         .navigationTitle(viewModel.displayTitle)
         .platformInlineNavigationTitle()
         .toolbar {

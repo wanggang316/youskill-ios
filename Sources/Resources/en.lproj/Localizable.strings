@@ -88,3 +88,14 @@
 "validation.server_error" = "The service is temporarily unavailable (HTTP %ld).";
 "validation.timeout" = "The request timed out. Check your network and try again.";
 "validation.tls_failed" = "A secure connection could not be established. Check your certificate or proxy settings.";
+
+"catalog.categories" = "Categories";
+"catalog.repositories" = "Hot repositories";
+"catalog.all" = "All skills";
+"catalog.sort" = "Sort skills";
+"skill.sort.popular" = "Most Popular";
+"catalog.search_scope" = "Search in %@";
+"catalog.no_repositories" = "No repositories yet";
+"catalog.retry_message" = "Pull to refresh or try again later.";
+"catalog.browse" = "Browse";
+"catalog.count" = "%ld skills";

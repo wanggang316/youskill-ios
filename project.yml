@@ -16,11 +16,15 @@ packages:
     url: https://github.com/appstefan/highlightswift.git
     from: 1.1.0
 
+  SVGView:
+    url: https://github.com/exyte/SVGView.git
+    from: 1.0.6
+
 settings:
   base:
     PRODUCT_NAME: YouSkill
-    CURRENT_PROJECT_VERSION: 20260414
-    MARKETING_VERSION: 1.0
+    CURRENT_PROJECT_VERSION: 20261021
+    MARKETING_VERSION: 1.1
     SWIFT_VERSION: 6.0
     GENERATE_INFOPLIST_FILE: NO
     SUPPORTS_MACCATALYST: NO
@@ -35,6 +39,7 @@ targets:
     dependencies:
       - package: MarkdownUI
       - package: HighlightSwift
+      - package: SVGView
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill
@@ -60,6 +65,7 @@ targets:
     scheme:
       testTargets:
         - YouSkillTests
+        - YouSkillUITests
 
   YouSkillTests:
     type: bundle.unit-test
@@ -67,6 +73,7 @@ targets:
     deploymentTarget: "17.0"
     settings:
       base:
+        PRODUCT_NAME: YouSkillTests
         PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill.tests
         CODE_SIGNING_ALLOWED: NO
         CODE_SIGNING_REQUIRED: NO
@@ -79,3 +86,20 @@ targets:
       properties:
         CFBundleDisplayName: YouSkillTests
         UILaunchScreen: {}
+
+  YouSkillUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: UITests
+    dependencies:
+      - target: YouSkill
+    settings:
+      base:
+        PRODUCT_NAME: YouSkillUITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: YouSkill
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO

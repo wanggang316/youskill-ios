@@ -88,3 +88,14 @@
 "validation.server_error" = "サービスは一時的に利用できません（HTTP %ld）。";
 "validation.timeout" = "リクエストがタイムアウトしました。ネットワークを確認して再試行してください。";
 "validation.tls_failed" = "安全な接続を確立できませんでした。証明書やプロキシ設定を確認してください。";
+
+"catalog.categories" = "カテゴリ";
+"catalog.repositories" = "人気のリポジトリ";
+"catalog.all" = "すべてのスキル";
+"catalog.sort" = "並べ替え";
+"skill.sort.popular" = "人気順";
+"catalog.search_scope" = "%@ 内を検索";
+"catalog.no_repositories" = "リポジトリはまだありません";
+"catalog.retry_message" = "下に引いて更新するか、後でもう一度お試しください。";
+"catalog.browse" = "ブラウズ";
+"catalog.count" = "%ld 件のスキル";

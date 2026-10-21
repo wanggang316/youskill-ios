@@ -12,14 +12,16 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/gonzalezreal/swift-markdown-ui", from: "2.4.1"),
-        .package(url: "https://github.com/appstefan/highlightswift.git", from: "1.1.0")
+        .package(url: "https://github.com/appstefan/highlightswift.git", from: "1.1.0"),
+        .package(url: "https://github.com/exyte/SVGView.git", from: "1.0.6")
     ],
     targets: [
         .target(
             name: "YouSkill",
             dependencies: [
                 .product(name: "MarkdownUI", package: "swift-markdown-ui"),
-                .product(name: "HighlightSwift", package: "highlightswift")
+                .product(name: "HighlightSwift", package: "highlightswift"),
+                .product(name: "SVGView", package: "SVGView")
             ],
             path: "Sources",
             exclude: ["App"],

@@ -88,3 +88,14 @@
 "validation.server_error" = "서비스를 일시적으로 사용할 수 없습니다 (HTTP %ld).";
 "validation.timeout" = "요청 시간이 초과되었습니다. 네트워크를 확인한 뒤 다시 시도해 주세요.";
 "validation.tls_failed" = "보안 연결을 설정할 수 없습니다. 인증서나 프록시 설정을 확인해 주세요.";
+
+"catalog.categories" = "카테고리";
+"catalog.repositories" = "인기 저장소";
+"catalog.all" = "모든 스킬";
+"catalog.sort" = "정렬";
+"skill.sort.popular" = "인기순";
+"catalog.search_scope" = "%@에서 검색";
+"catalog.no_repositories" = "저장소가 없습니다";
+"catalog.retry_message" = "아래로 당겨 새로고침하거나 나중에 다시 시도하세요.";
+"catalog.browse" = "둘러보기";
+"catalog.count" = "스킬 %ld개";

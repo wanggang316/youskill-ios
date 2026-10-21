@@ -7,6 +7,8 @@ extension SkillSortOption {
 
     var localizedDescription: String {
         switch self {
+        case .heatScore:
+            L10n.string("skill.sort.popular")
         case .installCount:
             L10n.string("filter.install_count.description")
         case .starCount:

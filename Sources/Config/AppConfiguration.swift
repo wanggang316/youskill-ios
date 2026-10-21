@@ -28,6 +28,15 @@ enum AppJSONCoders {
             if let date = ISO8601Formatters.makeBasic().date(from: value) {
                 return date
             }
+            // The catalog also returns UTC timestamps without a timezone suffix.
+            if value.range(of: #"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?$"#,
+                           options: .regularExpression) != nil {
+                let utcValue = value + "Z"
+                if let date = ISO8601Formatters.makeWithFractionalSeconds().date(from: utcValue)
+                    ?? ISO8601Formatters.makeBasic().date(from: utcValue) {
+                    return date
+                }
+            }
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date: \(value)")
         }
         return decoder
