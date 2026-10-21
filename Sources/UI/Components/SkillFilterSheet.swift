@@ -33,7 +33,7 @@ struct SkillFilterSheet: View {
 
     private func iconName(for option: SkillSortOption) -> String {
         switch option {
-        case .installCount:
+        case .heatScore, .installCount:
             "rectangle.stack"
         case .starCount:
             "star.fill"
@@ -44,7 +44,7 @@ struct SkillFilterSheet: View {
 
     private func iconBackground(for option: SkillSortOption) -> Color {
         switch option {
-        case .installCount:
+        case .heatScore, .installCount:
             AppTheme.accentSoft
         case .starCount:
             Color(red: 0.992, green: 0.894, blue: 0.84)

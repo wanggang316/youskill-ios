@@ -1,6 +1,6 @@
 # ExecPlan: Marketplace navigation
 
-**Status:** Active
+**Status:** Completed
 **Created:** 2026-10-21
 **Last Updated:** 2026-10-21
 
@@ -21,8 +21,8 @@ Add typed catalog navigation models and public repository methods through the ex
 - [x] Publish desktop PR #44.
 - [x] Inspect iOS architecture, repository contracts, and existing tests.
 - [x] Add catalog navigation requests and scoped queries with tests.
-- [ ] Confirm compact layout and implement native browsing.
-- [ ] Verify and commit the iOS changes.
+- [x] Confirm compact layout and implement native browsing.
+- [x] Verify and commit the iOS changes.
 
 ## Surprises & Discoveries
 
@@ -37,10 +37,12 @@ Add typed catalog navigation models and public repository methods through the ex
 - **Decision:** Use public catalog endpoints and existing URLSession infrastructure.
   **Rationale:** The deployed endpoints support category filters, repository filters, icons, and stars without a new dependency.
   **Date:** 2026-10-21
-- **Decision:** Keep UI layout pending user confirmation; API and state work can proceed independently.
-  **Rationale:** An always-visible phone sidebar and a native browse-then-list flow have different usability tradeoffs.
+- **Decision:** Use a native category/repository browser that pushes a scoped skill list on iPhone.
+  **Rationale:** The user approved this compact layout. Keep the existing iPhone-only target; do not add iPad distribution support.
   **Date:** 2026-10-21
 
 ## Outcomes & Retrospective
 
-The data layer and state changes pass 27 Swift tests and `harness check`. Native layout implementation remains pending user confirmation. The iOS Simulator build passes. UI runtime acceptance remains pending.
+The implementation passes 30 Swift tests, `harness check`, and an iOS Simulator build. Native layout includes a segmented category/repository browser, scoped search, heat/star sorting, a separate favorites entry, and preserved list state. An installed iPhone simulator runtime loaded the live homepage with category counts and SVG icons. Full interactive navigation has not been verified because this environment has no available Simulator GUI.
+
+Catalog icons use SVGView 1.0.6 (MIT) to render the backend Iconify SVGs. The icon service caches response data for the session and falls back to SF Symbols on missing or failed icons.

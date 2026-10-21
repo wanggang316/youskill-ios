@@ -1,6 +1,7 @@
 import Foundation
 
 enum SkillSortOption: String, CaseIterable, Identifiable {
+    case heatScore
     case installCount
     case starCount
     case favorites
@@ -9,6 +10,8 @@ enum SkillSortOption: String, CaseIterable, Identifiable {
 
     var titleKey: String {
         switch self {
+        case .heatScore:
+            "skill.sort.popular"
         case .installCount:
             "skill.sort.install_count"
         case .starCount:
@@ -20,6 +23,8 @@ enum SkillSortOption: String, CaseIterable, Identifiable {
 
     var apiValue: String? {
         switch self {
+        case .heatScore:
+            "heat_score"
         case .installCount:
             "install_count"
         case .starCount:

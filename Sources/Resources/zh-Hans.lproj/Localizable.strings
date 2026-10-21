@@ -88,3 +88,14 @@
 "validation.server_error" = "服务暂时不可用（HTTP %ld）。";
 "validation.timeout" = "请求超时，请检查网络后重试。";
 "validation.tls_failed" = "安全连接建立失败，请检查证书链、代理或网络设置。";
+
+"catalog.categories" = "分类";
+"catalog.repositories" = "热门仓库";
+"catalog.all" = "全部 Skills";
+"catalog.sort" = "排序";
+"skill.sort.popular" = "最热门";
+"catalog.search_scope" = "在 %@ 中搜索";
+"catalog.no_repositories" = "暂无热门仓库";
+"catalog.retry_message" = "下拉刷新或稍后重试。";
+"catalog.browse" = "浏览";
+"catalog.count" = "%ld 个 Skills";

@@ -16,6 +16,10 @@ packages:
     url: https://github.com/appstefan/highlightswift.git
     from: 1.1.0
 
+  SVGView:
+    url: https://github.com/exyte/SVGView.git
+    from: 1.0.6
+
 settings:
   base:
     PRODUCT_NAME: YouSkill
@@ -35,6 +39,7 @@ targets:
     dependencies:
       - package: MarkdownUI
       - package: HighlightSwift
+      - package: SVGView
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill

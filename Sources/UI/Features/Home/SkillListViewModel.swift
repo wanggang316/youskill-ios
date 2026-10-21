@@ -8,7 +8,7 @@ final class SkillListViewModel {
     private let favoritesStore: FavoritesStore
 
     private(set) var searchText = ""
-    var selectedSort: SkillSortOption = .installCount {
+    var selectedSort: SkillSortOption = .heatScore {
         didSet {
             if oldValue != selectedSort { invalidateResults() }
         }

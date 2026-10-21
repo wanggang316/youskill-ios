@@ -117,6 +117,36 @@ struct SkillListViewModelTests {
         #expect(!viewModel.isNavigationLoading)
     }
 
+    @Test
+    func returningToResultsKeepsScopeQuerySortAndLoadedSkills() async {
+        let repository = FakeSkillCatalogRepository()
+        let viewModel = makeViewModel(repository: repository)
+        let category = SkillCategory(id: 7, name: "design", icon: nil, skillCount: 1)
+        viewModel.selectScope(.category(category))
+        viewModel.selectedSort = .starCount
+        viewModel.applySearch("layout")
+        await viewModel.loadIfNeeded()
+        await viewModel.loadIfNeeded()
+        await viewModel.reloadIfNeeded(for: viewModel.reloadKey)
+        #expect(await repository.fetchCount == 1)
+        #expect(viewModel.scope == .category(category))
+        #expect(viewModel.searchText == "layout")
+        #expect(viewModel.selectedSort == .starCount)
+    }
+
+    @Test
+    func favoritesDoNotFetchRemoteSkills() async {
+        let repository = FakeSkillCatalogRepository()
+        let viewModel = makeViewModel(repository: repository)
+        let skill = sampleSkill(1)
+        viewModel.toggleFavorite(for: skill)
+        viewModel.selectedSort = .favorites
+        await viewModel.loadIfNeeded()
+        #expect(viewModel.displayedSkills.map(\.id) == [1])
+        #expect(await repository.fetchCount == 0)
+        #expect(!viewModel.canLoadMore)
+    }
+
     private func sampleSkill(_ id: Int) -> Skill {
         Skill(id: id, name: "skill-\(id)", description: nil, url: nil, path: nil,
               starCount: 120, heatScore: 10, installCount: 1, source: "team/tools",
