@@ -7,6 +7,7 @@ on:
       - 'docs/**'
       - '.harness/**'
       - 'harness.config.yaml'
+      - '.github/workflows/harness-check.yml'
 
 jobs:
   check:
@@ -16,4 +17,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npx harness-eng check
+      - name: Build pinned harness CLI
+        env:
+          HARNESS_REVISION: 0e0ee8dd87f86bcaa38335f862ab08da46ad9e77
+        run: |
+          git clone --no-checkout https://github.com/StvnWthrsp/harness.git "$RUNNER_TEMP/harness"
+          git -C "$RUNNER_TEMP/harness" checkout --detach "$HARNESS_REVISION"
+          npm ci --prefix "$RUNNER_TEMP/harness"
+          npm run build --prefix "$RUNNER_TEMP/harness"
+      - run: node "$RUNNER_TEMP/harness/dist/index.js" check
