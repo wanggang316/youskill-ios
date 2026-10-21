@@ -69,3 +69,13 @@ The first Xcode test build found a pre-existing product-name collision: `YouSkil
 The user-provided recording (2026-10-21 17:40:08, 2.398 seconds) shows the detail title briefly behind a second skill-list push at about 1.6 seconds. The list is pushed again above the detail; this is not merely the expected catalog/list/detail hierarchy. Replace the Boolean list destination with a value destination in one bound `NavigationPath`, shared with the existing skill destinations. The root toolbar now derives visibility from the same path. UI execution through XCUITest is still pending authorization; compilation and shared tests do not establish GUI acceptance.
 
 Validation after the path change: all 32 shared Swift tests, `harness check`, `git diff --check`, and the iPhone 17 `build-for-testing` pass. The UI test bundle has not been executed, so the video establishes the original failure but not runtime acceptance of the fix.
+
+## Release 1.1 preparation
+
+The user requested a PR merge and a new iOS release. Version 1.1 uses build
+20261021. On 2026-10-21, all 32 Swift tests and `harness check` pass. A signed
+Release archive succeeds with the existing Xcode development identity. The
+release archive must be rebuilt after the version bump. App Store Connect has
+no active browser session yet. Distribution upload and App Review submission
+remain pending. The existing XCUITest is compiled but has not run; authorization
+to use it instead of Computer Use is pending.
