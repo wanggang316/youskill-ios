@@ -24,10 +24,11 @@ struct MarkdownContentView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .font(.body)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: 760, alignment: .leading)
             .padding(.horizontal, 20)
             .padding(.vertical, 24)
             .textSelection(.enabled)
+            .frame(maxWidth: .infinity)
         }
         .background(AppTheme.cardBackground)
     }

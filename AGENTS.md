@@ -72,6 +72,8 @@ All project knowledge lives in `docs/`. Start with the area relevant to your tas
 
 ## Build & Test Commands
 
+For simulator acceptance, Duo display checks, store screenshots, and submission, see [iOS release workflow](docs/references/ios-release.md).
+
 ```bash
 xcodegen generate
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test

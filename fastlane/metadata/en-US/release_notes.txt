@@ -1,0 +1,1 @@
+Browse skills by category or repository. Search, sort, and save favorites. Read skill files with improved navigation and layouts for different screen sizes. Configure your translation model in Settings.

@@ -23,6 +23,15 @@ final class AppContainer {
 
     @MainActor
     static func live() -> AppContainer {
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--ui-testing") {
+            // Each UI test starts with clean local state without changing release behavior.
+            UserDefaults.standard.removePersistentDomain(forName: AppConfiguration.bundleIdentifier)
+        }
+        if ProcessInfo.processInfo.arguments.contains("--ui-fixtures") {
+            return uiTesting()
+        }
+#endif
         let favoritesStore = FavoritesStore()
         let settingsStore = AppSettingsStore()
         let httpClient = HTTPClient()

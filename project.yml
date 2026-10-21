@@ -23,7 +23,7 @@ packages:
 settings:
   base:
     PRODUCT_NAME: YouSkill
-    CURRENT_PROJECT_VERSION: 20261021
+    CURRENT_PROJECT_VERSION: 20261022
     MARKETING_VERSION: 1.1
     SWIFT_VERSION: 6.0
     GENERATE_INFOPLIST_FILE: NO
@@ -62,6 +62,9 @@ targets:
         UILaunchStoryboardName:
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+          - UIInterfaceOrientationPortraitUpsideDown
     scheme:
       testTargets:
         - YouSkillTests
@@ -103,3 +106,30 @@ targets:
         TEST_TARGET_NAME: YouSkill
         CODE_SIGNING_ALLOWED: NO
         CODE_SIGNING_REQUIRED: NO
+
+  YouSkillScreenshotTests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: ScreenshotTests
+    dependencies:
+      - target: YouSkill
+    settings:
+      base:
+        PRODUCT_NAME: YouSkillScreenshotTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.gumpw.youskill.screenshots
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: YouSkill
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+
+schemes:
+  YouSkillScreenshots:
+    build:
+      targets:
+        YouSkill: all
+        YouSkillScreenshotTests: [test]
+    test:
+      targets:
+        - YouSkillScreenshotTests

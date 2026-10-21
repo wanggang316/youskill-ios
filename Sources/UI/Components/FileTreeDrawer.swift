@@ -16,7 +16,7 @@ struct FileTreeDrawer: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let drawerWidth = min(max(geometry.size.width * 0.82, 294), 336)
+            let drawerWidth = min(geometry.size.width, min(max(geometry.size.width * 0.82, 294), 336))
 
             ZStack(alignment: .trailing) {
                 if isPresented {
@@ -71,6 +71,8 @@ struct FileTreeDrawer: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(L10n.string("common.done"))
+                .accessibilityIdentifier("detail.files.close")
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
@@ -296,6 +298,7 @@ private struct FileTreeNodeView: View {
         }
         .buttonStyle(.plain)
         .padding(.leading, CGFloat(depth) * 3)
+        .accessibilityIdentifier("detail.file.\(node.path)")
     }
 }
 

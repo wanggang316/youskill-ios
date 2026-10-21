@@ -1,0 +1,51 @@
+name: iOS Tests
+
+on:
+  pull_request:
+    paths:
+      - 'Sources/**'
+      - 'Tests/**'
+      - 'UITests/**'
+      - 'ScreenshotTests/**'
+      - 'project.yml'
+      - 'Gemfile*'
+      - 'fastlane/**'
+      - 'scripts/**'
+      - '.github/workflows/ios-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  simulator:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      IOS_TEST_DEVICES: iPhone 17,iPhone 16e
+      FASTLANE_SKIP_UPDATE_CHECK: '1'
+      FASTLANE_OPT_OUT_USAGE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0'
+          bundler-cache: true
+      - name: Install project generator
+        run: brew install xcodegen
+      - name: Run simulator regression suite
+        run: bundle exec fastlane ios verify
+      - name: Preserve test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulator-results
+          path: |
+            build/test-results
+            ~/Library/Logs/scan
+          if-no-files-found: warn

@@ -9,6 +9,10 @@
 "common.retry" = "重试";
 "common.save" = "保存";
 "common.unknown" = "未知";
+"skill.favorite.add" = "添加收藏";
+"skill.favorite.remove" = "取消收藏";
+"detail.translate" = "翻译";
+"detail.show_original" = "显示原文";
 
 "detail.content_load_failed" = "内容加载失败";
 "detail.directory" = "目录";

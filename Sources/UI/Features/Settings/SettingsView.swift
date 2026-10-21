@@ -15,6 +15,7 @@ struct SettingsView: View {
                         Button(L10n.string("common.done")) {
                             dismiss()
                         }
+                        .accessibilityIdentifier("settings.done")
                     }
                 }
         }
@@ -52,6 +53,7 @@ private struct SettingsFormView: View {
                         translationService: container.translationService
                     )
                 }
+                .accessibilityIdentifier("settings.model")
 
                 Picker(L10n.string("settings.target_language"), selection: Binding(
                     get: { settingsStore.translationSettings.targetLanguage },
@@ -119,13 +121,16 @@ private struct ModelSettingsView: View {
         Form {
             Section {
                 TextField(L10n.string("settings.base_url"), text: $draft.baseURL)
+                    .accessibilityIdentifier("settings.base-url")
                     .platformNonAutocorrectingTextInput()
                     .platformURLKeyboard()
 
                 SecureField(L10n.string("settings.api_key"), text: $draft.apiKey)
+                    .accessibilityIdentifier("settings.api-key")
                     .platformNonAutocorrectingTextInput()
 
                 TextField(L10n.string("settings.model"), text: $draft.model)
+                    .accessibilityIdentifier("settings.model-name")
                     .platformNonAutocorrectingTextInput()
             }
 
@@ -141,6 +146,7 @@ private struct ModelSettingsView: View {
                     }
                 }
                 .disabled(checkState == .checking)
+                .accessibilityIdentifier("settings.check")
 
                 switch checkState {
                 case .idle:
@@ -154,6 +160,7 @@ private struct ModelSettingsView: View {
                 case let .failure(message):
                     Label(message, systemImage: "xmark.circle.fill")
                         .foregroundStyle(.red)
+                        .accessibilityIdentifier("settings.check-failure")
                 }
             }
         }
@@ -165,6 +172,7 @@ private struct ModelSettingsView: View {
                     settingsStore.update(draft)
                     dismiss()
                 }
+                .accessibilityIdentifier("settings.save")
             }
         }
     }

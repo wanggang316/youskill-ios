@@ -9,6 +9,10 @@
 "common.retry" = "Retry";
 "common.save" = "Save";
 "common.unknown" = "Unknown";
+"skill.favorite.add" = "Add favorite";
+"skill.favorite.remove" = "Remove favorite";
+"detail.translate" = "Translate";
+"detail.show_original" = "Show original";
 
 "detail.content_load_failed" = "Couldn't load content";
 "detail.directory" = "Catalog";
