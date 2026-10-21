@@ -3,10 +3,14 @@ import SwiftUI
 struct SkillListView: View {
     let container: AppContainer
 
+    private enum CatalogDestination: Hashable {
+        case results
+    }
+
     @State private var viewModel: SkillListViewModel
     @State private var repositoriesSelected = false
     @State private var searchDraft = ""
-    @State private var isShowingResults = false
+    @State private var navigationPath = NavigationPath()
     @State private var isShowingSettings = false
     @State private var remoteSort: SkillSortOption = .heatScore
     @State private var scrollPosition: Int?
@@ -34,7 +38,7 @@ struct SkillListView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
                 Picker(L10n.string("catalog.browse"), selection: $repositoriesSelected) {
                     Text(L10n.string("catalog.categories")).tag(false)
@@ -86,7 +90,7 @@ struct SkillListView: View {
             .navigationTitle("YouSkill")
             .platformInlineNavigationTitle()
             .toolbar {
-                if !isShowingResults {
+                if navigationPath.isEmpty {
                     ToolbarItem(placement: PlatformToolbarPlacement.leading) {
                         Button {
                             if viewModel.selectedSort != .favorites { remoteSort = viewModel.selectedSort }
@@ -95,7 +99,7 @@ struct SkillListView: View {
                             viewModel.applySearch("")
                             searchDraft = ""
                             scrollPosition = nil
-                            isShowingResults = true
+                            navigationPath.append(CatalogDestination.results)
                         } label: { Image(systemName: "bookmark") }
                         .accessibilityLabel(L10n.string("skill.sort.favorites"))
                     }
@@ -106,7 +110,7 @@ struct SkillListView: View {
                 }
             }
             .sheet(isPresented: $isShowingSettings) { SettingsView(container: container) }
-            .navigationDestination(isPresented: $isShowingResults) { results }
+            .navigationDestination(for: CatalogDestination.self) { _ in results }
             .navigationDestination(for: Skill.self) { skill in
                 SkillDetailView(skill: skill, container: container)
             }
@@ -121,7 +125,7 @@ struct SkillListView: View {
         viewModel.selectScope(scope)
         if viewModel.selectedSort == .favorites { viewModel.selectedSort = remoteSort }
         searchDraft = viewModel.searchText
-        isShowingResults = true
+        navigationPath.append(CatalogDestination.results)
     }
 
     private func catalogRow(name: String, icon: String?, count: Int, fallback: String) -> some View {

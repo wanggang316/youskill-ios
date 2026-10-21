@@ -63,3 +63,9 @@ The user reported an extra navigation level when opening a skill. Static inspect
 Computer Use recovered discovery after opening the internal DeviceHub executable through Finder, but later input again failed with `noWindowsAvailable` and the native pipe failed to start. The UI test bundle passes `xcodebuild build-for-testing` and `harness check`; running XCUITest awaits explicit user authorization to use an alternative UI control technology under the Computer Use tool rules. No navigation fix has been applied yet.
 
 The first Xcode test build found a pre-existing product-name collision: `YouSkillTests` inherited `PRODUCT_NAME: YouSkill`. The test target now has its own product name. UI test lifecycle methods use async XCTest overrides for Swift 6 isolation.
+
+## Video-confirmed navigation fix
+
+The user-provided recording (2026-10-21 17:40:08, 2.398 seconds) shows the detail title briefly behind a second skill-list push at about 1.6 seconds. The list is pushed again above the detail; this is not merely the expected catalog/list/detail hierarchy. Replace the Boolean list destination with a value destination in one bound `NavigationPath`, shared with the existing skill destinations. The root toolbar now derives visibility from the same path. UI execution through XCUITest is still pending authorization; compilation and shared tests do not establish GUI acceptance.
+
+Validation after the path change: all 32 shared Swift tests, `harness check`, `git diff --check`, and the iPhone 17 `build-for-testing` pass. The UI test bundle has not been executed, so the video establishes the original failure but not runtime acceptance of the fix.
