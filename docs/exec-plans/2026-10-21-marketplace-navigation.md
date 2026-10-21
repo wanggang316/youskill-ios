@@ -1,6 +1,6 @@
 # ExecPlan: Marketplace navigation
 
-**Status:** Completed
+**Status:** Active
 **Created:** 2026-10-21
 **Last Updated:** 2026-10-21
 
@@ -43,6 +43,15 @@ Add typed catalog navigation models and public repository methods through the ex
 
 ## Outcomes & Retrospective
 
-The implementation passes 30 Swift tests, `harness check`, and an iOS Simulator build. Native layout includes a segmented category/repository browser, scoped search, heat/star sorting, a separate favorites entry, and preserved list state. An installed iPhone simulator runtime loaded the live homepage with category counts and SVG icons. Full interactive navigation has not been verified because this environment has no available Simulator GUI.
+The implementation passes 30 Swift tests, `harness check`, and an iOS Simulator build. Native layout includes a segmented category/repository browser, scoped search, heat/star sorting, a separate favorites entry, and preserved list state. An installed iPhone simulator runtime loaded the live homepage with category counts and SVG icons. Full interactive navigation remains unverified. Xcode 27 provides the simulator GUI through Device Hub; the earlier missing-GUI diagnosis was incorrect.
 
 Catalog icons use SVGView 1.0.6 (MIT) to render the backend Iconify SVGs. The icon service caches response data for the session and falls back to SF Symbols on missing or failed icons.
+
+## GUI acceptance follow-up
+
+- [x] Decode UTC timestamps without a timezone suffix from the live catalog.
+- [ ] Restore reliable Device Hub input and run the marketplace GUI flows.
+
+The Xcode 27 simulator GUI is Device Hub, not Simulator.app. The initial GUI absence conclusion was incorrect. Live GUI testing found a catalog decoding error: `updated_at` can omit the UTC suffix. Backend timestamps use UTC. Match both timestamp forms at the JSON boundary and retain rejection of invalid input.
+
+Timestamp regression first failed at `skills[0].updated_at`, then passed after the decoder change. All 32 Swift tests (including timezone offset and malformed input cases), `harness check`, and the iOS Simulator build pass. The repaired app was installed on the running iPhone 17. Device Hub screenshots confirmed the original error, but subsequent Computer Use operations timed out even for Finder. GUI acceptance remains blocked on the control service; no successful click recovery is claimed.

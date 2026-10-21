@@ -34,7 +34,7 @@ struct SkillCatalogRepositoryTests {
                   "skill_path_sha": "abc",
                   "tags": ["search"],
                   "created_at": "2026-04-01T12:00:00.000000Z",
-                  "updated_at": "2026-04-01T12:00:00.000000Z"
+                  "updated_at": "2026-04-01T12:00:00.000000"
                 }
               ],
               "total": 1,
@@ -53,6 +53,7 @@ struct SkillCatalogRepositoryTests {
         #expect(page.total == 1)
         #expect(page.skills.first?.name == "find-skill")
         #expect(page.skills.first?.starCount == 100)
+        #expect(page.skills.first?.updatedAt == page.skills.first?.createdAt)
     }
 
     @Test
@@ -93,6 +94,28 @@ struct SkillCatalogRepositoryTests {
         #expect(repos.count == 1)
         #expect(repos.first?.starCount == 120)
         #expect(repos.first?.icon == "lucide:star")
+    }
+
+    @Test(arguments: [
+        "2026-04-01T12:00:00Z",
+        "2026-04-01T12:00:00.000000Z",
+        "2026-04-01T12:00:00",
+        "2026-04-01T12:00:00.000000",
+        "2026-04-01T14:00:00+02:00"
+    ])
+    func catalogTimestampsPreserveUTCInstant(_ timestamp: String) throws {
+        let data = try JSONEncoder().encode(timestamp)
+        let date = try AppJSONCoders.decoder.decode(Date.self, from: data)
+        let expected = try #require(ISO8601Formatters.makeBasic().date(from: "2026-04-01T12:00:00Z"))
+        #expect(date == expected)
+    }
+
+    @Test(arguments: ["invalid", "2026-04-01", "2026-04-01T12:00:00garbage"])
+    func malformedTimestampsAreRejected(_ timestamp: String) throws {
+        let data = try JSONEncoder().encode(timestamp)
+        #expect(throws: DecodingError.self) {
+            try AppJSONCoders.decoder.decode(Date.self, from: data)
+        }
     }
 
     private func makeSession() -> URLSession {
