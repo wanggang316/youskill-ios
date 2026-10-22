@@ -118,3 +118,11 @@ Revision note: recorded final remote evidence and the user's reduced screenshot 
 The user clarified that the 3–5 screenshot limit applies to each language and device group, with consistent content across groups. Replace the asymmetric 4-phone/1-Duo selection with four matching screens per group: categories, popular repositories, skills, and reader. All four locales use the same sequence. This gives 32 images total. The existing archive and metadata remain valid. The release gate now rejects a missing group, fewer than three or more than five images per group, and inconsistent screen order. Candidate and selection tests, `harness check`, and `git diff --check` pass.
 
 Withdraw the pending review, retain existing matching images, upload the 12 missing Duo screenshots, and resubmit the same build. Confirm all eight locale/device groups contain the same four screens with COMPLETE state and matching source checksums before submission. Record the final review state after resubmission. The previous WAITING_FOR_REVIEW evidence describes the superseded asymmetric screenshot submission.
+
+### Parity correction confirmed
+
+On 2026-10-22 at 14:24:55 UTC, the same 1.1 build 202610221 was submitted again. Final API readback confirms WAITING_FOR_REVIEW, VALID build processing, and AFTER_APPROVAL release. The previous submission was canceled and its item became REMOVED before screenshot edits.
+
+For each of en-US, zh-Hans, ja, and ko, APP_IPHONE_67 and APP_IPHONE_DUO each contain four images in the order categories, popular repositories, skill list, reader. All 32 images are COMPLETE and their source checksums match local captures. Exact ordered filenames were asserted against `fastlane/screenshot-selection.json` for all eight groups; no other populated groups remain. Existing metadata still matches local files. Only the 12 missing Duo images were uploaded; the existing 20 images and IPA were retained.
+
+Evidence: `build/release/status/complete-device-groups.log`, `resubmit.log`, `parity-final-readback.log`, and `remote-verification.json`. Candidate/selection tests and harness checks passed. This outcome supersedes the earlier 20-image submission. Apple review remains pending, with automatic release after approval.
