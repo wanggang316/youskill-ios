@@ -1,6 +1,6 @@
 # ExecPlan: Verified iOS releases
 
-**Status:** Blocked on simulator acceptance
+**Status:** Active
 **Created:** 2026-10-22
 **Last Updated:** 2026-10-22
 
@@ -55,6 +55,18 @@ Run the existing simulator tests first and diagnose failures from result bundles
 - Test at the user interaction boundary and existing repository/service public interfaces. Preserve the navigation regression and add one behavior at a time.
 - Treat a passing build, passing simulator tests, screenshots, upload, review submission, and public availability as separate evidence.
 - Do not label another simulator or a resized screenshot as iPhone Duo evidence.
+
+## Current Release Attempt
+
+- The user authorized updating version 1.1 metadata and screenshots, uploading a new build, and submitting it for automatic release after approval.
+- App Store Connect reports 1.1 as `PREPARE_FOR_SUBMISSION`, with no selected build. The newest uploaded build is 20261021. The new candidate is 202610221.
+- The previously blocked Duo simulator now boots. The catalog split-view regression passed on device `09D50758-369E-4ED0-BC56-C45A956B51B6`.
+- Store capture must use the open display in landscape and handle the split-view sidebar when returning to Settings.
+- An executed screenshot smoke test passed its UI assertions but produced black images through `XCUIApplication.screenshot()`. Screenshot capture is not accepted until native image content and dimensions are verified.
+- Four-language descriptions and release notes now describe the catalog and Duo layouts. Existing support and privacy URLs are preserved. The previous dark-mode claim is removed because the app currently uses a light interface.
+- Native active-display capture passed a five-page Duo smoke flow with exact 2853 x 2007 images. The capture worker has checks for success, command failure, and invalid filenames. PNG export uses an opaque ImageIO context to satisfy the App Store format requirement.
+- Existing uploaded builds declare no non-exempt encryption. This release retains that declaration in the app plist; it does not change networking or cryptography.
+- Full matrix acceptance, final screenshot inspection, signed archive, upload, and review submission are pending for this candidate.
 
 ## Outcomes & Retrospective
 

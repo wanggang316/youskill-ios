@@ -1,0 +1,15 @@
+YouSkill helps you discover and read Agent Skills on iPhone.
+
+BROWSE AND SAVE
+Browse categories and popular repositories. Search within a category or repository, sort skills by popularity or stars, and save favorites for quick access.
+
+READ SKILL FILES
+Read Markdown documentation, explore related files with the file browser, view images, and inspect code with syntax highlighting.
+
+TRANSLATE WITH YOUR MODEL
+Translate Markdown into English, Simplified Chinese, Japanese, or Korean. Configure a compatible model provider and your own API key in Settings. Translation requires a model service; provider charges may apply.
+
+ADAPTS TO YOUR SCREEN
+On iPhone Duo, browse the catalog and Skills side by side when the device is open in landscape. Continue reading as you fold or rotate the device. Compact screens use single-column navigation.
+
+The interface supports English, Simplified Chinese, Japanese, and Korean.

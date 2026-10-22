@@ -23,7 +23,7 @@ packages:
 settings:
   base:
     PRODUCT_NAME: YouSkill
-    CURRENT_PROJECT_VERSION: 20261022
+    CURRENT_PROJECT_VERSION: 202610221
     MARKETING_VERSION: 1.1
     SWIFT_VERSION: 6.0
     GENERATE_INFOPLIST_FILE: NO
@@ -53,6 +53,7 @@ targets:
       path: Sources/App/Info.plist
       properties:
         CFBundleDisplayName: YouSkill
+        ITSAppUsesNonExemptEncryption: false
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UIApplicationSceneManifest:

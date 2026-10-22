@@ -17,7 +17,7 @@ bundle exec fastlane ios verify
 
 `IOS_TEST_DEVICES` accepts a comma-separated list of exact simulator names. A reduced matrix is useful for local regression work but does not establish Duo support. `IOS_DERIVED_DATA` can reuse an existing build cache.
 
-If several simulators have the same name, `IOS_SIMULATOR_UDIDS` can select an exact device with a JSON object, such as `{"iPhone Duo":"DEVICE-UDID"}`. An unknown UDID fails selection instead of falling back to another device. Run `bundle exec ruby scripts/test-release-preflight.rb` to check device selection and startup failure guards without booting a simulator.
+If several simulators have the same name, `IOS_SIMULATOR_UDIDS` can select an exact device with a JSON object, such as `{"iPhone Duo":"DEVICE-UDID"}`. An unknown UDID fails selection instead of falling back to another device. Run `bundle exec ruby scripts/test-release-preflight.rb` to check device selection and startup failure guards without booting a simulator. Run `ruby scripts/test-screenshot-capture.rb` to check the screenshot handshake and failure propagation.
 
 The workflow activates one selected simulator at a time and shuts down other selected devices to reduce host memory and CPU load. It does not erase device data or shut down devices outside the selected matrix. Each device gets its own result bundle. Use a current runtime when creating test devices; legacy-runtime boot failures are environment failures, not passing app tests.
 
@@ -41,7 +41,7 @@ bundle exec fastlane ios screenshots
 
 The screenshot lane first runs acceptance. It captures five screens in English, Simplified Chinese, Japanese, and Korean, including separate Duo cover and inner display sets. Existing `fastlane/screenshots` must be moved aside before a fresh capture. Inspect the generated images for clipping, empty content, localization, and correct active-display dimensions before submission. A completed capture alone does not establish visual quality.
 
-Capture uses the separate `YouSkillScreenshots` XCTest scheme through fastlane `run_tests`. The pinned snapshot launcher shuts down all booted simulators, so it cannot preserve a selected Duo posture. The native test target reads a temporary host configuration, sets the app language, and writes original PNG data with matching result-bundle attachments. The workflow removes that configuration after capture and validates both image counts and Duo display dimensions.
+Capture uses the separate `YouSkillScreenshots` XCTest scheme through fastlane `run_tests`. The pinned snapshot launcher shuts down all booted simulators, so it cannot preserve a selected Duo posture. The native test target reads a temporary host configuration, sets the app language and posture, and signals when each page is ready. A host worker uses sim-use to capture the active display at its native resolution, then returns the PNG for the test result attachment. This avoids black images and rounded dimensions from XCTest screen capture on Duo. Open-display screenshots use landscape to show both catalog columns. The workflow removes that configuration after capture and validates both image counts and Duo display dimensions.
 
 ```bash
 ./scripts/bump-build.sh

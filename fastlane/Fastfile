@@ -5,6 +5,7 @@ require "rbconfig"
 require "yaml"
 require "time"
 require "digest"
+require_relative "../scripts/screenshot-capture"
 
 # Child tools must use the same Ruby as Bundler, not the macOS system Ruby.
 ENV["PATH"] = "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch('PATH')}"
@@ -91,6 +92,9 @@ platform :ios do
     output_directory = "build/test-results/#{Time.now.utc.strftime('%Y%m%dT%H%M%SZ')}"
     selected_simulators.each do |device|
       activate_simulator(device)
+      if device.fetch("name") == "iPhone Duo"
+        sh("ruby ../scripts/with-timeout.rb 60 sim-use ios fold closed --device #{Shellwords.escape(device.fetch('udid'))} --json")
+      end
       run_tests(
         project: "YouSkill.xcodeproj",
         scheme: "YouSkill",
@@ -157,26 +161,32 @@ platform :ios do
       { "en-US" => "en_US", "zh-Hans" => "zh_CN", "ja" => "ja_JP", "ko" => "ko_KR" }.each do |language, locale|
         directory = File.expand_path("../#{output}/#{language}", __dir__)
         FileUtils.mkdir_p(directory)
-        File.write(configuration_path, JSON.generate({ language: language, locale: locale, outputDirectory: directory }))
-        run_tests(
-          project: "YouSkill.xcodeproj",
-          scheme: "YouSkillScreenshots",
-          xcodebuild_command: "ruby #{Shellwords.escape(File.expand_path('../scripts/with-timeout.rb', __dir__))} 1200 xcodebuild",
-          destination: "platform=iOS Simulator,id=#{device.fetch('udid')}",
-          skip_detect_devices: true,
-          force_quit_simulator: false,
-          reset_simulator: false,
-          disable_slide_to_type: false,
-          parallel_testing: false,
-          disable_concurrent_testing: true,
-          skip_package_dependencies_resolution: true,
-          disable_package_automatic_updates: true,
-          derived_data_path: ENV.fetch("IOS_DERIVED_DATA", "build/DerivedData"),
-          output_directory: "#{output}/#{language}/results",
-          result_bundle: true,
-          xcargs: "-collect-test-diagnostics never -test-timeouts-enabled YES -default-test-execution-time-allowance 600 -maximum-test-execution-time-allowance 600",
-          fail_build: true
-        )
+        File.write(configuration_path, JSON.generate({ language: language, locale: locale, outputDirectory: directory, posture: posture }))
+        capture = SimulatorScreenshotCapture.new(device: device.fetch("udid"), directory: directory)
+        capture.start
+        begin
+          run_tests(
+            project: "YouSkill.xcodeproj",
+            scheme: "YouSkillScreenshots",
+            xcodebuild_command: "ruby #{Shellwords.escape(File.expand_path('../scripts/with-timeout.rb', __dir__))} 1200 xcodebuild",
+            destination: "platform=iOS Simulator,id=#{device.fetch('udid')}",
+            skip_detect_devices: true,
+            force_quit_simulator: false,
+            reset_simulator: false,
+            disable_slide_to_type: false,
+            parallel_testing: false,
+            disable_concurrent_testing: true,
+            skip_package_dependencies_resolution: true,
+            disable_package_automatic_updates: true,
+            derived_data_path: ENV.fetch("IOS_DERIVED_DATA", "build/DerivedData"),
+            output_directory: "#{output}/#{language}/results",
+            result_bundle: true,
+            xcargs: "-collect-test-diagnostics never -test-timeouts-enabled YES -default-test-execution-time-allowance 600 -maximum-test-execution-time-allowance 600",
+            fail_build: true
+          )
+        ensure
+          capture.stop
+        end
         files = Dir.glob(File.join(directory, "*.png"))
         UI.user_error!("Incomplete screenshots for #{name}/#{posture}/#{language}.") unless files.length == 5
         destination = File.join(root, language)
