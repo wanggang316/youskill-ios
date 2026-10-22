@@ -84,3 +84,17 @@ The implementation is ready for review, with complete ordinary iPhone 17 regress
 - https://developer.apple.com/design/human-interface-guidelines/layout
 - https://github.com/lycorp-jp/sim-use
 - https://docs.fastlane.tools/actions/upload_to_app_store/
+
+## Release resumption on 2026-10-22
+
+The prepared 1.1 build 202610221 is bound to `1de97641391f643f1da11811ca7fa5893e3005c1`. Its 101 artifact hashes match after transfer. The clean acceptance record in `build/test-results/20261022T111233Z/acceptance.json` covers iPhone 16e, iPhone 17, iPhone 18 Pro Max, and Duo. All four locale contact sheets were inspected, including Duo open landscape. The images contain live content and are opaque RGB.
+
+Use the exec-plan skill for this continuation. The remaining milestones are to validate restricted candidate reuse, inspect App Store Connect, and submit the existing archive and assets through the release lane. No new app behavior is needed. The later navigation test change affects test setup only; app and archive inputs are identical. The new reuse option requires original clean acceptance and unchanged production inputs. It preserves the manifest revision and writes a separate submission-source record. The default lane still rejects a changed HEAD without explicit opt-in.
+
+- [x] Verify transferred candidate hashes, acceptance, and screenshot content.
+- [x] Add and test rejection of changed production inputs, dirty source, incomplete acceptance, version mismatch, altered artifacts, and unbound screenshots.
+- [ ] Upload the candidate, verify metadata and image processing, and request review with automatic release.
+
+Decision: preserve the verified archive and capture rather than repeat the device matrix. The explicit allowlist accepts only non-artifact paths and the tested release gate files. The original tests remain the evidence for this candidate; later test changes are not represented as executed acceptance.
+
+Revision note: added the resumption contract because the merge and skill changes advanced HEAD beyond the original artifact revision. Remote upload and review remain unverified until the final readback.

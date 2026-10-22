@@ -81,3 +81,7 @@ The preparation lane requires a clean commit. It runs acceptance and screenshot 
 - [fastlane scan](https://docs.fastlane.tools/actions/run_tests/)
 - [fastlane snapshot](https://docs.fastlane.tools/actions/capture_screenshots/)
 - [fastlane deliver](https://docs.fastlane.tools/actions/upload_to_app_store/)
+
+## Reuse after a merge
+
+Run `bundle exec fastlane ios release reuse_prepared:true` to submit the original prepared candidate after a merge that changed only documentation, agent skills, tests, or the release gate itself. The candidate revision must be an ancestor of HEAD. The gate rejects other changes, including app source, project settings, dependencies, metadata, and capture scripts. It also requires a clean working tree, the original clean acceptance record and full device matrix, matching version/build, unchanged asset hashes, and an exact screenshot inventory. The manifest keeps its original revision. `build/release/submission-source.json` records both source and submission revisions. Reused acceptance proves the original candidate; it does not claim that later tests ran. Run `ruby scripts/test-release-candidate.rb` to check the rejection boundaries.

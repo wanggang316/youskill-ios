@@ -6,6 +6,7 @@ require "yaml"
 require "time"
 require "digest"
 require_relative "../scripts/screenshot-capture"
+require_relative "../scripts/release-candidate"
 
 # Child tools must use the same Ruby as Bundler, not the macOS system Ruby.
 ENV["PATH"] = "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch('PATH')}"
@@ -260,15 +261,28 @@ platform :ios do
   end
 
   desc "Upload the inspected, verified release and request App Store review"
-  lane :release do
+  lane :release do |options|
     require_release_environment!
     path = File.expand_path("../build/release/manifest.json", __dir__)
     UI.user_error!("Run ios prepare_release and inspect its screenshots first.") unless File.file?(path)
     manifest = JSON.parse(File.read(path))
-    UI.user_error!("Source changed after acceptance.") unless source_revision == manifest.fetch("revision") && sh("git status --porcelain", log: false).strip.empty?
-    manifest.fetch("files").each do |file, digest|
-      UI.user_error!("Release asset changed: #{file}") unless File.file?(file) && Digest::SHA256.file(file).hexdigest == digest
+    root = File.expand_path("..", __dir__)
+    acceptance = Dir.glob(File.join(root, "build/test-results/*/acceptance.json")).filter_map do |file|
+      record = JSON.parse(File.read(file))
+      record if record["revision"] == manifest.fetch("revision")
+    end.last
+    begin
+      evidence = ReleaseCandidate.validate!(
+        root: root, manifest: manifest,
+        version: project_version.fetch("MARKETING_VERSION").to_s,
+        build: project_version.fetch("CURRENT_PROJECT_VERSION").to_s,
+        reuse: options[:reuse_prepared].to_s == "true", acceptance: acceptance,
+        required_devices: REQUIRED_RELEASE_DEVICES
+      )
+    rescue ArgumentError => error
+      UI.user_error!(error.message)
     end
+    File.write(File.join(root, "build/release/submission-source.json"), JSON.pretty_generate(evidence))
     api_key = app_store_connect_api_key(
       key_id: ENV.fetch("ASC_KEY_ID"),
       issuer_id: ENV.fetch("ASC_ISSUER_ID"),
