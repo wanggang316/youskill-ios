@@ -93,10 +93,22 @@ Use the exec-plan skill for this continuation. The remaining milestones are to v
 
 - [x] Verify transferred candidate hashes, acceptance, and screenshot content.
 - [x] Add and test rejection of changed production inputs, dirty source, incomplete acceptance, version mismatch, altered artifacts, and unbound screenshots.
-- [ ] Upload the candidate, verify metadata and image processing, and request review with automatic release.
+- [x] Upload the candidate, verify metadata and image processing, and request review with automatic release.
 
 Decision: preserve the verified archive and capture rather than repeat the device matrix. The explicit allowlist accepts only non-artifact paths and the tested release gate files. The original tests remain the evidence for this candidate; later test changes are not represented as executed acceptance.
 
 Revision note: added the resumption contract because the merge and skill changes advanced HEAD beyond the original artifact revision. Remote upload and review remain unverified until the final readback.
 
 The first submission attempt exposed conflicting Fastlane options (`ipa` and `build_number`); no upload occurred. The lane now validates identity from the IPA and lets Deliver select that exact processed build. The next attempt updated all four locales, then failed on a concurrent TLS read before image or binary upload. A single-thread retry successfully uploaded images. The user then requested only 3–5 key images. That uploader was stopped before IPA upload. The release now selects five images per locale (20 total) from the original hashed capture set. The original 100 captures and manifest remain unchanged. Sync must retain matching selected remote images, remove the redundant images, and upload only missing selections. Selection rejection tests and `harness check` pass.
+
+## Confirmed submission outcome — 2026-10-22
+
+App Store Connect readback confirmed version **1.1**, build **202610221**, build processing **VALID**, version state **WAITING_FOR_REVIEW**, and release type **AFTER_APPROVAL**. This is a review submission, not public availability. The original archive source remains `1de97641391f643f1da11811ca7fa5893e3005c1`; the final release-tool revision used for submission was `eeb93e4`. The manifest was not rewritten.
+
+Each of en-US, zh-Hans, ja, and ko has exactly five images: four ordinary iPhone core screens and one Duo expanded catalog. All 20 images report COMPLETE and their remote source checksums match the selected local captures. Descriptions, keywords, release notes, support URLs, and marketing URLs match local metadata. Privacy URLs, names, and subtitles were read back. Copyright keeps the existing owner and now reads `2026 WangGang`; precheck passes without warnings. The review contact and encryption/content-rights declarations were preserved.
+
+Evidence is in ignored local files `build/release/status/remote-verification.json`, `submit.log`, `upload-binary.log`, and `final-readback.log`. Original captures, acceptance, and the IPA remain intact. The first wide screenshot upload was stopped at the user's request; the final remote set is the reduced selection, not the original 100 images. Image processing and IPA upload were resumed separately through the installed Deliver/Spaceship dependencies to avoid duplicate upload. No Git push, tag, or deployment was performed.
+
+Validation completed: release candidate rejection checks, screenshot selection checks, release preflight and simulator-retention checks, Fastlane option validation, `harness check`, and `git diff --check`. No device acceptance was rerun; the full original candidate acceptance was reused under the tested non-artifact change contract. This documentation update occurs after confirmed submission and changes HEAD without changing the submitted artifact provenance.
+
+Revision note: recorded final remote evidence and the user's reduced screenshot scope. Apple's review is the only remaining external step; approval triggers automatic release.
