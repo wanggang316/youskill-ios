@@ -44,3 +44,19 @@ expect_error("JSON object") { flow.selected_simulators }
 ENV["IOS_SIMULATOR_UDIDS"] = "not-json"
 expect_error("JSON object") { flow.selected_simulators }
 puts "Release preflight checks passed."
+
+commands = []
+devices = [device.merge("state" => "Booted"), { "name" => "iPhone 17", "udid" => "phone", "state" => "Booted" }]
+flow.define_singleton_method(:selected_simulators) { devices }
+flow.define_singleton_method(:sh) do |command, **|
+  commands << command
+  "Finished"
+end
+ENV["IOS_KEEP_BOOTED_UDIDS"] = "selected-device"
+flow.activate_simulator(devices.last)
+abort "The retained simulator was shut down." if commands.any? { |command| command.include?("shutdown") }
+ENV.delete("IOS_KEEP_BOOTED_UDIDS")
+commands.clear
+flow.activate_simulator(devices.last)
+abort "The default did not shut down the other simulator." unless commands.any? { |command| command.end_with?("shutdown selected-device") }
+puts "Simulator retention checks passed."

@@ -17,6 +17,8 @@ bundle exec fastlane ios verify
 
 `IOS_TEST_DEVICES` accepts a comma-separated list of exact simulator names. A reduced matrix is useful for local regression work but does not establish Duo support. `IOS_DERIVED_DATA` can reuse an existing build cache.
 
+`IOS_KEEP_BOOTED_UDIDS` accepts a comma-separated list of devices that must remain booted while other selected devices run. Use it for a recovered simulator whose cold startup is unreliable. The default still shuts down other selected devices to limit resource use; retaining a device increases resource use and does not bypass its acceptance tests.
+
 If several simulators have the same name, `IOS_SIMULATOR_UDIDS` can select an exact device with a JSON object, such as `{"iPhone Duo":"DEVICE-UDID"}`. An unknown UDID fails selection instead of falling back to another device. Run `bundle exec ruby scripts/test-release-preflight.rb` to check device selection and startup failure guards without booting a simulator. Run `ruby scripts/test-screenshot-capture.rb` to check the screenshot handshake and failure propagation.
 
 The workflow activates one selected simulator at a time and shuts down other selected devices to reduce host memory and CPU load. It does not erase device data or shut down devices outside the selected matrix. Each device gets its own result bundle. Use a current runtime when creating test devices; legacy-runtime boot failures are environment failures, not passing app tests.

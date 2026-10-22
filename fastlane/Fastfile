@@ -65,6 +65,7 @@ end
 def activate_simulator(device)
   selected_simulators.each do |other|
     next if other.fetch("udid") == device.fetch("udid") || other.fetch("state") != "Booted"
+    next if ENV.fetch("IOS_KEEP_BOOTED_UDIDS", "").split(",").map(&:strip).include?(other.fetch("udid"))
     sh("ruby ../scripts/with-timeout.rb 60 xcrun simctl shutdown #{Shellwords.escape(other.fetch('udid'))}")
   end
   current = selected_simulators.find { |item| item.fetch("udid") == device.fetch("udid") }
