@@ -5,6 +5,7 @@ require "rbconfig"
 require "yaml"
 require "time"
 require "digest"
+require "fastlane_core/ipa_file_analyser"
 require_relative "../scripts/screenshot-capture"
 require_relative "../scripts/release-candidate"
 
@@ -288,11 +289,15 @@ platform :ios do
       issuer_id: ENV.fetch("ASC_ISSUER_ID"),
       key_filepath: ENV.fetch("ASC_KEY_PATH")
     )
+    ipa = manifest.fetch("files").keys.find { |file| file.end_with?(".ipa") }
+    unless FastlaneCore::IpaFileAnalyser.fetch_app_version(ipa) == manifest.fetch("version") &&
+           FastlaneCore::IpaFileAnalyser.fetch_app_build(ipa) == manifest.fetch("build")
+      UI.user_error!("IPA version or build does not match the manifest.")
+    end
     upload_to_app_store(
       api_key: api_key,
       app_version: manifest.fetch("version"),
-      build_number: manifest.fetch("build"),
-      ipa: manifest.fetch("files").keys.find { |file| file.end_with?(".ipa") },
+      ipa: ipa,
       metadata_path: "fastlane/metadata",
       screenshots_path: "fastlane/screenshots",
       overwrite_screenshots: true,
