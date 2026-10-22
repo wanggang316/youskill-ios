@@ -112,3 +112,9 @@ Evidence is in ignored local files `build/release/status/remote-verification.jso
 Validation completed: release candidate rejection checks, screenshot selection checks, release preflight and simulator-retention checks, Fastlane option validation, `harness check`, and `git diff --check`. No device acceptance was rerun; the full original candidate acceptance was reused under the tested non-artifact change contract. This documentation update occurs after confirmed submission and changes HEAD without changing the submitted artifact provenance.
 
 Revision note: recorded final remote evidence and the user's reduced screenshot scope. Apple's review is the only remaining external step; approval triggers automatic release.
+
+## Screenshot parity correction
+
+The user clarified that the 3–5 screenshot limit applies to each language and device group, with consistent content across groups. Replace the asymmetric 4-phone/1-Duo selection with four matching screens per group: categories, popular repositories, skills, and reader. All four locales use the same sequence. This gives 32 images total. The existing archive and metadata remain valid. The release gate now rejects a missing group, fewer than three or more than five images per group, and inconsistent screen order. Candidate and selection tests, `harness check`, and `git diff --check` pass.
+
+Withdraw the pending review, retain existing matching images, upload the 12 missing Duo screenshots, and resubmit the same build. Confirm all eight locale/device groups contain the same four screens with COMPLETE state and matching source checksums before submission. Record the final review state after resubmission. The previous WAITING_FOR_REVIEW evidence describes the superseded asymmetric screenshot submission.

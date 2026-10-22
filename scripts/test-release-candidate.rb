@@ -50,18 +50,26 @@ Dir.mktmpdir do |root|
     File.write('build/release/App.ipa', 'changed')
     reject_candidate('changed archive') { check.call(true) }
     File.write('build/release/App.ipa', 'archive')
-    File.write('fastlane/screenshot-selection.json', JSON.generate(['screen.png']))
-    reject_candidate('undersized selection') { ReleaseCandidate.select_screenshots!(root: Dir.pwd, manifest: manifest) }
-    File.write('fastlane/screenshot-selection.json', JSON.generate(['screen.png', 'missing.png', 'other.png']))
+    selection = {
+      'APP_IPHONE_67' => ['01-categories.png', '02-repositories.png', '03-skills.png'].map { |n| "phones-iPhone 18 Pro Max-#{n}" },
+      'APP_IPHONE_DUO' => ['01-categories.png', '02-repositories.png', '03-skills.png'].map { |n| "open-iPhone Duo-#{n}" }
+    }
+    write_selection = ->(value) { File.write('fastlane/screenshot-selection.json', JSON.generate(value)) }
+    write_selection.call(selection.merge('APP_IPHONE_DUO' => selection['APP_IPHONE_DUO'].first(1)))
+    reject_candidate('undersized display group') { ReleaseCandidate.select_screenshots!(root: Dir.pwd, manifest: manifest) }
+    write_selection.call(selection.merge('APP_IPHONE_DUO' => selection['APP_IPHONE_DUO'].reverse))
+    reject_candidate('inconsistent screen order') { ReleaseCandidate.select_screenshots!(root: Dir.pwd, manifest: manifest) }
+    write_selection.call(selection.reject { |key, _| key == 'APP_IPHONE_DUO' })
+    reject_candidate('missing device group') { ReleaseCandidate.select_screenshots!(root: Dir.pwd, manifest: manifest) }
+    write_selection.call(selection)
     reject_candidate('unbound selection') { ReleaseCandidate.select_screenshots!(root: Dir.pwd, manifest: manifest) }
-    %w[second.png third.png].each do |name|
+    selection.values.flatten.each do |name|
       p = File.expand_path("fastlane/screenshots/en-US/#{name}")
       File.write(p, name)
       manifest['files'][p] = Digest::SHA256.file(p).hexdigest
     end
-    File.write('fastlane/screenshot-selection.json', JSON.generate(%w[screen.png second.png third.png]))
     selected = ReleaseCandidate.select_screenshots!(root: Dir.pwd, manifest: manifest)
-    abort 'Selection is incomplete' unless Dir.glob("#{selected}/*/*.png").size == 3
+    abort 'Selection is incomplete' unless Dir.glob("#{selected}/*/*.png").size == 6
     git('add', 'fastlane/screenshot-selection.json'); git('commit', '-m', 'Select store screenshots')
     check.call(true)
     File.write('project.yml', 'version: 2')

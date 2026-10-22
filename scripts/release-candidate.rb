@@ -47,11 +47,21 @@ module ReleaseCandidate
     {source_revision: revision, release_revision: head, reused: head != revision}
   end
   def self.select_screenshots!(root:, manifest:)
-    names = JSON.parse(File.read(File.join(root, 'fastlane/screenshot-selection.json')))
-    unless names.is_a?(Array) && names.size.between?(3, 5) && names.uniq == names &&
-           names.all? { |name| name.is_a?(String) && File.basename(name) == name && name.end_with?('.png') }
-      raise ArgumentError, 'Select three to five distinct screenshot filenames.'
+    groups = JSON.parse(File.read(File.join(root, 'fastlane/screenshot-selection.json')))
+    prefixes = {'APP_IPHONE_67' => 'phones-iPhone 18 Pro Max-', 'APP_IPHONE_DUO' => 'open-iPhone Duo-'}
+    unless groups.is_a?(Hash) && groups.keys.sort == prefixes.keys.sort
+      raise ArgumentError, 'Select ordinary iPhone and Duo display groups.'
     end
+    screens = groups.map do |group, names|
+      prefix = prefixes.fetch(group)
+      unless names.is_a?(Array) && names.size.between?(3, 5) && names.uniq == names &&
+             names.all? { |name| name.is_a?(String) && File.basename(name) == name && name.start_with?(prefix) && name.end_with?('.png') }
+        raise ArgumentError, 'Select three to five distinct screenshots per display group.'
+      end
+      names.map { |name| name.delete_prefix(prefix) }
+    end
+    raise ArgumentError, 'Display groups must show the same screens in the same order.' unless screens.uniq.size == 1
+    names = groups.values.flatten
     locales = Dir.children(File.join(root, 'fastlane/screenshots')).select do |name|
       File.directory?(File.join(root, 'fastlane/screenshots', name))
     end

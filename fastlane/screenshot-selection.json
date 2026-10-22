@@ -1,7 +1,14 @@
-[
-  "phones-iPhone 18 Pro Max-01-categories.png",
-  "phones-iPhone 18 Pro Max-02-repositories.png",
-  "phones-iPhone 18 Pro Max-03-skills.png",
-  "phones-iPhone 18 Pro Max-04-reader.png",
-  "open-iPhone Duo-01-categories.png"
-]
+{
+  "APP_IPHONE_67": [
+    "phones-iPhone 18 Pro Max-01-categories.png",
+    "phones-iPhone 18 Pro Max-02-repositories.png",
+    "phones-iPhone 18 Pro Max-03-skills.png",
+    "phones-iPhone 18 Pro Max-04-reader.png"
+  ],
+  "APP_IPHONE_DUO": [
+    "open-iPhone Duo-01-categories.png",
+    "open-iPhone Duo-02-repositories.png",
+    "open-iPhone Duo-03-skills.png",
+    "open-iPhone Duo-04-reader.png"
+  ]
+}
