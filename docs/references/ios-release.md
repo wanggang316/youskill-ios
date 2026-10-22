@@ -29,7 +29,7 @@ IOS_TEST_DEVICES='iPhone 17' bundle exec fastlane ios verify
 
 ## Acceptance boundary
 
-The standard suite runs shared logic tests, a live catalog-to-reader navigation regression, and deterministic UI flows for search, sorting, favorite persistence, file types, translation settings, retry, and rotation. Fixture repositories are available only in Debug builds with `--ui-fixtures`. Store screenshots use live data.
+The standard suite runs shared logic tests and deterministic UI flows for catalog-to-reader navigation, search, sorting, favorite persistence, file types, translation settings, retry, and rotation. The navigation regression uses the same fixture repositories as the other UI tests so GitHub API rate limits cannot block its back-stack assertions. Fixture repositories are available only in Debug builds with `--ui-fixtures`. Store screenshots use live data.
 
 When Duo is in the matrix, `scripts/verify-duo.rb` changes the active display with sim-use while a selected file remains open. It checks catalog/result column geometry, compact navigation, the selected scope, file, drawer, rotation, back navigation, and reader re-entry without restarting the app between display changes. A failed command or assertion blocks screenshots. This script requires validation on the supported runtime; syntax checks are not device acceptance.
 

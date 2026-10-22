@@ -6,7 +6,9 @@ final class MarketplaceNavigationTests: XCTestCase {
 
     override func setUp() async throws {
         continueAfterFailure = false
+        XCUIDevice.shared.orientation = .portrait
         app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--ui-fixtures", "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launch()
     }
 
