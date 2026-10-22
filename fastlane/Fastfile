@@ -27,12 +27,20 @@ def acceptance_devices
 end
 
 def selected_simulators
+  begin
+    overrides = JSON.parse(ENV.fetch("IOS_SIMULATOR_UDIDS", "{}"))
+  rescue JSON::ParserError
+    UI.user_error!("IOS_SIMULATOR_UDIDS must be a JSON object mapping device names to UDIDs.")
+  end
+  unless overrides.is_a?(Hash) && overrides.values.all? { |value| value.is_a?(String) && !value.empty? }
+    UI.user_error!("IOS_SIMULATOR_UDIDS must be a JSON object mapping device names to UDIDs.")
+  end
   inventory = JSON.parse(sh("ruby ../scripts/with-timeout.rb 60 xcrun simctl list devices available --json", log: false))
   runtimes = inventory.fetch("devices").select { |runtime, _| runtime.include?(".iOS-") }
   candidates = runtimes.sort_by { |runtime, _| Gem::Version.new(runtime.split(".iOS-").last.tr("-", ".")) }.reverse
   acceptance_devices.map do |name|
     match = candidates.flat_map { |runtime, devices| devices.map { |device| device.merge("runtime" => runtime) } }
-                      .find { |device| device.fetch("name") == name }
+                      .find { |device| device.fetch("name") == name && (!overrides.key?(name) || device.fetch("udid") == overrides.fetch(name)) }
     UI.user_error!("Missing simulator: #{name}. Install its runtime and create the device in Xcode.") unless match
     match
   end
@@ -61,7 +69,9 @@ def activate_simulator(device)
   current = selected_simulators.find { |item| item.fetch("udid") == device.fetch("udid") }
   udid = Shellwords.escape(device.fetch("udid"))
   sh("ruby ../scripts/with-timeout.rb 60 xcrun simctl boot #{udid}") if current.fetch("state") == "Shutdown"
-  sh("ruby ../scripts/with-timeout.rb 600 xcrun simctl bootstatus #{udid} -b")
+  output = sh("ruby ../scripts/with-timeout.rb 600 xcrun simctl bootstatus #{udid} -b")
+  # simctl can report a terminal migration failure with exit status zero.
+  UI.user_error!("Simulator data migration failed: #{device.fetch('name')} (#{device.fetch('udid')}).") if output.include?("Data Migration Failed")
 end
 
 platform :ios do

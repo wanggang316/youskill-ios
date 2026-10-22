@@ -1,6 +1,6 @@
 # ExecPlan: Verified iOS releases
 
-**Status:** Blocked on simulator acceptance and release credentials
+**Status:** Blocked on simulator acceptance
 **Created:** 2026-10-22
 **Last Updated:** 2026-10-22
 
@@ -45,6 +45,9 @@ Run the existing simulator tests first and diagnose failures from result bundles
 - Inspection of fastlane 2.241.1 found that the snapshot launcher unconditionally shuts down booted simulators. Store capture now uses a native XCTest PNG writer through `run_tests` so that the selected Duo posture is retained. This capture path remains gated by full device acceptance.
 - The iPhone 16e run passed 32 logic tests, live navigation, and catalog/retry coverage, then hit the overall timeout during the file/settings flow after tapping a text field. XCTest reported a missing app-idle notification. A sample showed the app main thread waiting in the event loop; concurrent unrelated builds were also active. The incomplete result is retained beside the iPhone 17 result, and no `acceptance.json` was issued for the matrix. Further acceptance needs a responsive simulator host; no tests were skipped or marked passed from this timeout.
 - The final native screenshot target passed `build-for-testing` without running screenshot capture. Final fastlane lane discovery, Ruby syntax checks, `harness check`, and `git diff --check` passed. CI is configured but has not run remotely. Native capture, Duo display changes, signed archive export, and submission remain unverified.
+- App Store Connect API access to YouSkill was verified with a read-only request. Credentials are in ignored local configuration; the private key remains outside the repository.
+- Xcode 27.1 and the iOS 27.1 runtime are installed. Disk cleanup increased available space to 25 GiB. The app and test targets compiled with the new SDK, but two Duo devices reported a terminal `Data Migration Failed` status after restart. `simctl bootstatus` returned zero despite this failure. The lane now rejects that result and supports exact device selection through `IOS_SIMULATOR_UDIDS`; regression checks cover both behaviors and invalid selection input.
+- Signature verification returned `-67054` for both iOS 27.1 and the existing iOS 27.0 runtime. This does not isolate the failure to the new runtime. The ordinary iPhone 16e booted successfully but remained in app installation while host load exceeded 600. Attempts were stopped without erasing devices, and logs were preserved. A separate active Duo prevented a global simulator-service restart without coordination.
 
 ## Decision Log
 
@@ -55,7 +58,7 @@ Run the existing simulator tests first and diagnose failures from result bundles
 
 ## Outcomes & Retrospective
 
-The implementation is ready for review, with complete ordinary iPhone 17 regression evidence and partial iPhone 16e evidence. Finish the small-device suite on a responsive host, install Xcode 27.1 with Duo support, and run the full matrix before store capture. Configure App Store Connect API credentials before submission. No new store screenshots or release upload have been produced by this workflow. See [the release workflow](../references/ios-release.md) for commands and evidence boundaries.
+The implementation is ready for review, with complete ordinary iPhone 17 regression evidence from Xcode 27.0 and partial iPhone 16e evidence. Xcode 27.1, its Duo runtime, and release credentials are now configured. Resolve the simulator startup and installation failures, then run the full matrix before store capture. No new store screenshots or release upload have been produced by this workflow. See [the release workflow](../references/ios-release.md) for commands and evidence boundaries.
 
 ## References
 

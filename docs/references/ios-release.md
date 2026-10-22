@@ -17,6 +17,8 @@ bundle exec fastlane ios verify
 
 `IOS_TEST_DEVICES` accepts a comma-separated list of exact simulator names. A reduced matrix is useful for local regression work but does not establish Duo support. `IOS_DERIVED_DATA` can reuse an existing build cache.
 
+If several simulators have the same name, `IOS_SIMULATOR_UDIDS` can select an exact device with a JSON object, such as `{"iPhone Duo":"DEVICE-UDID"}`. An unknown UDID fails selection instead of falling back to another device. Run `bundle exec ruby scripts/test-release-preflight.rb` to check device selection and startup failure guards without booting a simulator.
+
 The workflow activates one selected simulator at a time and shuts down other selected devices to reduce host memory and CPU load. It does not erase device data or shut down devices outside the selected matrix. Each device gets its own result bundle. Use a current runtime when creating test devices; legacy-runtime boot failures are environment failures, not passing app tests.
 
 ```bash
@@ -62,6 +64,7 @@ The preparation lane requires a clean commit. It runs acceptance and screenshot 
 - sim-use reports an explicit hint for a stale accessibility bridge. Restart that device's bridge only when no test runner is using it, then retry the query.
 - fastlane prefixes child-process `PATH` with its active Ruby directory so formatters do not load the macOS system Ruby.
 - Simulator boot waits and the host Duo check have a 10-minute limit. The timeout wrapper terminates its command group and returns exit code 124. A timeout fails the lane; it does not skip the device or mark acceptance complete.
+- A `Data Migration Failed` boot result also fails the lane, even when `simctl` exits with status zero. Keep the failed device and logs for diagnosis; do not treat this state as a ready test destination.
 - Each device's build and test process has a 20-minute total limit, including installation and test-host launch. Individual test execution has a separate 10-minute limit. This allows cold simulator input services to start; element and state assertion deadlines remain short.
 
 ## Sources

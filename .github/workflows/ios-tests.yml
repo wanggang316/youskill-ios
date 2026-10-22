@@ -38,6 +38,8 @@ jobs:
           bundler-cache: true
       - name: Install project generator
         run: brew install xcodegen
+      - name: Check release preflight guards
+        run: bundle exec ruby scripts/test-release-preflight.rb
       - name: Run simulator regression suite
         run: bundle exec fastlane ios verify
       - name: Preserve test evidence
