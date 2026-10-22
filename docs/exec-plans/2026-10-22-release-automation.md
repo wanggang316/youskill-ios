@@ -67,6 +67,7 @@ Run the existing simulator tests first and diagnose failures from result bundles
 - Native active-display capture passed a five-page Duo smoke flow with exact 2853 x 2007 images. The capture worker has checks for success, command failure, and invalid filenames. PNG export uses an opaque ImageIO context to satisfy the App Store format requirement.
 - Existing uploaded builds declare no non-exempt encryption. This release retains that declaration in the app plist; it does not change networking or cryptography.
 - Full matrix acceptance, final screenshot inspection, signed archive, upload, and review submission are pending for this candidate.
+- The first candidate matrix passed iPhone 16e, then failed on iPhone 17 because the model-settings tap occurred during sheet presentation. The failure hierarchy remained on the settings home screen. The test now waits for the entry to be interactive and the destination to appear. The complete file, configuration, validation, and translation flow passed in a focused iPhone 17 rerun.
 
 ## Outcomes & Retrospective
 

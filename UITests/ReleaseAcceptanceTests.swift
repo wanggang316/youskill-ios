@@ -108,8 +108,14 @@ final class ReleaseAcceptanceTests: XCTestCase {
         let setup = app.alerts.firstMatch
         XCTAssertTrue(setup.waitForExistence(timeout: 10))
         setup.buttons["Open Settings"].tap()
-        app.buttons["settings.model"].tap()
-        app.buttons["settings.check"].tap()
+        let modelSettings = app.buttons["settings.model"]
+        XCTAssertTrue(modelSettings.waitForExistence(timeout: 10))
+        expectation(for: NSPredicate(format: "hittable == true"), evaluatedWith: modelSettings)
+        waitForExpectations(timeout: 10)
+        modelSettings.tap()
+        let checkConnection = app.buttons["settings.check"]
+        XCTAssertTrue(checkConnection.waitForExistence(timeout: 10))
+        checkConnection.tap()
         XCTAssertTrue(app.staticTexts["settings.check-failure"].waitForExistence(timeout: 10))
         replaceText(in: app.textFields["settings.base-url"], with: "https://example.invalid/v1")
         app.secureTextFields["settings.api-key"].tap()
