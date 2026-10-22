@@ -1,6 +1,6 @@
 ---
 name: release
-description: Prepare, resume, submit, and verify a YouSkill iOS App Store release. Use for builds, store metadata or screenshots, review resubmission, and release tagging after public availability.
+description: Prepare, resume, submit, and verify a YouSkill iOS App Store release. Use for builds, store metadata or screenshots, review resubmission, and release tagging after successful review submission.
 ---
 
 # Release YouSkill iOS
@@ -30,10 +30,10 @@ Use the repository Ruby version, Bundler, selected Xcode, and existing local con
 | Metadata or images partly uploaded | Read remote state and reconcile only missing or incorrect items through installed Fastlane/Spaceship dependencies. |
 | IPA upload accepted or build processing | Check the exact version/build before any retry. Wait for processing; do not upload the same build again. |
 | Build VALID, assets ready, no review requested | Select the exact existing build and submit without binary or asset upload. |
-| Review requested, no requested changes | Verify selection and release mode. Report the state without another submission. |
+| Review requested, no requested changes | Verify selection and release mode, then create the submission tag if missing. Do not submit again. |
 | Review requested, user asks to change screenshots | Cancel that submission, wait until the version is editable, update the requested assets, then resubmit the same valid build. |
 | No prepared candidate | Commit release inputs and use `prepare_release`; inspect its output before submission. |
-| Public release confirmed | Complete authorized release tagging and record evidence. |
+| Public release confirmed | Record public availability separately from the existing submission tag. |
 
 `prepare_release` runs acceptance, capture, and archive; it is not a resume command and rejects an existing capture directory. Preserve valid outputs. Repair only the failed stage, with a narrow tested lane change if required.
 
@@ -84,13 +84,15 @@ After submission, read App Store Connect again and verify:
 
 A zero exit status or successful upload alone is not enough. Once WAITING_FOR_REVIEW is confirmed, report that review is pending and automatic release is configured. Do not wait indefinitely for Apple's decision or claim public availability from submission.
 
-## Tag the public release
+## Tag after successful review submission
 
-When the user authorizes a tag after release, keep that as an explicit pending item until public availability is verified. Confirm the exact version and selected build in App Store Connect and the released version on the public listing in an intended storefront. Do not tag from WAITING_FOR_REVIEW, approval alone, or pending release status.
+Create an annotated tag after App Store Connect confirms successful review submission for the exact version and selected build, normally WAITING_FOR_REVIEW. Do not wait for approval or public availability. An accepted binary upload alone is not enough. The tag records a submitted candidate; it does not claim that Apple approved or published it.
 
-Use an annotated tag following the repository's existing naming convention. Point it at the **source revision that produced the shipped IPA**, taken from the verified manifest, rather than an arbitrary later documentation or tooling commit. Include the marketing version, build number, and release evidence in the annotation. Record later submission-tool revisions separately. Check existing local tags and relevant remote tags before creation; never move or overwrite a conflicting tag. Tag creation authorization does not by itself authorize pushing it or publishing a GitHub Release.
+Follow the repository's existing naming convention. Point the tag at the **source revision that produced the submitted IPA**, taken from the verified manifest, rather than an arbitrary later documentation or tooling commit. Include the marketing version, build number, and confirmed submission evidence in the annotation. Record later submission-tool revisions separately. Check existing local tags and relevant remote tags before creation. Tag creation does not by itself authorize pushing it or publishing a GitHub Release.
 
-If review is still pending, record the intended version/build, source revision, tag name, and public-verification condition in the execution plan. State that the tag remains pending. Do not imply that background monitoring is active unless it was actually configured.
+If review fails and code changes are needed, create and validate a new build, submit it, then create a new annotated tag for that candidate. Preserve previous tags. Use the new version tag when the version changes; when only the build changes, use a distinct build-qualified tag such as `<version>-build.<build>`. Do not move or overwrite a tag from an earlier submission. Screenshot or metadata corrections that reuse the same IPA do not require a new source tag; record the resubmission evidence in the execution plan.
+
+Record the tag name, source revision, version/build, and review state in the execution plan. Continue to report review and public availability separately. Do not imply that background monitoring is active unless it was actually configured.
 
 ## Completion and cost control
 

@@ -127,13 +127,15 @@ For each of en-US, zh-Hans, ja, and ko, APP_IPHONE_67 and APP_IPHONE_DUO each co
 
 Evidence: `build/release/status/complete-device-groups.log`, `resubmit.log`, `parity-final-readback.log`, and `remote-verification.json`. Candidate/selection tests and harness checks passed. This outcome supersedes the earlier 20-image submission. Apple review remains pending, with automatic release after approval.
 
-## Public release tag and workflow follow-up
+## Submission tag and workflow follow-up
 
-The user requested a release tag after successful publication. A fresh App Store Connect read still reports 1.1 build 202610221 as WAITING_FOR_REVIEW with AFTER_APPROVAL release. No tag was created from submission alone.
+The user clarified that successful review submission is the tag milestone; approval and public availability are not prerequisites. This replaces the earlier interpretation that tagging should wait for public release. A fresh App Store Connect read confirms version 1.1 build 202610221 is WAITING_FOR_REVIEW, with VALID build processing and AFTER_APPROVAL release.
 
-- [ ] Verify public availability of 1.1 in an intended storefront and confirm selected build 202610221 in App Store Connect.
-- [ ] Create annotated tag `1.1.0`, following the existing `1.0.0` convention, at the IPA source revision `1de97641391f643f1da11811ca7fa5893e3005c1`. Check local and remote tag conflicts first. Include version/build and public-release evidence in the annotation. Do not tag a later documentation commit. Tag push and GitHub Release publication are not authorized by this request.
+- [x] Verify exact submitted version/build and original IPA hash.
+- [x] Check local and remote tag conflicts and create annotated tag `1.1.0` at IPA source revision `1de97641391f643f1da11811ca7fa5893e3005c1`, following the existing `1.0.0` convention.
 
-This is a recorded follow-up, not an active background monitor. The release skill now carries the public-release/tag boundary and pending-item requirements.
+The tag annotation records version/build and review submission evidence, without claiming public availability. The tag remains local; tag push and GitHub Release publication were not requested. If review requires code changes, validate and submit a new build, then create a distinct tag while preserving this submission tag. A new version uses its version tag; a same-version replacement build uses a build-qualified tag. Asset-only resubmission of the same IPA does not require a new source tag.
+
+The release skill now follows this submission/tag boundary. Public availability remains a separate state. No background monitor is configured.
 
 The release retrospective identified these reusable lessons: capture evidence and store selection are different sets; 3–5 screens means per locale and device group with matching content and order; later non-artifact commits need the tested candidate-reuse gate; IPA and build-number upload options conflict; concurrent TLS failures require remote readback and a targeted serial retry; pending image processing must not trigger replacement; withdrawal requires waiting for editability; and upload, review, public release, and tagging need separate evidence. These rules are maintained in `.agents/skills/release/SKILL.md`, with implementation details in the existing release reference and helpers.
