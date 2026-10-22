@@ -299,7 +299,7 @@ platform :ios do
       app_version: manifest.fetch("version"),
       ipa: ipa,
       metadata_path: "fastlane/metadata",
-      screenshots_path: "fastlane/screenshots",
+      screenshots_path: ReleaseCandidate.select_screenshots!(root: root, manifest: manifest),
       overwrite_screenshots: true,
       submit_for_review: true,
       automatic_release: true,

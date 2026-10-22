@@ -50,6 +50,20 @@ Dir.mktmpdir do |root|
     File.write('build/release/App.ipa', 'changed')
     reject_candidate('changed archive') { check.call(true) }
     File.write('build/release/App.ipa', 'archive')
+    File.write('fastlane/screenshot-selection.json', JSON.generate(['screen.png']))
+    reject_candidate('undersized selection') { ReleaseCandidate.select_screenshots!(root: Dir.pwd, manifest: manifest) }
+    File.write('fastlane/screenshot-selection.json', JSON.generate(['screen.png', 'missing.png', 'other.png']))
+    reject_candidate('unbound selection') { ReleaseCandidate.select_screenshots!(root: Dir.pwd, manifest: manifest) }
+    %w[second.png third.png].each do |name|
+      p = File.expand_path("fastlane/screenshots/en-US/#{name}")
+      File.write(p, name)
+      manifest['files'][p] = Digest::SHA256.file(p).hexdigest
+    end
+    File.write('fastlane/screenshot-selection.json', JSON.generate(%w[screen.png second.png third.png]))
+    selected = ReleaseCandidate.select_screenshots!(root: Dir.pwd, manifest: manifest)
+    abort 'Selection is incomplete' unless Dir.glob("#{selected}/*/*.png").size == 3
+    git('add', 'fastlane/screenshot-selection.json'); git('commit', '-m', 'Select store screenshots')
+    check.call(true)
     File.write('project.yml', 'version: 2')
     reject_candidate('dirty source') { check.call(true) }
     git('add', 'project.yml'); git('commit', '-m', 'Change production input')

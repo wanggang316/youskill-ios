@@ -1,11 +1,13 @@
 require 'digest'
 require 'open3'
+require 'fileutils'
+require 'json'
 
 module ReleaseCandidate
   # These paths do not contribute to the archived app. Acceptance stays bound to
   # the original revision, including its original test implementation.
   NON_ARTIFACT_PREFIXES = %w[docs/ .agents/ .claude/ Tests/ UITests/].freeze
-  RELEASE_TOOL_PATHS = %w[fastlane/Fastfile scripts/release-candidate.rb scripts/test-release-candidate.rb].freeze
+  RELEASE_TOOL_PATHS = %w[fastlane/Fastfile fastlane/screenshot-selection.json scripts/release-candidate.rb scripts/test-release-candidate.rb].freeze
 
   def self.validate!(root:, manifest:, version:, build:, reuse:, acceptance:, required_devices:)
     root = File.realpath(root)
@@ -44,4 +46,30 @@ module ReleaseCandidate
     end
     {source_revision: revision, release_revision: head, reused: head != revision}
   end
+  def self.select_screenshots!(root:, manifest:)
+    names = JSON.parse(File.read(File.join(root, 'fastlane/screenshot-selection.json')))
+    unless names.is_a?(Array) && names.size.between?(3, 5) && names.uniq == names &&
+           names.all? { |name| name.is_a?(String) && File.basename(name) == name && name.end_with?('.png') }
+      raise ArgumentError, 'Select three to five distinct screenshot filenames.'
+    end
+    locales = Dir.children(File.join(root, 'fastlane/screenshots')).select do |name|
+      File.directory?(File.join(root, 'fastlane/screenshots', name))
+    end
+    sources = locales.flat_map { |locale| names.map { |name| File.join(root, 'fastlane/screenshots', locale, name) } }
+    sources.each do |path|
+      digest = manifest.fetch('files')[path]
+      raise ArgumentError, "Unverified selected screenshot: #{path}" unless digest && File.file?(path) && Digest::SHA256.file(path).hexdigest == digest
+    end
+    # A content-addressed directory keeps previous selections intact.
+    selection_hash = Digest::SHA256.hexdigest(JSON.generate(sources.to_h { |p| [p, manifest.fetch('files').fetch(p)] }))
+    destination = File.join(root, 'build/release/selections', selection_hash)
+    sources.each do |source|
+      target = File.join(destination, File.basename(File.dirname(source)), File.basename(source))
+      FileUtils.mkdir_p(File.dirname(target))
+      FileUtils.cp(source, target)
+    end
+    File.write(File.join(destination, 'selection.json'), JSON.pretty_generate(sources.to_h { |p| [p, manifest.fetch('files').fetch(p)] }))
+    destination
+  end
+
 end
