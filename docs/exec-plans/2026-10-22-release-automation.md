@@ -126,3 +126,14 @@ On 2026-10-22 at 14:24:55 UTC, the same 1.1 build 202610221 was submitted again.
 For each of en-US, zh-Hans, ja, and ko, APP_IPHONE_67 and APP_IPHONE_DUO each contain four images in the order categories, popular repositories, skill list, reader. All 32 images are COMPLETE and their source checksums match local captures. Exact ordered filenames were asserted against `fastlane/screenshot-selection.json` for all eight groups; no other populated groups remain. Existing metadata still matches local files. Only the 12 missing Duo images were uploaded; the existing 20 images and IPA were retained.
 
 Evidence: `build/release/status/complete-device-groups.log`, `resubmit.log`, `parity-final-readback.log`, and `remote-verification.json`. Candidate/selection tests and harness checks passed. This outcome supersedes the earlier 20-image submission. Apple review remains pending, with automatic release after approval.
+
+## Public release tag and workflow follow-up
+
+The user requested a release tag after successful publication. A fresh App Store Connect read still reports 1.1 build 202610221 as WAITING_FOR_REVIEW with AFTER_APPROVAL release. No tag was created from submission alone.
+
+- [ ] Verify public availability of 1.1 in an intended storefront and confirm selected build 202610221 in App Store Connect.
+- [ ] Create annotated tag `1.1.0`, following the existing `1.0.0` convention, at the IPA source revision `1de97641391f643f1da11811ca7fa5893e3005c1`. Check local and remote tag conflicts first. Include version/build and public-release evidence in the annotation. Do not tag a later documentation commit. Tag push and GitHub Release publication are not authorized by this request.
+
+This is a recorded follow-up, not an active background monitor. The release skill now carries the public-release/tag boundary and pending-item requirements.
+
+The release retrospective identified these reusable lessons: capture evidence and store selection are different sets; 3–5 screens means per locale and device group with matching content and order; later non-artifact commits need the tested candidate-reuse gate; IPA and build-number upload options conflict; concurrent TLS failures require remote readback and a targeted serial retry; pending image processing must not trigger replacement; withdrawal requires waiting for editability; and upload, review, public release, and tagging need separate evidence. These rules are maintained in `.agents/skills/release/SKILL.md`, with implementation details in the existing release reference and helpers.
