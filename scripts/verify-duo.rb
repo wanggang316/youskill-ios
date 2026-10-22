@@ -23,6 +23,25 @@ def rotate(device, orientation)
   raise "Display did not rotate: #{result}" unless result.include?("Rotated to #{orientation}")
 end
 
+def restore_display_session(device)
+  # XCTest can leave Duo with an active but blank app window. Keep the device booted.
+  run("xcrun", "simctl", "spawn", device, "launchctl", "stop", "com.apple.SpringBoard")
+  run("xcrun", "simctl", "spawn", device, "launchctl", "stop", "com.apple.CoreSimulator.bridge")
+  run("sim-use", "daemon", "stop", "--udid", device)
+  deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 60
+  loop do
+    stdout, = Open3.capture3("sim-use", "describe-ui", "--device", device, "--json", "--no-raw")
+    data = JSON.parse(stdout)
+    return if data["ok"] && data.dig("data", "screen", "width").to_f > 0
+    raise "Duo display session did not recover: #{data}" if Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
+    unless data["ok"]
+      run("xcrun", "simctl", "spawn", device, "launchctl", "stop", "com.apple.CoreSimulator.bridge")
+      run("sim-use", "daemon", "stop", "--udid", device)
+    end
+    sleep 1
+  end
+end
+
 def assert_visible(device, output, name, label)
   deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 30
   loop do
@@ -54,7 +73,9 @@ def assert_catalog_columns(device, output, name, expanded:)
 end
 
 begin
+  restore_display_session(device)
   run("sim-use", "ios", "fold", "closed", "--device", device, "--json")
+  rotate(device, "portrait")
   run("xcrun", "simctl", "launch", "--terminate-running-process", device, "com.gumpw.youskill",
       "--ui-testing", "--ui-fixtures", "-AppleLanguages", "(en)", "-AppleLocale", "en_US")
   tap(device, "catalog.category.1")

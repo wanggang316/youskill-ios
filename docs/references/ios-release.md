@@ -35,6 +35,8 @@ When Duo is in the matrix, `scripts/verify-duo.rb` changes the active display wi
 
 The ordinary XCTest rotation case is excluded only on Duo because its orientation command did not rotate the active cover display. The Duo script replaces that case with explicit cover and inner display rotation checks and rejects a command that reports no rotation. Duo search can appear as a Search button; the UI test opens that control before entering a query.
 
+After XCTest, Duo can create an active app window with no rendered content. The host check first restarts SpringBoard and the simulator accessibility bridge, then waits for a usable display session. It keeps the simulator booted and fails if recovery exceeds one minute. This setup occurs before the app launch; display transitions within the check still run without restarting the app.
+
 Test results are stored in `build/test-results/<timestamp>/`. Keep the `.xcresult`, JUnit report, Duo accessibility snapshots, and `acceptance.json` together. CI runs ordinary iPhone regression tests; the current hosted runner configuration does not provide Duo acceptance.
 
 ## Screenshots and submission
