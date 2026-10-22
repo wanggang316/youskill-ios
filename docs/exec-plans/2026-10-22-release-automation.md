@@ -63,7 +63,7 @@ Run the existing simulator tests first and diagnose failures from result bundles
 - The previously blocked Duo simulator now boots. The catalog split-view regression passed on device `09D50758-369E-4ED0-BC56-C45A956B51B6`.
 - Store capture must use the open display in landscape and handle the split-view sidebar when returning to Settings.
 - An executed screenshot smoke test passed its UI assertions but produced black images through `XCUIApplication.screenshot()`. Screenshot capture is not accepted until native image content and dimensions are verified.
-- Four-language descriptions and release notes now describe the catalog and Duo layouts. Existing support and privacy URLs are preserved. The previous dark-mode claim is removed because the app currently uses a light interface.
+- Four-language descriptions and release notes now describe the catalog and Duo layouts. The support URL is preserved. The privacy URL now points to `/apps/privacy.html`; the former `/privacy.html` returned the site shell rather than the policy. The previous dark-mode claim is removed because the app currently uses a light interface.
 - Native active-display capture passed a five-page Duo smoke flow with exact 2853 x 2007 images. The capture worker has checks for success, command failure, and invalid filenames. PNG export uses an opaque ImageIO context to satisfy the App Store format requirement.
 - Existing uploaded builds declare no non-exempt encryption. This release retains that declaration in the app plist; it does not change networking or cryptography.
 - Full matrix acceptance, final screenshot inspection, signed archive, upload, and review submission are pending for this candidate.
