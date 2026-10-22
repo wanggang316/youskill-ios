@@ -105,6 +105,8 @@ platform :ios do
         reset_simulator: false,
         disable_slide_to_type: false,
         only_testing: ["YouSkillTests", "YouSkillUITests"],
+        # XCTest did not rotate Duo's cover display. verify-duo checks both displays through sim-use.
+        skip_testing: device.fetch("name") == "iPhone Duo" ? ["YouSkillUITests/ReleaseAcceptanceTests/testRotationPreservesTheOpenReaderAndBackStack"] : [],
         parallel_testing: false,
         concurrent_workers: 1,
         disable_concurrent_testing: true,

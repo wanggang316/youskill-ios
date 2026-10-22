@@ -68,6 +68,8 @@ Run the existing simulator tests first and diagnose failures from result bundles
 - Existing uploaded builds declare no non-exempt encryption. This release retains that declaration in the app plist; it does not change networking or cryptography.
 - Full matrix acceptance, final screenshot inspection, signed archive, upload, and review submission are pending for this candidate.
 - The first candidate matrix passed iPhone 16e, then failed on iPhone 17 because the model-settings tap occurred during sheet presentation. The failure hierarchy remained on the settings home screen. The test now waits for the entry to be interactive and the destination to appear. The complete file, configuration, validation, and translation flow passed in a focused iPhone 17 rerun.
+- The next matrix passed the complete iPhone 16e, iPhone 17, and iPhone 18 Pro Max suites. Duo passed navigation, catalog retry, and file/translation settings. Its cover display did not rotate through XCTest, and search appeared as a button rather than an expanded field. The updated search/sort/favorite flow passed on Duo. Rotation coverage now uses explicit sim-use acceptance on both displays; this replacement still needs a complete run.
+- The display-only rerun encountered a blank application window with an idle main thread. Diagnostics were retained. A device-only restart then reported `Data Migration Failed` while host load exceeded 250. The failed device was shut down. No final matrix acceptance, store screenshots, signed archive, or submission is established by these partial results.
 
 ## Outcomes & Retrospective
 

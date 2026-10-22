@@ -31,6 +31,8 @@ The standard suite runs shared logic tests, a live catalog-to-reader navigation 
 
 When Duo is in the matrix, `scripts/verify-duo.rb` changes the active display with sim-use while a selected file remains open. It checks catalog/result column geometry, compact navigation, the selected scope, file, drawer, rotation, back navigation, and reader re-entry without restarting the app between display changes. A failed command or assertion blocks screenshots. This script requires validation on the supported runtime; syntax checks are not device acceptance.
 
+The ordinary XCTest rotation case is excluded only on Duo because its orientation command did not rotate the active cover display. The Duo script replaces that case with explicit cover and inner display rotation checks and rejects a command that reports no rotation. Duo search can appear as a Search button; the UI test opens that control before entering a query.
+
 Test results are stored in `build/test-results/<timestamp>/`. Keep the `.xcresult`, JUnit report, Duo accessibility snapshots, and `acceptance.json` together. CI runs ordinary iPhone regression tests; the current hosted runner configuration does not provide Duo acceptance.
 
 ## Screenshots and submission

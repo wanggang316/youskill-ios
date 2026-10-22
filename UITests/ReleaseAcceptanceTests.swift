@@ -55,6 +55,11 @@ final class ReleaseAcceptanceTests: XCTestCase {
         expectation(for: sorted, evaluatedWith: app)
         waitForExpectations(timeout: 15)
         let search = app.searchFields.firstMatch
+        if !search.exists {
+            let searchButton = app.buttons["Search"]
+            XCTAssertTrue(searchButton.waitForExistence(timeout: 10))
+            searchButton.tap()
+        }
         XCTAssertTrue(search.waitForExistence(timeout: 10))
         search.tap()
         search.typeText("find-skills\n")

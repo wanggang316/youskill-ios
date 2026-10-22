@@ -18,6 +18,11 @@ def tap(device, identifier)
   run("sim-use", "tap", "--device", device, "--id", identifier, "--wait-timeout", "30")
 end
 
+def rotate(device, orientation)
+  result = run("sim-use", "ios", "rotate", orientation, "--device", device)
+  raise "Display did not rotate: #{result}" unless result.include?("Rotated to #{orientation}")
+end
+
 def assert_visible(device, output, name, label)
   deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 30
   loop do
@@ -66,6 +71,9 @@ begin
   tap(device, "detail.files")
   tap(device, "detail.file.example.swift")
   assert_visible(device, output, "initial", "example.swift")
+  rotate(device, "landscape-left")
+  assert_visible(device, output, "cover-landscape", "example.swift")
+  rotate(device, "portrait")
 
   %w[open closed open].each_with_index do |posture, index|
     result = run("sim-use", "ios", "fold", posture, "--device", device, "--json")
@@ -76,7 +84,7 @@ begin
     # The reader identifier can mask the drawer close identifier in the AX tree.
     run("sim-use", "tap", "--device", device, "--label", "Done", "--element-type", "Button", "--wait-timeout", "30")
   end
-  run("sim-use", "ios", "rotate", "landscape-left", "--device", device)
+  rotate(device, "landscape-left")
   assert_visible(device, output, "landscape", "example.swift")
   tap(device, "BackButton")
   tap(device, "skill.card.1")
