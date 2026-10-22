@@ -63,17 +63,20 @@ struct SkillDetailView: View {
                     if viewModel.isTranslating {
                         ProgressView()
                     } else {
-                        Image(systemName: viewModel.isShowingTranslated ? "text.badge.checkmark" : "globe")
+                        Label(L10n.string(viewModel.isShowingTranslated ? "detail.show_original" : "detail.translate"),
+                              systemImage: viewModel.isShowingTranslated ? "text.badge.checkmark" : "globe")
                     }
                 }
                 .disabled(!viewModel.canTranslate || viewModel.isTranslating)
+                .accessibilityIdentifier("detail.translate")
 
                 Button {
                     drawerBinding.wrappedValue = true
                 } label: {
-                    Image(systemName: "sidebar.right")
+                    Label(L10n.string("detail.directory"), systemImage: "sidebar.right")
                 }
                 .disabled(viewModel.fileTree.isEmpty)
+                .accessibilityIdentifier("detail.files")
             }
         }
         .alert(L10n.string("detail.translation_required_title"), isPresented: $viewModel.needsTranslationSettings) {
@@ -109,6 +112,7 @@ struct SkillDetailView: View {
             if let activePath = viewModel.activePath {
                 HStack(spacing: 6) {
                     Text(activePath)
+                        .accessibilityIdentifier("detail.active-file")
                         .font(.footnote)
                         .foregroundStyle(AppTheme.secondaryText)
                         .lineLimit(1)

@@ -6,7 +6,9 @@ final class MarketplaceNavigationTests: XCTestCase {
 
     override func setUp() async throws {
         continueAfterFailure = false
+        XCUIDevice.shared.orientation = .portrait
         app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--ui-fixtures", "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launch()
     }
 
@@ -31,17 +33,17 @@ final class MarketplaceNavigationTests: XCTestCase {
 
         for attempt in 1...2 {
             app.buttons[cardIdentifier].tap()
-            XCTAssertTrue(app.otherElements["skill.detail"].waitForExistence(timeout: 15))
+            XCTAssertTrue(app.scrollViews["skill.detail"].waitForExistence(timeout: 30))
             attachScreenshot("Detail entry \(attempt)")
 
-            app.navigationBars.buttons.element(boundBy: 0).tap()
+            app.buttons["BackButton"].tap()
             XCTAssertTrue(results.waitForExistence(timeout: 15), "One back action must return to the skill list")
             XCTAssertTrue(app.buttons[cardIdentifier].isHittable)
-            XCTAssertFalse(app.otherElements["skill.detail"].exists)
+            XCTAssertFalse(app.scrollViews["skill.detail"].exists)
             attachScreenshot("List after one back action \(attempt)")
         }
 
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.buttons["BackButton"].tap()
         XCTAssertTrue(allSkills.waitForExistence(timeout: 15), "The next back action must return to the catalog")
     }
 

@@ -4,6 +4,12 @@
 
 YouSkill iOS is a SwiftUI application for browsing, reading, and translating Agent Skills on mobile devices. The app combines a remote skill catalog API with direct GitHub file tree and raw file reads so users can discover skills, open `SKILL.md`, inspect related files, and translate Markdown into a target language. The main user-facing interfaces are the home feed, the skill detail reader with a catalog drawer, and the settings flow for translation model configuration.
 
+## Catalog Navigation
+
+The catalog uses `NavigationSplitView`: the sidebar contains the category/repository picker and catalog list; the detail column contains the selected scope's Skills and a `NavigationStack` for the reader. Wide windows show both columns; the system can hide the sidebar when space is limited. Compact windows show one column at a time, starting with the catalog. The system controls column collapse and toolbar placement.
+
+`SkillListView` owns the view model, search draft, sort, result scroll position, and reader path above both columns. Display changes do not reset them. Selecting a catalog scope returns the detail column to its results; selecting a different scope resets the result scroll position. The selected scope is highlighted in the wide catalog. Before an explicit selection, the detail column shows all Skills.
+
 ## Domain Model
 
 - **Skill Catalog** — Remote skill listing, search, sorting, pagination, and feed presentation.

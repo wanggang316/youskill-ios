@@ -1,0 +1,291 @@
+require "json"
+require "shellwords"
+require "fileutils"
+require "rbconfig"
+require "yaml"
+require "time"
+require "digest"
+require_relative "../scripts/screenshot-capture"
+
+# Child tools must use the same Ruby as Bundler, not the macOS system Ruby.
+ENV["PATH"] = "#{File.dirname(RbConfig.ruby)}:#{ENV.fetch('PATH')}"
+ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] ||= "60"
+
+default_platform(:ios)
+
+REQUIRED_RELEASE_DEVICES = ["iPhone 16e", "iPhone 17", "iPhone Duo"].freeze
+
+def project_version
+  YAML.load_file(File.expand_path("../project.yml", __dir__)).fetch("settings").fetch("base")
+end
+
+def source_revision
+  sh("git rev-parse HEAD", log: false).strip
+end
+
+def acceptance_devices
+  ENV.fetch("IOS_TEST_DEVICES", REQUIRED_RELEASE_DEVICES.join(",")).split(",").map(&:strip).reject(&:empty?).uniq
+end
+
+def selected_simulators
+  begin
+    overrides = JSON.parse(ENV.fetch("IOS_SIMULATOR_UDIDS", "{}"))
+  rescue JSON::ParserError
+    UI.user_error!("IOS_SIMULATOR_UDIDS must be a JSON object mapping device names to UDIDs.")
+  end
+  unless overrides.is_a?(Hash) && overrides.values.all? { |value| value.is_a?(String) && !value.empty? }
+    UI.user_error!("IOS_SIMULATOR_UDIDS must be a JSON object mapping device names to UDIDs.")
+  end
+  inventory = JSON.parse(sh("ruby ../scripts/with-timeout.rb 60 xcrun simctl list devices available --json", log: false))
+  runtimes = inventory.fetch("devices").select { |runtime, _| runtime.include?(".iOS-") }
+  candidates = runtimes.sort_by { |runtime, _| Gem::Version.new(runtime.split(".iOS-").last.tr("-", ".")) }.reverse
+  acceptance_devices.map do |name|
+    match = candidates.flat_map { |runtime, devices| devices.map { |device| device.merge("runtime" => runtime) } }
+                      .find { |device| device.fetch("name") == name && (!overrides.key?(name) || device.fetch("udid") == overrides.fetch(name)) }
+    UI.user_error!("Missing simulator: #{name}. Install its runtime and create the device in Xcode.") unless match
+    match
+  end
+end
+
+def require_duo_environment!
+  version = sh("xcodebuild -version", log: false).match(/Xcode (\d+\.\d+)/)
+  UI.user_error!("Release requires Xcode 27.1 or later.") unless version && Gem::Version.new(version[1]) >= Gem::Version.new("27.1")
+  missing = REQUIRED_RELEASE_DEVICES - acceptance_devices
+  UI.user_error!("Release acceptance is missing: #{missing.join(', ')}.") unless missing.empty?
+end
+
+def require_release_environment!
+  require_duo_environment!
+  %w[ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_PATH].each do |name|
+    UI.user_error!("Set #{name} before release.") if ENV[name].to_s.empty?
+  end
+  UI.user_error!("ASC_KEY_PATH must point to a local .p8 file.") unless File.file?(ENV.fetch("ASC_KEY_PATH"))
+end
+
+def activate_simulator(device)
+  selected_simulators.each do |other|
+    next if other.fetch("udid") == device.fetch("udid") || other.fetch("state") != "Booted"
+    next if ENV.fetch("IOS_KEEP_BOOTED_UDIDS", "").split(",").map(&:strip).include?(other.fetch("udid"))
+    sh("ruby ../scripts/with-timeout.rb 60 xcrun simctl shutdown #{Shellwords.escape(other.fetch('udid'))}")
+  end
+  current = selected_simulators.find { |item| item.fetch("udid") == device.fetch("udid") }
+  udid = Shellwords.escape(device.fetch("udid"))
+  sh("ruby ../scripts/with-timeout.rb 60 xcrun simctl boot #{udid}") if current.fetch("state") == "Shutdown"
+  output = sh("ruby ../scripts/with-timeout.rb 600 xcrun simctl bootstatus #{udid} -b")
+  # simctl can report a terminal migration failure with exit status zero.
+  UI.user_error!("Simulator data migration failed: #{device.fetch('name')} (#{device.fetch('udid')}).") if output.include?("Data Migration Failed")
+end
+
+platform :ios do
+  desc "Check the simulator inventory and generate the Xcode project"
+  lane :prepare do
+    FileUtils.mkdir_p(File.expand_path("../build", __dir__))
+    sh("cd .. && xcodegen generate --use-cache --cache-path build/xcodegen-cache")
+    UI.user_error!("IOS_TEST_DEVICES must contain at least one device name.") if acceptance_devices.empty?
+    selected_simulators
+    derived = File.expand_path(ENV.fetch("IOS_DERIVED_DATA", "build/DerivedData"), File.expand_path("..", __dir__))
+    sh("xcodebuild -resolvePackageDependencies -project ../YouSkill.xcodeproj -scheme YouSkill -derivedDataPath #{Shellwords.escape(derived)} -onlyUsePackageVersionsFromResolvedFile")
+  end
+
+  desc "Run logic and user-flow tests on every required simulator"
+  lane :verify do
+    prepare
+    output_directory = "build/test-results/#{Time.now.utc.strftime('%Y%m%dT%H%M%SZ')}"
+    selected_simulators.each do |device|
+      activate_simulator(device)
+      if device.fetch("name") == "iPhone Duo"
+        sh("ruby ../scripts/with-timeout.rb 60 sim-use ios fold closed --device #{Shellwords.escape(device.fetch('udid'))} --json")
+      end
+      run_tests(
+        project: "YouSkill.xcodeproj",
+        scheme: "YouSkill",
+        xcodebuild_command: "ruby #{Shellwords.escape(File.expand_path('../scripts/with-timeout.rb', __dir__))} 1200 xcodebuild",
+        destination: "platform=iOS Simulator,id=#{device.fetch('udid')}",
+        skip_detect_devices: true,
+        force_quit_simulator: false,
+        reset_simulator: false,
+        disable_slide_to_type: false,
+        only_testing: ["YouSkillTests", "YouSkillUITests"],
+        # XCTest did not rotate Duo's cover display. verify-duo checks both displays through sim-use.
+        skip_testing: device.fetch("name") == "iPhone Duo" ? ["YouSkillUITests/ReleaseAcceptanceTests/testRotationPreservesTheOpenReaderAndBackStack"] : [],
+        parallel_testing: false,
+        concurrent_workers: 1,
+        disable_concurrent_testing: true,
+        skip_package_dependencies_resolution: true,
+        disable_package_automatic_updates: true,
+        result_bundle: true,
+        output_directory: "#{output_directory}/#{device.fetch('udid')}",
+        derived_data_path: ENV.fetch("IOS_DERIVED_DATA", "build/DerivedData"),
+        xcargs: "-collect-test-diagnostics never -test-timeouts-enabled YES -default-test-execution-time-allowance 600 -maximum-test-execution-time-allowance 600",
+        fail_build: true
+      )
+      if device.fetch("name") == "iPhone Duo"
+        sh("ruby ../scripts/with-timeout.rb 600 ruby ../scripts/verify-duo.rb #{Shellwords.escape(device.fetch('udid'))} #{Shellwords.escape(File.expand_path("../#{output_directory}", __dir__))}")
+      end
+    end
+    File.write(File.expand_path("../#{output_directory}/acceptance.json", __dir__), JSON.pretty_generate({
+      revision: source_revision,
+      working_tree_dirty: !sh("git status --porcelain", log: false).strip.empty?,
+      version: project_version.fetch("MARKETING_VERSION").to_s,
+      build: project_version.fetch("CURRENT_PROJECT_VERSION").to_s,
+      devices: selected_simulators,
+      completed_at: Time.now.utc.iso8601
+    }))
+  end
+
+  desc "Run acceptance before capturing localized App Store screenshots"
+  lane :screenshots do
+    require_duo_environment!
+    verify
+    capture_store_screenshots
+  end
+
+  private_lane :capture_store_screenshots do
+    root = File.expand_path("screenshots", __dir__)
+    UI.user_error!("Move the existing fastlane/screenshots directory before capturing a new set.") if Dir.exist?(root)
+    configuration_path = File.expand_path("~/Library/Caches/com.gumpw.youskill.screenshots/config.json")
+    FileUtils.mkdir_p(File.dirname(configuration_path))
+    duo = selected_simulators.find { |device| device.fetch("name") == "iPhone Duo" }
+    duo_started = false
+    status_bar_device = nil
+    groups = acceptance_devices.reject { |name| name == "iPhone Duo" }.map { |name| ["phones", name] }
+    groups += [["closed", "iPhone Duo"], ["open", "iPhone Duo"]] if duo
+    groups.each do |posture, name|
+      device = selected_simulators.find { |item| item.fetch("name") == name }
+      activate_simulator(device)
+      udid = Shellwords.escape(device.fetch("udid"))
+      if posture != "phones"
+        duo_started = true
+        sh("ruby ../scripts/with-timeout.rb 60 sim-use ios fold #{posture} --device #{udid} --json")
+      end
+      status_bar_device = udid
+      sh("ruby ../scripts/with-timeout.rb 60 xcrun simctl status_bar #{udid} override --time '9:41' --batteryState charged --batteryLevel 100")
+      output = "build/screenshots/#{Time.now.utc.strftime('%Y%m%dT%H%M%SZ')}-#{device.fetch('udid')}-#{posture}"
+      { "en-US" => "en_US", "zh-Hans" => "zh_CN", "ja" => "ja_JP", "ko" => "ko_KR" }.each do |language, locale|
+        directory = File.expand_path("../#{output}/#{language}", __dir__)
+        FileUtils.mkdir_p(directory)
+        File.write(configuration_path, JSON.generate({ language: language, locale: locale, outputDirectory: directory, posture: posture }))
+        capture = SimulatorScreenshotCapture.new(device: device.fetch("udid"), directory: directory)
+        capture.start
+        begin
+          run_tests(
+            project: "YouSkill.xcodeproj",
+            scheme: "YouSkillScreenshots",
+            xcodebuild_command: "ruby #{Shellwords.escape(File.expand_path('../scripts/with-timeout.rb', __dir__))} 1200 xcodebuild",
+            destination: "platform=iOS Simulator,id=#{device.fetch('udid')}",
+            skip_detect_devices: true,
+            force_quit_simulator: false,
+            reset_simulator: false,
+            disable_slide_to_type: false,
+            parallel_testing: false,
+            disable_concurrent_testing: true,
+            skip_package_dependencies_resolution: true,
+            disable_package_automatic_updates: true,
+            derived_data_path: ENV.fetch("IOS_DERIVED_DATA", "build/DerivedData"),
+            output_directory: "#{output}/#{language}/results",
+            result_bundle: true,
+            xcargs: "-collect-test-diagnostics never -test-timeouts-enabled YES -default-test-execution-time-allowance 600 -maximum-test-execution-time-allowance 600",
+            fail_build: true
+          )
+        ensure
+          capture.stop
+        end
+        files = Dir.glob(File.join(directory, "*.png"))
+        UI.user_error!("Incomplete screenshots for #{name}/#{posture}/#{language}.") unless files.length == 5
+        destination = File.join(root, language)
+        FileUtils.mkdir_p(destination)
+        files.each do |file|
+          if posture != "phones"
+            dimensions = File.binread(file, 24).byteslice(16, 8).unpack("NN").sort
+            expected = posture == "closed" ? [1398, 2034] : [2007, 2853]
+            UI.user_error!("Unexpected Duo #{posture} screenshot dimensions: #{dimensions.inspect}") unless dimensions == expected
+          end
+          FileUtils.cp(file, File.join(destination, "#{posture}-#{name}-#{File.basename(file)}"))
+        end
+      end
+      sh("ruby ../scripts/with-timeout.rb 60 xcrun simctl status_bar #{udid} clear")
+      status_bar_device = nil
+    end
+  ensure
+    cleanup = []
+    cleanup << "xcrun simctl status_bar #{status_bar_device} clear" if status_bar_device
+    cleanup << "sim-use ios fold closed --device #{Shellwords.escape(duo.fetch('udid'))} --json" if duo && duo_started
+    cleanup.each do |command|
+      begin
+        sh("ruby ../scripts/with-timeout.rb 60 #{command}")
+      rescue StandardError => error
+        UI.error("Simulator cleanup failed: #{error.message}")
+      end
+    end
+    FileUtils.rm_f(configuration_path) if configuration_path
+  end
+
+  desc "Verify, capture screenshots, and archive the committed release"
+  lane :prepare_release do |options|
+    require_duo_environment!
+    UI.user_error!("Commit the release source and build number before release.") unless sh("git status --porcelain", log: false).strip.empty?
+    build_number = project_version.fetch("CURRENT_PROJECT_VERSION").to_s
+    if options[:build] && options[:build].to_s != build_number
+      UI.user_error!("Set CURRENT_PROJECT_VERSION in project.yml and commit it before release.")
+    end
+    version = project_version.fetch("MARKETING_VERSION").to_s
+    revision = source_revision
+    verify
+    capture_store_screenshots
+    build_app(
+      project: "YouSkill.xcodeproj",
+      scheme: "YouSkill",
+      configuration: "Release",
+      skip_package_dependencies_resolution: true,
+      disable_package_automatic_updates: true,
+      derived_data_path: ENV.fetch("IOS_DERIVED_DATA", "build/DerivedData"),
+      export_method: "app-store",
+      output_directory: "build/release",
+      output_name: "YouSkill.ipa",
+      xcargs: "-allowProvisioningUpdates",
+      export_options: {
+        signingStyle: "automatic",
+        teamID: "HC438T2B8P",
+        manageAppVersionAndBuildNumber: false,
+        uploadSymbols: true
+      }
+    )
+    UI.user_error!("Source changed during release. Run the release again.") unless source_revision == revision && sh("git status --porcelain", log: false).strip.empty?
+    assets = Dir.glob(File.expand_path("screenshots/*/*.png", __dir__))
+    assets << lane_context[SharedValues::IPA_OUTPUT_PATH]
+    manifest = { revision: revision, version: version, build: build_number,
+                 files: assets.to_h { |path| [File.expand_path(path), Digest::SHA256.file(path).hexdigest] } }
+    File.write(File.expand_path("../build/release/manifest.json", __dir__), JSON.pretty_generate(manifest))
+    UI.success("Release prepared. Inspect the screenshots before running ios release.")
+  end
+
+  desc "Upload the inspected, verified release and request App Store review"
+  lane :release do
+    require_release_environment!
+    path = File.expand_path("../build/release/manifest.json", __dir__)
+    UI.user_error!("Run ios prepare_release and inspect its screenshots first.") unless File.file?(path)
+    manifest = JSON.parse(File.read(path))
+    UI.user_error!("Source changed after acceptance.") unless source_revision == manifest.fetch("revision") && sh("git status --porcelain", log: false).strip.empty?
+    manifest.fetch("files").each do |file, digest|
+      UI.user_error!("Release asset changed: #{file}") unless File.file?(file) && Digest::SHA256.file(file).hexdigest == digest
+    end
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_filepath: ENV.fetch("ASC_KEY_PATH")
+    )
+    upload_to_app_store(
+      api_key: api_key,
+      app_version: manifest.fetch("version"),
+      build_number: manifest.fetch("build"),
+      ipa: manifest.fetch("files").keys.find { |file| file.end_with?(".ipa") },
+      metadata_path: "fastlane/metadata",
+      screenshots_path: "fastlane/screenshots",
+      overwrite_screenshots: true,
+      submit_for_review: true,
+      automatic_release: true,
+      precheck_include_in_app_purchases: false,
+      force: true
+    )
+  end
+end

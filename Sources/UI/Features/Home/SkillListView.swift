@@ -2,15 +2,14 @@ import SwiftUI
 
 struct SkillListView: View {
     let container: AppContainer
-
-    private enum CatalogDestination: Hashable {
-        case results
-    }
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @State private var viewModel: SkillListViewModel
     @State private var repositoriesSelected = false
     @State private var searchDraft = ""
     @State private var navigationPath = NavigationPath()
+    @State private var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
     @State private var isShowingSettings = false
     @State private var remoteSort: SkillSortOption = .heatScore
     @State private var scrollPosition: Int?
@@ -38,84 +37,110 @@ struct SkillListView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $navigationPath) {
-            VStack(spacing: 0) {
-                Picker(L10n.string("catalog.browse"), selection: $repositoriesSelected) {
-                    Text(L10n.string("catalog.categories")).tag(false)
-                    Text(L10n.string("catalog.repositories")).tag(true)
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-
-                List {
-                    if !repositoriesSelected {
-                        Button { open(.all) } label: {
-                            Label(L10n.string("catalog.all"), systemImage: "square.grid.2x2")
-                        }
-                        .accessibilityIdentifier("catalog.all")
-                        ForEach(viewModel.categories) { category in
-                            Button { open(.category(category)) } label: {
-                                catalogRow(name: category.name, icon: category.icon,
-                                           count: category.skillCount, fallback: "tag")
-                            }
-                        }
-                    } else {
-                        ForEach(viewModel.repositories) { repository in
-                            Button { open(.repository(repository)) } label: {
-                                catalogRow(name: repository.name, icon: repository.icon,
-                                           count: repository.skillCount, fallback: "shippingbox")
-                            }
-                        }
+        NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
+            catalog
+                .navigationSplitViewColumnWidth(min: 240, ideal: 320, max: 400)
+        } detail: {
+            NavigationStack(path: $navigationPath) {
+                results
+                    .navigationDestination(for: Skill.self) { skill in
+                        SkillDetailView(skill: skill, container: container)
                     }
-                    if viewModel.isNavigationLoading {
-                        ProgressView().frame(maxWidth: .infinity)
-                    } else if let error = repositoriesSelected ? viewModel.repositoriesError : viewModel.categoriesError {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(error).font(.footnote).foregroundStyle(.secondary)
-                            Button(L10n.string("common.retry")) {
-                                Task { await viewModel.refreshNavigation() }
-                            }
-                        }
-                    } else if repositoriesSelected && viewModel.repositories.isEmpty {
-                        EmptyStateView(systemImage: "shippingbox", title: L10n.string("catalog.no_repositories"),
-                                       message: L10n.string("catalog.retry_message"))
-                    }
-                }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-                .refreshable { await viewModel.refreshNavigation() }
             }
-            .background(AppTheme.groupedBackground.ignoresSafeArea())
-            .navigationTitle("YouSkill")
-            .platformInlineNavigationTitle()
-            .toolbar {
-                if navigationPath.isEmpty {
-                    ToolbarItem(placement: PlatformToolbarPlacement.leading) {
-                        Button {
-                            if viewModel.selectedSort != .favorites { remoteSort = viewModel.selectedSort }
-                            viewModel.selectedSort = .favorites
-                            viewModel.selectScope(.all)
-                            viewModel.applySearch("")
-                            searchDraft = ""
-                            scrollPosition = nil
-                            navigationPath.append(CatalogDestination.results)
-                        } label: { Image(systemName: "bookmark") }
-                        .accessibilityLabel(L10n.string("skill.sort.favorites"))
-                    }
-                    ToolbarItem(placement: PlatformToolbarPlacement.trailing) {
-                        Button { isShowingSettings = true } label: { Image(systemName: "gearshape") }
-                            .accessibilityLabel(L10n.string("settings.title"))
-                    }
-                }
-            }
-            .sheet(isPresented: $isShowingSettings) { SettingsView(container: container) }
-            .navigationDestination(for: CatalogDestination.self) { _ in results }
-            .navigationDestination(for: Skill.self) { skill in
-                SkillDetailView(skill: skill, container: container)
-            }
-            .task { await viewModel.loadNavigationIfNeeded() }
         }
+        .navigationSplitViewStyle(.balanced)
+        .sheet(isPresented: $isShowingSettings) { SettingsView(container: container) }
+        .task { await viewModel.loadNavigationIfNeeded() }
+    }
+
+    private var catalog: some View {
+        VStack(spacing: 0) {
+            Picker(L10n.string("catalog.browse"), selection: $repositoriesSelected) {
+                Text(L10n.string("catalog.categories")).tag(false)
+                    .accessibilityIdentifier("catalog.categories")
+                Text(L10n.string("catalog.repositories")).tag(true)
+                    .accessibilityIdentifier("catalog.repositories")
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
+            List {
+                if !repositoriesSelected {
+                    Button { open(.all) } label: {
+                        Label(L10n.string("catalog.all"), systemImage: "square.grid.2x2")
+                    }
+                    .accessibilityIdentifier("catalog.all")
+                    .listRowBackground(selectionBackground(for: .all))
+                    ForEach(viewModel.categories) { category in
+                        Button { open(.category(category)) } label: {
+                            catalogRow(name: category.name, icon: category.icon,
+                                       count: category.skillCount, fallback: "tag")
+                        }
+                        .accessibilityIdentifier("catalog.category.\(category.id)")
+                        .listRowBackground(selectionBackground(for: .category(category)))
+                    }
+                } else {
+                    ForEach(viewModel.repositories) { repository in
+                        Button { open(.repository(repository)) } label: {
+                            catalogRow(name: repository.name, icon: repository.icon,
+                                       count: repository.skillCount, fallback: "shippingbox")
+                        }
+                        .accessibilityIdentifier("catalog.repository.\(repository.id)")
+                        .listRowBackground(selectionBackground(for: .repository(repository)))
+                    }
+                }
+                if viewModel.isNavigationLoading {
+                    ProgressView().frame(maxWidth: .infinity)
+                } else if let error = repositoriesSelected ? viewModel.repositoriesError : viewModel.categoriesError {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(error).font(.footnote).foregroundStyle(.secondary)
+                        Button(L10n.string("common.retry")) {
+                            Task { await viewModel.refreshNavigation() }
+                        }
+                    }
+                } else if repositoriesSelected && viewModel.repositories.isEmpty {
+                    EmptyStateView(systemImage: "shippingbox", title: L10n.string("catalog.no_repositories"),
+                                   message: L10n.string("catalog.retry_message"))
+                }
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .refreshable { await viewModel.refreshNavigation() }
+        }
+        .background(AppTheme.groupedBackground.ignoresSafeArea())
+        .navigationTitle("YouSkill")
+        .platformInlineNavigationTitle()
+        .toolbar {
+            ToolbarItem(placement: PlatformToolbarPlacement.leading) {
+                Button {
+                    if viewModel.selectedSort != .favorites { remoteSort = viewModel.selectedSort }
+                    viewModel.selectedSort = .favorites
+                    viewModel.selectScope(.all)
+                    viewModel.applySearch("")
+                    searchDraft = ""
+                    scrollPosition = nil
+                    showResults()
+                } label: { Label(L10n.string("skill.sort.favorites"), systemImage: "bookmark") }
+                .accessibilityIdentifier("catalog.favorites")
+            }
+            ToolbarItem(placement: PlatformToolbarPlacement.trailing) {
+                Button { isShowingSettings = true } label: {
+                    Label(L10n.string("settings.title"), systemImage: "gearshape")
+                }
+                .accessibilityIdentifier("catalog.settings")
+            }
+        }
+    }
+
+    private func selectionBackground(for scope: CatalogScope) -> Color {
+        horizontalSizeClass == .regular && viewModel.selectedSort != .favorites && viewModel.scope.key == scope.key
+            ? AppTheme.accent.opacity(0.12) : .clear
+    }
+
+    private func showResults() {
+        navigationPath = NavigationPath()
+        preferredCompactColumn = .detail
     }
 
     private func open(_ scope: CatalogScope) {
@@ -125,7 +150,7 @@ struct SkillListView: View {
         viewModel.selectScope(scope)
         if viewModel.selectedSort == .favorites { viewModel.selectedSort = remoteSort }
         searchDraft = viewModel.searchText
-        navigationPath.append(CatalogDestination.results)
+        showResults()
     }
 
     private func catalogRow(name: String, icon: String?, count: Int, fallback: String) -> some View {
@@ -154,7 +179,7 @@ struct SkillListView: View {
                                message: L10n.string(viewModel.selectedSort == .favorites ? "home.empty.no_favorites_message" : "home.empty.no_results_message"))
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 16) {
+                    LazyVGrid(columns: resultColumns, spacing: 16) {
                         ForEach(viewModel.displayedSkills) { skill in
                             NavigationLink(value: skill) {
                                 SkillCard(skill: skill, showsSource: !isRepositoryScope,
@@ -189,6 +214,21 @@ struct SkillListView: View {
         .background(AppTheme.groupedBackground.ignoresSafeArea())
         .navigationTitle(resultTitle)
         .platformInlineNavigationTitle()
+        .safeAreaInset(edge: .top, spacing: 0) {
+            HStack {
+                Text(L10n.format("catalog.count", viewModel.selectedSort == .favorites ? viewModel.displayedSkills.count : viewModel.totalCount))
+                Spacer(minLength: 8)
+                if isRepositoryScope, case let .repository(repository) = viewModel.scope,
+                   let stars = repository.starCount {
+                    Label(stars.formatted(), systemImage: "star")
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(AppTheme.groupedBackground)
+        }
         .searchable(text: $searchDraft, prompt: L10n.format("catalog.search_scope", resultTitle))
         .onChange(of: searchDraft) { _, value in
             if value.trimmingCharacters(in: .whitespacesAndNewlines) != viewModel.searchText {
@@ -197,20 +237,6 @@ struct SkillListView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                VStack(spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(resultTitle).font(.headline).lineLimit(1)
-                        if isRepositoryScope, case let .repository(repository) = viewModel.scope,
-                           let stars = repository.starCount {
-                            Label(stars.formatted(), systemImage: "star")
-                                .font(.caption).foregroundStyle(.secondary).fixedSize()
-                        }
-                    }
-                    Text(L10n.format("catalog.count", viewModel.selectedSort == .favorites ? viewModel.displayedSkills.count : viewModel.totalCount))
-                        .font(.caption2).foregroundStyle(.secondary)
-                }
-            }
             if viewModel.selectedSort != .favorites {
                 ToolbarItem(placement: PlatformToolbarPlacement.trailing) {
                     Menu {
@@ -218,8 +244,8 @@ struct SkillListView: View {
                             Text(SkillSortOption.heatScore.localizedTitle).tag(SkillSortOption.heatScore)
                             Text(SkillSortOption.starCount.localizedTitle).tag(SkillSortOption.starCount)
                         }
-                    } label: { Image(systemName: "arrow.up.arrow.down") }
-                    .accessibilityLabel(L10n.string("catalog.sort"))
+                    } label: { Label(L10n.string("catalog.sort"), systemImage: "arrow.up.arrow.down") }
+                    .accessibilityIdentifier("catalog.sort")
                 }
             }
         }
@@ -233,5 +259,12 @@ struct SkillListView: View {
         .task(id: viewModel.reloadKey) {
             await viewModel.reloadIfNeeded(for: viewModel.reloadKey)
         }
+    }
+
+    private var resultColumns: [GridItem] {
+        if dynamicTypeSize.isAccessibilitySize {
+            return [GridItem(.flexible())]
+        }
+        return [GridItem(.adaptive(minimum: 300), spacing: 16, alignment: .top)]
     }
 }

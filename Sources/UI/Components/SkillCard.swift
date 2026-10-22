@@ -38,6 +38,8 @@ struct SkillCard: View {
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("skill.favorite.\(skill.id)")
+                .accessibilityLabel(L10n.string(isFavorite ? "skill.favorite.remove" : "skill.favorite.add"))
             }
 
             if let description = skill.description, !description.isEmpty {

@@ -9,6 +9,10 @@
 "common.retry" = "再試行";
 "common.save" = "保存";
 "common.unknown" = "不明";
+"skill.favorite.add" = "お気に入りに追加";
+"skill.favorite.remove" = "お気に入りから削除";
+"detail.translate" = "翻訳";
+"detail.show_original" = "原文を表示";
 
 "detail.content_load_failed" = "コンテンツを読み込めませんでした";
 "detail.directory" = "目次";

@@ -1,0 +1,86 @@
+# ExecPlan: Verified iOS releases
+
+**Status:** Active
+**Created:** 2026-10-22
+**Last Updated:** 2026-10-22
+
+## Purpose / Big Picture
+
+Make build, simulator acceptance, store screenshots, and App Store submission a repeatable fastlane workflow. Adapt the app to iPhone Duo and verify display transitions before claiming device support.
+
+## Context and Orientation
+
+Version 1.1 build 20261021 was uploaded before this work. `project.yml` generates the Xcode project. Shared tests cover repositories and list state. `UITests/MarketplaceNavigationTests.swift` contains one live navigation regression that was compiled but never executed. The app currently supports portrait only. `SkillListView` owns navigation state, and `SkillDetailView` owns reading state.
+
+## Plan of Work
+
+Run the existing simulator tests first and diagnose failures from result bundles. Add stable user-flow coverage for catalog browsing, search, sorting, favorites, reading, files, settings, and resizing. Use XCUITest for repeatable assertions and sim-use for interactive inspection. Add fastlane lanes with explicit device selection, failure propagation, test artifacts, screenshot gating, signing, and API-key submission. Keep release secrets outside Git. Generate and inspect store screenshots only after the acceptance suite passes. Build and upload a new build number after code changes.
+
+## Progress
+
+- [x] Inspect project conventions and previous failed acceptance attempts.
+- [x] Verify iPhone Duo and Xcode 27.1 support in Apple documentation.
+- [x] Execute baseline simulator tests and fix the observed failures.
+- [x] Add adaptive layout and regression coverage.
+- [ ] Configure and validate fastlane and CI.
+- [ ] Pass the simulator acceptance matrix and inspect screenshots.
+- [ ] Upload the verified build and screenshots, then submit for review.
+
+## Surprises & Discoveries
+
+- Sandboxed simctl fails with CoreSimulator connection errors. The same command outside the sandbox lists installed runtimes successfully; this does not establish a simulator service crash.
+- The previous UI acceptance failure was in the computer-control service. XCUITest was compiled but not executed. The user now explicitly authorizes simulator automation frameworks.
+- Installed Xcode is 27.0 (27A266a). Installed device types do not include iPhone Duo. Apple documents Duo simulator support in Xcode 27.1. The host runs macOS 26.6.2, which meets its minimum requirement. Free disk space was about 15 GiB before tool installation.
+- The exec-plan skill is absent. This plan follows the repository's existing template.
+- The baseline navigation test queried an `Other` element, but the observed SwiftUI hierarchy exposed a scroll view. The corrected live navigation test passed, including a second entry and return.
+- A portrait-only declaration prevented the rotation regression from passing. The same test passed after enabling all orientations.
+- The first fastlane execution used system Ruby for xcpretty despite starting Bundler with Homebrew Ruby. Prefixing the active Ruby directory fixes that environment mismatch.
+- The final iPhone 17 fastlane run passed all 32 logic tests and five UI tests, including files, translation settings, favorites, rotation, and the live navigation regression. The result bundle is `build/test-results/20261021T174258Z/CE86A573-E6BB-4BA8-A9E0-B8BFADA14C51/YouSkill.xcresult`. This evidence covers the local build 20261022 source before commit; it does not cover Duo.
+- Ruby syntax, lane discovery, and `harness check` pass. These checks do not establish screenshot capture, signing, upload, or Duo runtime support.
+- The file workflow initially queried an identifier that SwiftUI replaced with its parent identifier. The failure hierarchy showed `example.swift` and the rendered code. Querying the visible filename fixed the test; the complete file and translation-settings flow then passed.
+- The production Release configuration builds with signing disabled. Its binary excludes the Debug fixture markers. Build 20261022 is the final local test candidate.
+- The first iPhone 16e boot stalled in the MobileGestalt migration plugin's synchronous IPC call. Diagnostics were preserved before a device-only restart. Boot and Duo host checks now have bounded execution; success, failure propagation, and timeout exit 124 were verified.
+- Host load average exceeded 600 while multiple simulators were active. The workflow now activates and tests one selected simulator at a time. The legacy iOS 26 iPhone 16e was retained; a new iPhone 16e on iOS 27 completed initialization after the idle test simulator was shut down. This supports resource contention as a contributing factor, but does not establish the sole cause of the legacy migration stall.
+- One file-flow run completed every assertion at 299 seconds but reached the five-minute limit during teardown. App sampling showed an idle main thread while XCTest waited for an idle notification. Test execution now allows 10 minutes, with unchanged element assertions and a 20-minute limit for each device's complete build/test process. The next iPhone 17 run passed all 32 logic tests and five UI flows; the file flow completed in 54 seconds.
+- Inspection of fastlane 2.241.1 found that the snapshot launcher unconditionally shuts down booted simulators. Store capture now uses a native XCTest PNG writer through `run_tests` so that the selected Duo posture is retained. This capture path remains gated by full device acceptance.
+- The iPhone 16e run passed 32 logic tests, live navigation, and catalog/retry coverage, then hit the overall timeout during the file/settings flow after tapping a text field. XCTest reported a missing app-idle notification. A sample showed the app main thread waiting in the event loop; concurrent unrelated builds were also active. The incomplete result is retained beside the iPhone 17 result, and no `acceptance.json` was issued for the matrix. Further acceptance needs a responsive simulator host; no tests were skipped or marked passed from this timeout.
+- The final native screenshot target passed `build-for-testing` without running screenshot capture. Final fastlane lane discovery, Ruby syntax checks, `harness check`, and `git diff --check` passed. CI is configured but has not run remotely. Native capture, Duo display changes, signed archive export, and submission remain unverified.
+- App Store Connect API access to YouSkill was verified with a read-only request. Credentials are in ignored local configuration; the private key remains outside the repository.
+- Xcode 27.1 and the iOS 27.1 runtime are installed. Disk cleanup increased available space to 25 GiB. The app and test targets compiled with the new SDK, but two Duo devices reported a terminal `Data Migration Failed` status after restart. `simctl bootstatus` returned zero despite this failure. The lane now rejects that result and supports exact device selection through `IOS_SIMULATOR_UDIDS`; regression checks cover both behaviors and invalid selection input.
+- Signature verification returned `-67054` for both iOS 27.1 and the existing iOS 27.0 runtime. This does not isolate the failure to the new runtime. The ordinary iPhone 16e booted successfully but remained in app installation while host load exceeded 600. Attempts were stopped without erasing devices, and logs were preserved. A separate active Duo prevented a global simulator-service restart without coordination.
+
+## Decision Log
+
+- Use the existing repository and XCUITest target rather than a parallel test system. sim-use supplements interactive diagnosis; it does not replace assertions.
+- Test at the user interaction boundary and existing repository/service public interfaces. Preserve the navigation regression and add one behavior at a time.
+- Treat a passing build, passing simulator tests, screenshots, upload, review submission, and public availability as separate evidence.
+- Do not label another simulator or a resized screenshot as iPhone Duo evidence.
+
+## Current Release Attempt
+
+- The user authorized updating version 1.1 metadata and screenshots, uploading a new build, and submitting it for automatic release after approval.
+- App Store Connect reports 1.1 as `PREPARE_FOR_SUBMISSION`, with no selected build. The newest uploaded build is 20261021. The new candidate is 202610221.
+- The previously blocked Duo simulator now boots. The catalog split-view regression passed on device `09D50758-369E-4ED0-BC56-C45A956B51B6`.
+- Store capture must use the open display in landscape and handle the split-view sidebar when returning to Settings.
+- An executed screenshot smoke test passed its UI assertions but produced black images through `XCUIApplication.screenshot()`. Screenshot capture is not accepted until native image content and dimensions are verified.
+- Four-language descriptions and release notes now describe the catalog and Duo layouts. The support URL is preserved. The privacy URL now points to `/apps/privacy.html`; the former `/privacy.html` returned the site shell rather than the policy. The previous dark-mode claim is removed because the app currently uses a light interface.
+- Native active-display capture passed a five-page Duo smoke flow with exact 2853 x 2007 images. The capture worker has checks for success, command failure, and invalid filenames. PNG export uses an opaque ImageIO context to satisfy the App Store format requirement.
+- Existing uploaded builds declare no non-exempt encryption. This release retains that declaration in the app plist; it does not change networking or cryptography.
+- Full matrix acceptance, final screenshot inspection, signed archive, upload, and review submission are pending for this candidate.
+- The first candidate matrix passed iPhone 16e, then failed on iPhone 17 because the model-settings tap occurred during sheet presentation. The failure hierarchy remained on the settings home screen. The test now waits for the entry to be interactive and the destination to appear. The complete file, configuration, validation, and translation flow passed in a focused iPhone 17 rerun.
+- The next matrix passed the complete iPhone 16e, iPhone 17, and iPhone 18 Pro Max suites. Duo passed navigation, catalog retry, and file/translation settings. Its cover display did not rotate through XCTest, and search appeared as a button rather than an expanded field. The updated search/sort/favorite flow passed on Duo. Rotation coverage now uses explicit sim-use acceptance on both displays; this replacement still needs a complete run.
+- The display-only rerun encountered a blank application window with an idle main thread. Diagnostics were retained. A device-only restart then reported `Data Migration Failed` while host load exceeded 250. The failed device was shut down. No final matrix acceptance, store screenshots, signed archive, or submission is established by these partial results.
+- After the user reopened Duo, the complete host regression passed, including explicit cover and inner rotation checks. Evidence is in `build/test-results/duo-resumed-20261022`. The workflow can retain this recovered device through `IOS_KEEP_BOOTED_UDIDS`; checks cover both retention and the default shutdown behavior. A new full release run will bind all evidence and artifacts to the final source revision.
+- The next Duo logic and four-flow UI suite passed. The following host check reproduced a blank foreground window after XCTest. Both Debug and Release had a valid SwiftUI scene and root controller but no rendered content. Restarting only SpringBoard and the accessibility bridge restored normal Release live-data rendering without a device reboot. The host setup now performs this bounded recovery. The complete host regression then passed in `build/test-results/duo-handoff-recovery-final`.
+
+## Outcomes & Retrospective
+
+The implementation is ready for review, with complete ordinary iPhone 17 regression evidence from Xcode 27.0 and partial iPhone 16e evidence. Xcode 27.1, its Duo runtime, and release credentials are now configured. Resolve the simulator startup and installation failures, then run the full matrix before store capture. No new store screenshots or release upload have been produced by this workflow. See [the release workflow](../references/ios-release.md) for commands and evidence boundaries.
+
+## References
+
+- https://www.apple.com/iphone-duo/
+- https://developer.apple.com/documentation/xcode-release-notes/xcode-27_1-release-notes
+- https://developer.apple.com/design/human-interface-guidelines/layout
+- https://github.com/lycorp-jp/sim-use
+- https://docs.fastlane.tools/actions/upload_to_app_store/
