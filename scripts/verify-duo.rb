@@ -25,9 +25,26 @@ def assert_visible(device, output, name, label)
     raise "Accessibility query failed: #{data}" unless data.fetch("ok")
     File.write(File.join(output, "duo-#{name}.json"), JSON.pretty_generate(data))
     entries = data.fetch("data").fetch("entries")
-    return if entries.any? { |entry| entry["label"] == label && entry.fetch("w", 0) > 0 && entry.fetch("h", 0) > 0 }
+    return if entries.any? { |entry| entry["label"] == label && entry.fetch("frame", {}).fetch("width", 0) > 0 && entry.fetch("frame", {}).fetch("height", 0) > 0 }
     raise "#{label} is not visible after #{name}" if Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
     sleep 1
+  end
+end
+
+def assert_catalog_columns(device, output, name, expanded:)
+  data = JSON.parse(run("sim-use", "describe-ui", "--device", device, "--json", "--no-raw"))
+  raise "Accessibility query failed: #{data}" unless data.fetch("ok")
+  File.write(File.join(output, "duo-#{name}.json"), JSON.pretty_generate(data))
+  entries = data.fetch("data").fetch("entries")
+  catalog = entries.find { |entry| entry["uniqueId"] == "catalog.category.1" }
+  result = entries.find { |entry| entry["uniqueId"] == "skill.card.1" }
+  raise "Selected scope results are missing after #{name}" unless result
+  if expanded
+    raise "Catalog is missing after #{name}" unless catalog
+    left, right = catalog.fetch("frame"), result.fetch("frame")
+    raise "Catalog and results must occupy separate columns" unless left.fetch("x") + left.fetch("width") <= right.fetch("x")
+  else
+    raise "Compact results must not show the catalog" if catalog
   end
 end
 
@@ -35,7 +52,16 @@ begin
   run("sim-use", "ios", "fold", "closed", "--device", device, "--json")
   run("xcrun", "simctl", "launch", "--terminate-running-process", device, "com.gumpw.youskill",
       "--ui-testing", "--ui-fixtures", "-AppleLanguages", "(en)", "-AppleLocale", "en_US")
-  tap(device, "catalog.all")
+  tap(device, "catalog.category.1")
+  assert_visible(device, output, "selected-category", "Development")
+  assert_catalog_columns(device, output, "compact-category", expanded: false)
+  run("sim-use", "ios", "fold", "open", "--device", device, "--json")
+  run("sim-use", "ios", "rotate", "landscape-right", "--device", device)
+  assert_visible(device, output, "expanded-category", "Development")
+  assert_catalog_columns(device, output, "expanded-columns", expanded: true)
+  run("sim-use", "ios", "fold", "closed", "--device", device, "--json")
+  assert_visible(device, output, "collapsed-category", "Development")
+  assert_catalog_columns(device, output, "collapsed-columns", expanded: false)
   tap(device, "skill.card.1")
   tap(device, "detail.files")
   tap(device, "detail.file.example.swift")
@@ -47,13 +73,16 @@ begin
     assert_visible(device, output, "#{index}-#{posture}", "example.swift")
     tap(device, "detail.files")
     assert_visible(device, output, "#{index}-drawer", "archive.zip")
-    tap(device, "detail.files.close")
+    # The reader identifier can mask the drawer close identifier in the AX tree.
+    run("sim-use", "tap", "--device", device, "--label", "Done", "--element-type", "Button", "--wait-timeout", "30")
   end
   run("sim-use", "ios", "rotate", "landscape-left", "--device", device)
   assert_visible(device, output, "landscape", "example.swift")
   tap(device, "BackButton")
   tap(device, "skill.card.1")
   assert_visible(device, output, "back-results-reopen", "SKILL.md")
+  run("sim-use", "ios", "fold", "closed", "--device", device, "--json")
+  assert_visible(device, output, "compact-reader", "SKILL.md")
   tap(device, "BackButton")
   tap(device, "BackButton")
   tap(device, "catalog.all")
