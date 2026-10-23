@@ -139,3 +139,7 @@ The tag annotation records version/build and review submission evidence, without
 The release skill now follows this submission/tag boundary. Public availability remains a separate state. No background monitor is configured.
 
 The release retrospective identified these reusable lessons: capture evidence and store selection are different sets; 3–5 screens means per locale and device group with matching content and order; later non-artifact commits need the tested candidate-reuse gate; IPA and build-number upload options conflict; concurrent TLS failures require remote readback and a targeted serial retry; pending image processing must not trigger replacement; withdrawal requires waiting for editability; and upload, review, public release, and tagging need separate evidence. These rules are maintained in `.agents/skills/release/SKILL.md`, with implementation details in the existing release reference and helpers.
+
+## Public availability confirmed — 2026-10-23
+
+The user reported approval and authorized pushing the commits and tag. Fresh App Store Connect readback confirms version 1.1, selected build 202610221, READY_FOR_SALE, and VALID processing. Apple's public US storefront lookup for app 6761548607 returns YouSkill version 1.1. README screenshots now use the same four core screens as the approved store selection, for both ordinary iPhone and expanded Duo. The README download link was corrected to the verified app ID. The annotated 1.1.0 tag remains on the submitted IPA source revision; later documentation commits do not move it.
