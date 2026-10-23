@@ -8,8 +8,6 @@ YouSkill helps you browse, search, and read MCP (Model Context Protocol) Skills 
 
 Version 1.1: browse categories and popular repositories, explore skills, and read their files.
 
-### iPhone
-
 <p align="center">
   <img src="screenshots/iphone/01-categories.png" width="200" alt="Browse skill categories on iPhone" />
   <img src="screenshots/iphone/02-repositories.png" width="200" alt="Browse popular repositories on iPhone" />
@@ -17,17 +15,9 @@ Version 1.1: browse categories and popular repositories, explore skills, and rea
   <img src="screenshots/iphone/04-reader.png" width="200" alt="Read a skill document on iPhone" />
 </p>
 
-### iPhone Duo
-
-The expanded landscape layout keeps the catalog beside the skill list or reader.
-
 <p align="center">
-  <img src="screenshots/duo/01-categories.png" width="420" alt="Browse categories beside the skill list on iPhone Duo" />
-  <img src="screenshots/duo/02-repositories.png" width="420" alt="Browse popular repositories beside the skill list on iPhone Duo" />
-</p>
-<p align="center">
-  <img src="screenshots/duo/03-skills.png" width="420" alt="Explore repository skills with the catalog visible on iPhone Duo" />
-  <img src="screenshots/duo/04-reader.png" width="420" alt="Read a skill document beside the catalog on iPhone Duo" />
+  <img src="screenshots/duo/02-repositories.png" width="48%" alt="Browse popular repositories beside the skill list on iPhone Duo" />
+  <img src="screenshots/duo/04-reader.png" width="48%" alt="Read a skill document beside the catalog on iPhone Duo" />
 </p>
 
 ## Download
