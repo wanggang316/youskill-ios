@@ -15,7 +15,7 @@ The catalog uses `NavigationSplitView`: the sidebar contains the category/reposi
 - **Skill Catalog** — Remote skill listing, search, sorting, pagination, and feed presentation.
 - **Skill Content** — GitHub repository resolution, skill directory tree construction, raw file retrieval, and file-type aware rendering.
 - **Translation** — Chat Completion API model configuration, connectivity validation, translation requests, and translation caching.
-- **Settings** — Local persistence of translation settings, target language preference, version metadata, and external links.
+- **Settings** — Local persistence of translation settings, target language preference, translation display mode (bilingual or translation only), version metadata, and external links.
 - **Favorites** — Local bookmark persistence and favorite-only filtering.
 
 ## Layer Structure
