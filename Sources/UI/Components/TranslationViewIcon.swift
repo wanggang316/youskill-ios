@@ -3,11 +3,52 @@ import SwiftUI
 /// Toolbar glyph for the reader's translation control: a globe behind an "A" bubble (original)
 /// and a "文" bubble (translation). The bubbles of the current view are filled.
 ///
-/// Drawn as a one-color template, like an SF Symbol. The toolbar's glass renders light fills
-/// translucently, so instead of covering the globe with a white fill, the globe is cut away
-/// under each bubble, empty bubbles are hollow, and a filled bubble's letter is cut out of it.
+/// The toolbar's glass does not composite custom drawing faithfully: a white fill came out
+/// translucent and destination-out cutouts came out black. So the glyph is rendered offscreen
+/// once per state and shown as a template image, which the toolbar tints like an SF Symbol.
 struct TranslationViewIcon: View {
     /// `nil` before a translation exists; no bubble is filled.
+    let view: TranslationView?
+
+    @Environment(\.displayScale) private var displayScale
+
+    @MainActor private static var templates: [TemplateKey: CGImage] = [:]
+
+    var body: some View {
+        Group {
+            if let template = Self.template(for: view, scale: displayScale) {
+                Image(decorative: template, scale: displayScale)
+                    .renderingMode(.template)
+            } else {
+                Image(systemName: "translate")
+            }
+        }
+        .accessibilityHidden(true)
+    }
+
+    /// The glyph as a template mask: opaque where drawn, and fully transparent inside empty
+    /// bubbles, around each bubble, and in a filled bubble's letter.
+    @MainActor
+    static func template(for view: TranslationView?, scale: CGFloat) -> CGImage? {
+        let key = TemplateKey(view: view, scale: scale)
+        if let cached = templates[key] {
+            return cached
+        }
+        let renderer = ImageRenderer(content: TranslationViewGlyph(view: view))
+        renderer.scale = scale
+        guard let image = renderer.cgImage else { return nil }
+        templates[key] = image
+        return image
+    }
+}
+
+private struct TemplateKey: Hashable {
+    let view: TranslationView?
+    let scale: CGFloat
+}
+
+/// The glyph drawing. Rendered offscreen only; see `TranslationViewIcon`.
+private struct TranslationViewGlyph: View {
     let view: TranslationView?
 
     private static let size = CGSize(width: 28, height: 24)
@@ -36,9 +77,8 @@ struct TranslationViewIcon: View {
             )
         }
         .frame(width: Self.size.width, height: Self.size.height, alignment: .topLeading)
-        // Confines the destination-out cutouts to the icon so they do not punch through the toolbar.
+        // Confines the destination-out cutouts to the glyph.
         .compositingGroup()
-        .accessibilityHidden(true)
     }
 
     private var globe: some View {
