@@ -180,7 +180,7 @@ final class ReleaseAcceptanceTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Skill guide"].exists, "A failed translation keeps the original")
         XCTAssertTrue(app.staticTexts["Retranslated guide"].exists, "A failed translation keeps the earlier translation")
         XCTAssertFalse(app.staticTexts["Couldn't load content"].exists)
-        XCTAssertTrue(app.buttons["detail.translation-retry"].exists)
+        XCTAssertTrue(app.buttons["Retry"].exists)
         attachScreenshot("failure")
 
         app.buttons["detail.files"].tap()

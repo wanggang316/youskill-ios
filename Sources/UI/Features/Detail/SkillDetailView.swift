@@ -218,7 +218,6 @@ struct SkillDetailView: View {
                 Text(message)
                     .font(.footnote)
                     .foregroundStyle(AppTheme.secondaryText)
-                    .accessibilityIdentifier("detail.translation-error-message")
             }
 
             Spacer(minLength: 0)
@@ -228,7 +227,6 @@ struct SkillDetailView: View {
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
-            .accessibilityIdentifier("detail.translation-retry")
 
             Button {
                 viewModel.dismissTranslationError()

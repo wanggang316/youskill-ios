@@ -69,6 +69,7 @@ struct MarkdownContentView: View {
             .font(.system(size: 16 * Self.headingScale(level), weight: .semibold))
             .foregroundStyle(.primary)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityAddTraits(.isHeader)
         }
     }
 
