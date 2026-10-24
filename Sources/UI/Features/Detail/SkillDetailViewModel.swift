@@ -8,6 +8,10 @@ final class SkillDetailViewModel {
 
     private let contentService: SkillContentService
     private let translationService: TranslationService
+    private let translationSettings: @MainActor () -> TranslationSettings
+    /// Bumped whenever the open file changes so late translation results for another file are dropped.
+    private var fileGeneration = 0
+    private var lastTranslationWasForced = false
 
     private(set) var directoryEntries: [SkillDirectoryEntry] = []
     private(set) var fileTree: [FileTreeNode] = []
@@ -16,8 +20,9 @@ final class SkillDetailViewModel {
     private(set) var translatedContent: String?
     private(set) var originalDescription: String?
     private(set) var translatedDescription: String?
+    private var alignedSegments: [BilingualSegment] = []
     private(set) var rawOriginalMarkdown: String = ""
-    private(set) var isShowingTranslated = false
+    private(set) var translationView: TranslationView = .original
     private(set) var fileKind: SkillFileKind = .markdown
     private(set) var rawFileURL: URL?
     private(set) var browserFileURL: URL?
@@ -25,28 +30,55 @@ final class SkillDetailViewModel {
     private(set) var isLoadingFile = false
     private(set) var isTranslating = false
     private(set) var errorMessage: String?
+    private(set) var translationErrorMessage: String?
+    private(set) var missingTranslationFields: [TranslationSettingField] = []
     private(set) var didLoad = false
     var isDrawerOpen = false
     var needsTranslationSettings = false
 
-    init(skill: Skill, contentService: SkillContentService, translationService: TranslationService) {
+    init(
+        skill: Skill,
+        contentService: SkillContentService,
+        translationService: TranslationService,
+        translationSettings: @escaping @MainActor () -> TranslationSettings
+    ) {
         self.skill = skill
         self.contentService = contentService
         self.translationService = translationService
+        self.translationSettings = translationSettings
+    }
+
+    var hasTranslation: Bool {
+        translatedContent != nil
+    }
+
+    /// The view actually rendered. Without a translation the reader always shows the original.
+    var effectiveTranslationView: TranslationView {
+        hasTranslation ? translationView : .original
     }
 
     var displayedContent: String {
-        if isShowingTranslated, let translatedContent {
+        if effectiveTranslationView == .translation, let translatedContent {
             return translatedContent
         }
         return originalContent
     }
 
     var displayedDescription: String? {
-        if isShowingTranslated {
-            return translatedDescription
+        if effectiveTranslationView == .translation {
+            return translatedDescription ?? originalDescription
         }
         return originalDescription
+    }
+
+    /// Only shown under the original description in bilingual view.
+    var secondaryDescription: String? {
+        guard effectiveTranslationView == .bilingual, translatedDescription != originalDescription else { return nil }
+        return translatedDescription
+    }
+
+    var bilingualSegments: [BilingualSegment]? {
+        effectiveTranslationView == .bilingual ? alignedSegments : nil
     }
 
     var displayTitle: String {
@@ -87,11 +119,16 @@ final class SkillDetailViewModel {
     }
 
     func loadFile(at path: String) async {
+        fileGeneration += 1
+        let generation = fileGeneration
         activePath = path
         fileKind = SkillFileKind(path: path)
         translatedContent = nil
         translatedDescription = nil
-        isShowingTranslated = false
+        alignedSegments = []
+        translationView = .original
+        translationErrorMessage = nil
+        isTranslating = false
         rawFileURL = try? contentService.rawURL(for: skill, relativePath: path)
         browserFileURL = skill.browserURL(for: path)
         errorMessage = nil
@@ -109,6 +146,7 @@ final class SkillDetailViewModel {
 
         do {
             let fetchedContent = try await contentService.fetchTextFile(for: skill, relativePath: path)
+            guard generation == fileGeneration else { return }
             if fileKind == .markdown {
                 rawOriginalMarkdown = fetchedContent
                 let parsed = MarkdownFrontmatterParser.parse(fetchedContent)
@@ -118,47 +156,94 @@ final class SkillDetailViewModel {
                 originalContent = fetchedContent
             }
         } catch {
+            guard generation == fileGeneration else { return }
             originalContent = ""
             errorMessage = error.localizedDescription
         }
+
+        await restoreCachedTranslation(generation: generation)
     }
 
-    func toggleTranslation(using settings: TranslationSettings) async {
+    /// First translation of the open file. The view follows the global display mode.
+    func translate() async {
+        guard !hasTranslation else { return }
+        await performTranslation(force: false)
+    }
+
+    /// Skips the cache and keeps the current view.
+    func retranslate() async {
+        await performTranslation(force: true)
+    }
+
+    func retryTranslation() async {
+        await performTranslation(force: lastTranslationWasForced)
+    }
+
+    /// Changes only this page's in-memory view; settings are untouched.
+    func selectTranslationView(_ view: TranslationView) {
+        guard hasTranslation, !isTranslating else { return }
+        translationView = view
+    }
+
+    func dismissTranslationError() {
+        translationErrorMessage = nil
+    }
+
+    private func restoreCachedTranslation(generation: Int) async {
         guard canTranslate, let activePath else { return }
+        let settings = translationSettings()
+        guard let cached = await translationService.cachedTranslation(
+            markdown: rawOriginalMarkdown,
+            skillID: skill.id,
+            relativePath: activePath,
+            settings: settings
+        ), generation == fileGeneration, !hasTranslation else { return }
+        applyTranslation(cached)
+        translationView = TranslationView(settings.displayMode)
+    }
 
-        if isShowingTranslated {
-            isShowingTranslated = false
-            return
-        }
+    private func performTranslation(force: Bool) async {
+        guard canTranslate, !isTranslating, let activePath else { return }
 
+        let settings = translationSettings()
         guard settings.isComplete else {
+            missingTranslationFields = settings.missingFields
             needsTranslationSettings = true
             return
         }
 
-        if translatedContent != nil {
-            isShowingTranslated = true
-            return
-        }
-
+        let generation = fileGeneration
+        let isFirstTranslation = !hasTranslation
+        lastTranslationWasForced = force
         isTranslating = true
-        errorMessage = nil
+        translationErrorMessage = nil
 
         do {
             let translated = try await translationService.translate(
                 markdown: rawOriginalMarkdown,
                 skillID: skill.id,
                 relativePath: activePath,
-                settings: settings
+                settings: settings,
+                force: force
             )
-            let parsed = MarkdownFrontmatterParser.parse(translated)
-            translatedDescription = parsed.frontmatterDescription
-            translatedContent = parsed.body
-            isShowingTranslated = true
+            guard generation == fileGeneration else { return }
+            applyTranslation(translated)
+            if isFirstTranslation {
+                translationView = TranslationView(settings.displayMode)
+            }
         } catch {
-            errorMessage = error.localizedDescription
+            guard generation == fileGeneration else { return }
+            // Keep the original and any earlier translation on screen.
+            translationErrorMessage = TranslationValidationErrorFormatter.message(for: error)
         }
 
         isTranslating = false
+    }
+
+    private func applyTranslation(_ translated: String) {
+        let parsed = MarkdownFrontmatterParser.parse(translated)
+        translatedDescription = parsed.frontmatterDescription
+        translatedContent = parsed.body
+        alignedSegments = BilingualMarkdownAligner.segments(original: originalContent, translated: parsed.body)
     }
 }
