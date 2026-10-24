@@ -34,6 +34,7 @@ Source of truth: the v1.0 product spec "youskill-ios 翻译显示模式与正文
 - [x] 2026-10-24 Service force / cache restore / unchanged results (`801f9ce`)
 - [x] 2026-10-24 Reader menu, bilingual rendering, failure banner (`d57f42d`)
 - [x] 2026-10-24 UI tests with screenshot attachments (`6c092d3`)
+- [x] 2026-10-24 Review: icon toolbar control
 
 ## Surprises & Discoveries
 
@@ -57,6 +58,9 @@ Source of truth: the v1.0 product spec "youskill-ios 翻译显示模式与正文
   **Date/Author:** 2026-10-24 / Claude
 - **Decision:** Retry after a failure repeats the failed request's mode (forced or not).
   **Rationale:** A failed Retranslate must not silently return the old cached text.
+  **Date/Author:** 2026-10-24 / Claude
+- **Decision:** The reader's translation control is a drawn icon (globe behind an "A" bubble and a "文" bubble) instead of the view name. Original fills A, Translation fills 文, Bilingual fills both; before a translation exists neither is filled. VoiceOver reads "Translation view" with the current view as its value.
+  **Rationale:** Review feedback on HAN-259: the text label was too long for the toolbar. Drawn with SwiftUI shapes so it follows the toolbar tint and disabled state.
   **Date/Author:** 2026-10-24 / Claude
 - **Decision:** No translated-text styling option.
   **Rationale:** Spec P2.

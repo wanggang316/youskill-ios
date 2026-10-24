@@ -111,10 +111,12 @@ struct SkillDetailView: View {
                     ProgressView()
                         .accessibilityLabel(L10n.string("detail.translating"))
                 } else {
-                    Text(viewModel.translationView.localizedTitle)
+                    TranslationViewIcon(view: viewModel.translationView)
                 }
             }
             .disabled(viewModel.isTranslating)
+            .accessibilityLabel(L10n.string("detail.translation_view"))
+            .accessibilityValue(viewModel.translationView.localizedTitle)
             .accessibilityIdentifier("detail.translation-menu")
         } else {
             Button {
@@ -124,10 +126,11 @@ struct SkillDetailView: View {
                     ProgressView()
                         .accessibilityLabel(L10n.string("detail.translating"))
                 } else {
-                    Label(L10n.string("detail.translate"), systemImage: "globe")
+                    TranslationViewIcon(view: nil)
                 }
             }
             .disabled(!viewModel.canTranslate || viewModel.isTranslating)
+            .accessibilityLabel(L10n.string("detail.translate"))
             .accessibilityIdentifier("detail.translate")
         }
     }
