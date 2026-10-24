@@ -34,13 +34,15 @@ Source of truth: the v1.0 product spec "youskill-ios 翻译显示模式与正文
 - [x] 2026-10-24 Service force / cache restore / unchanged results (`801f9ce`)
 - [x] 2026-10-24 Reader menu, bilingual rendering, failure banner (`d57f42d`)
 - [x] 2026-10-24 UI tests with screenshot attachments (`6c092d3`)
-- [x] 2026-10-24 Review: icon toolbar control
+- [x] 2026-10-24 Review: icon toolbar control (`d55060a`)
+- [x] 2026-10-24 Review: hollow bubbles with the globe cut away, no white fill
 
 ## Surprises & Discoveries
 
 - The translation cache key used `String.hashValue`, which is seeded per process, so cached translations were never found after a relaunch. Restoring a cached translation on open (P1) depends on a stable key, so the key now contains the source text itself; `DiskCache` already hashes the whole key with SHA-256. Old entries are orphaned once.
 - The UI-test translation cache lives in the simulator's Caches directory and persisted between tests. With restore-on-open, that would hide the Translate button, so the fixture clears it when launched with `--ui-testing`.
 - MarkdownUI strips the top margin of the first block in each `Markdown` view, so bilingual segments are separate `Markdown` views in a `VStack` with fixed spacing.
+- The iOS 26 toolbar's Liquid Glass draws a `Color.white` fill in a toolbar label with a vibrancy blend, so it does not cover what is behind it: in the first icon the globe showed through the "empty" bubbles as cyan lines (pixel (196, 251, 255) in the CI screenshot). Anything in a toolbar label that must hide other content has to be cut out, not painted over.
 
 ## Decision Log
 
@@ -62,10 +64,13 @@ Source of truth: the v1.0 product spec "youskill-ios 翻译显示模式与正文
 - **Decision:** The reader's translation control is a drawn icon (globe behind an "A" bubble and a "文" bubble) instead of the view name. Original fills A, Translation fills 文, Bilingual fills both; before a translation exists neither is filled. VoiceOver reads "Translation view" with the current view as its value.
   **Rationale:** Review feedback on HAN-259: the text label was too long for the toolbar. Drawn with SwiftUI shapes so it follows the toolbar tint and disabled state.
   **Date/Author:** 2026-10-24 / Claude
+- **Decision:** Draw the icon as a one-color template, like an SF Symbol: the globe is erased (destination-out inside a compositing group) under each bubble and in a 1pt band around its outline; an empty bubble is only an outline; a filled bubble's letter is cut out of the fill. The icon uses no white.
+  **Rationale:** Second review on HAN-259: empty bubbles looked translucent with the globe behind them. The glass blends white fills (see Surprises), so only cut-outs reliably keep the globe out of the bubbles. `TranslationViewIconTests` renders the icon and checks that nothing is drawn inside an empty bubble.
+  **Date/Author:** 2026-10-24 / Claude
 - **Decision:** No translated-text styling option.
   **Rationale:** Spec P2.
   **Date/Author:** 2026-10-24 / Claude
 
 ## Outcomes & Retrospective
 
-All P0 and P1 items from the spec are implemented. Logic is covered by `BilingualMarkdownTests`, `TranslationSettingsTests`, `TranslationServiceTests`, `SkillDetailViewModelTests`, and `AppSettingsStoreTests`; the reader flow by `ReleaseAcceptanceTests.testTranslationViewsRetranslateAndFailureKeepTheReader`.
+All P0 and P1 items from the spec are implemented. Logic is covered by `BilingualMarkdownTests`, `TranslationSettingsTests`, `TranslationServiceTests`, `SkillDetailViewModelTests`, `AppSettingsStoreTests`, and `TranslationViewIconTests`; the reader flow by `ReleaseAcceptanceTests.testTranslationViewsRetranslateAndFailureKeepTheReader`.
