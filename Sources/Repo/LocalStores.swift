@@ -88,6 +88,11 @@ final class AppSettingsStore {
         persist()
     }
 
+    func updateDisplayMode(_ mode: TranslationDisplayMode) {
+        translationSettings.displayMode = mode
+        persist()
+    }
+
     func updateAppLanguage(_ language: AppLanguage) {
         appLanguage = language
         userDefaults.set(language.rawValue, forKey: AppLanguage.storageKey)

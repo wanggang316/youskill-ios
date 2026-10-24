@@ -12,7 +12,6 @@
 "skill.favorite.add" = "Add favorite";
 "skill.favorite.remove" = "Remove favorite";
 "detail.translate" = "Translate";
-"detail.show_original" = "Show original";
 
 "detail.content_load_failed" = "Couldn't load content";
 "detail.directory" = "Catalog";
@@ -27,7 +26,7 @@
 "detail.no_readable_files" = "This skill doesn't have any readable files.";
 "detail.open_source" = "Open source file";
 "detail.read_failed" = "Failed to load";
-"detail.translation_required_message" = "Fill in BASE_URL, API_KEY, and Model before translating.";
+"detail.translation_required_message" = "Missing: %@. Fill these in before translating.";
 "detail.translation_required_title" = "Set up a translation model first";
 "detail.type_label" = "Type";
 "detail.unsupported.message" = "This file type doesn't have a viewer yet. You can still open the source file.";
@@ -103,3 +102,13 @@
 "catalog.retry_message" = "Pull to refresh or try again later.";
 "catalog.browse" = "Browse";
 "catalog.count" = "%ld skills";
+"common.close" = "Close";
+"detail.retranslate" = "Retranslate";
+"detail.translating" = "Translating…";
+"detail.translation_failed" = "Translation failed";
+"detail.translation_view" = "Translation view";
+"settings.display_mode" = "Display Mode";
+"translation_view.bilingual" = "Bilingual";
+"translation_view.translation" = "Translation";
+"translation_view.original" = "Original";
+"translation.error.unchanged" = "The model returned the original text unchanged. It may already be in the target language.";
