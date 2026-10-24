@@ -12,7 +12,6 @@
 "skill.favorite.add" = "添加收藏";
 "skill.favorite.remove" = "取消收藏";
 "detail.translate" = "翻译";
-"detail.show_original" = "显示原文";
 
 "detail.content_load_failed" = "内容加载失败";
 "detail.directory" = "目录";
@@ -27,7 +26,7 @@
 "detail.no_readable_files" = "当前 Skill 没有可读文件。";
 "detail.open_source" = "打开源文件";
 "detail.read_failed" = "读取失败";
-"detail.translation_required_message" = "需要填写 BASE_URL、API_KEY 和 Model 后才能翻译。";
+"detail.translation_required_message" = "缺少：%@。填写后才能翻译。";
 "detail.translation_required_title" = "请先配置翻译模型";
 "detail.type_label" = "类型";
 "detail.unsupported.message" = "当前文件类型还没有预览器，你仍然可以打开源文件查看原始内容。";
@@ -103,3 +102,13 @@
 "catalog.retry_message" = "下拉刷新或稍后重试。";
 "catalog.browse" = "浏览";
 "catalog.count" = "%ld 个 Skills";
+"common.close" = "关闭";
+"detail.retranslate" = "重新翻译";
+"detail.translating" = "翻译中…";
+"detail.translation_failed" = "翻译失败";
+"detail.translation_view" = "翻译视图";
+"settings.display_mode" = "显示模式";
+"translation_view.bilingual" = "双语对照";
+"translation_view.translation" = "译文";
+"translation_view.original" = "原文";
+"translation.error.unchanged" = "模型返回的内容与原文相同，未翻译。原文可能已是目标语言。";

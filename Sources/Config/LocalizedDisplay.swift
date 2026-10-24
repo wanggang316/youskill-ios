@@ -25,6 +25,24 @@ extension TargetLanguage {
     }
 }
 
+extension TranslationDisplayMode {
+    var localizedTitle: String {
+        L10n.string(titleKey)
+    }
+}
+
+extension TranslationView {
+    var localizedTitle: String {
+        L10n.string(titleKey)
+    }
+}
+
+extension TranslationSettingField {
+    var localizedTitle: String {
+        L10n.string(titleKey)
+    }
+}
+
 extension AppLanguage {
     var localizedTitle: String {
         L10n.string(titleKey)

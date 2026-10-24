@@ -17,7 +17,8 @@ struct SkillDetailView: View {
         _viewModel = State(initialValue: SkillDetailViewModel(
             skill: skill,
             contentService: container.skillContentService,
-            translationService: container.translationService
+            translationService: container.translationService,
+            translationSettings: { [settingsStore = container.settingsStore] in settingsStore.translationSettings }
         ))
     }
 
@@ -55,20 +56,7 @@ struct SkillDetailView: View {
         .platformInlineNavigationTitle()
         .toolbar {
             ToolbarItemGroup(placement: PlatformToolbarPlacement.trailing) {
-                Button {
-                    Task {
-                        await viewModel.toggleTranslation(using: container.settingsStore.translationSettings)
-                    }
-                } label: {
-                    if viewModel.isTranslating {
-                        ProgressView()
-                    } else {
-                        Label(L10n.string(viewModel.isShowingTranslated ? "detail.show_original" : "detail.translate"),
-                              systemImage: viewModel.isShowingTranslated ? "text.badge.checkmark" : "globe")
-                    }
-                }
-                .disabled(!viewModel.canTranslate || viewModel.isTranslating)
-                .accessibilityIdentifier("detail.translate")
+                translationControl
 
                 Button {
                     drawerBinding.wrappedValue = true
@@ -85,13 +73,65 @@ struct SkillDetailView: View {
             }
             Button(L10n.string("common.cancel"), role: .cancel) {}
         } message: {
-            Text(L10n.string("detail.translation_required_message"))
+            Text(L10n.format(
+                "detail.translation_required_message",
+                viewModel.missingTranslationFields.map(\.localizedTitle).joined(separator: ", ")
+            ))
         }
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(container: container)
         }
         .task {
             await viewModel.loadIfNeeded()
+        }
+    }
+
+    @ViewBuilder
+    private var translationControl: some View {
+        if viewModel.hasTranslation {
+            Menu {
+                Picker(L10n.string("detail.translation_view"), selection: Binding(
+                    get: { viewModel.translationView },
+                    set: { viewModel.selectTranslationView($0) }
+                )) {
+                    ForEach(TranslationView.allCases) { view in
+                        Text(view.localizedTitle).tag(view)
+                    }
+                }
+                .pickerStyle(.inline)
+
+                Button {
+                    Task { await viewModel.retranslate() }
+                } label: {
+                    Label(L10n.string("detail.retranslate"), systemImage: "arrow.clockwise")
+                }
+                .accessibilityIdentifier("detail.retranslate")
+            } label: {
+                if viewModel.isTranslating {
+                    ProgressView()
+                        .accessibilityLabel(L10n.string("detail.translating"))
+                } else {
+                    TranslationViewIcon(view: viewModel.translationView)
+                }
+            }
+            .disabled(viewModel.isTranslating)
+            .accessibilityLabel(L10n.string("detail.translation_view"))
+            .accessibilityValue(viewModel.translationView.localizedTitle)
+            .accessibilityIdentifier("detail.translation-menu")
+        } else {
+            Button {
+                Task { await viewModel.translate() }
+            } label: {
+                if viewModel.isTranslating {
+                    ProgressView()
+                        .accessibilityLabel(L10n.string("detail.translating"))
+                } else {
+                    TranslationViewIcon(view: nil)
+                }
+            }
+            .disabled(!viewModel.canTranslate || viewModel.isTranslating)
+            .accessibilityLabel(L10n.string("detail.translate"))
+            .accessibilityIdentifier("detail.translate")
         }
     }
 
@@ -127,6 +167,10 @@ struct SkillDetailView: View {
                 .padding(.bottom, 10)
             }
 
+            if let message = viewModel.translationErrorMessage {
+                translationErrorBanner(message)
+            }
+
             if let errorMessage = viewModel.errorMessage, !errorMessage.isEmpty, viewModel.activePath != nil {
                 EmptyStateView(
                     systemImage: "exclamationmark.triangle",
@@ -144,7 +188,9 @@ struct SkillDetailView: View {
                 case .markdown:
                     MarkdownContentView(
                         description: viewModel.displayedDescription,
+                        translatedDescription: viewModel.secondaryDescription,
                         markdown: viewModel.displayedContent,
+                        bilingualSegments: viewModel.bilingualSegments,
                         baseURL: viewModel.rawFileURL?.deletingLastPathComponent()
                     )
                 case .code:
@@ -161,6 +207,48 @@ struct SkillDetailView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    /// Translation failures keep the reader visible and offer a retry.
+    private func translationErrorBanner(_ message: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.orange)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(L10n.string("detail.translation_failed"))
+                    .font(.subheadline.weight(.semibold))
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+
+            Spacer(minLength: 0)
+
+            Button(L10n.string("common.retry")) {
+                Task { await viewModel.retryTranslation() }
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+
+            Button {
+                viewModel.dismissTranslationError()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(L10n.string("common.close"))
+        }
+        .padding(12)
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(AppTheme.divider, lineWidth: 1)
+        )
+        .padding(.horizontal, 20)
+        .padding(.bottom, 10)
     }
 
     @ViewBuilder

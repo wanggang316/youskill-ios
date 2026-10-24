@@ -8,6 +8,7 @@ protocol TranslationRepositoryProtocol: Sendable {
 enum TranslationRepositoryError: LocalizedError, Equatable {
     case incompleteSettings
     case modelNotFound(String)
+    case unchangedTranslation
 
     var errorDescription: String? {
         switch self {
@@ -15,6 +16,8 @@ enum TranslationRepositoryError: LocalizedError, Equatable {
             L10n.string("translation.error.incomplete_settings")
         case let .modelNotFound(model):
             L10n.format("translation.error.model_not_found", model)
+        case .unchangedTranslation:
+            L10n.string("translation.error.unchanged")
         }
     }
 }

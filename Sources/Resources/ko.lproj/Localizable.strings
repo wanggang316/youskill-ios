@@ -12,7 +12,6 @@
 "skill.favorite.add" = "즐겨찾기 추가";
 "skill.favorite.remove" = "즐겨찾기 삭제";
 "detail.translate" = "번역";
-"detail.show_original" = "원문 보기";
 
 "detail.content_load_failed" = "콘텐츠를 불러오지 못했습니다";
 "detail.directory" = "목차";
@@ -27,7 +26,7 @@
 "detail.no_readable_files" = "이 Skill 에는 읽을 수 있는 파일이 없습니다.";
 "detail.open_source" = "원본 파일 열기";
 "detail.read_failed" = "불러오기에 실패했습니다";
-"detail.translation_required_message" = "번역하려면 BASE_URL, API_KEY, Model 을 입력해야 합니다.";
+"detail.translation_required_message" = "누락: %@. 번역하려면 입력하세요.";
 "detail.translation_required_title" = "먼저 번역 모델을 설정하세요";
 "detail.type_label" = "유형";
 "detail.unsupported.message" = "이 파일 형식용 뷰어는 아직 없습니다. 원본 파일을 열어 내용을 확인할 수 있습니다.";
@@ -103,3 +102,13 @@
 "catalog.retry_message" = "아래로 당겨 새로고침하거나 나중에 다시 시도하세요.";
 "catalog.browse" = "둘러보기";
 "catalog.count" = "스킬 %ld개";
+"common.close" = "닫기";
+"detail.retranslate" = "다시 번역";
+"detail.translating" = "번역 중…";
+"detail.translation_failed" = "번역 실패";
+"detail.translation_view" = "번역 보기";
+"settings.display_mode" = "표시 모드";
+"translation_view.bilingual" = "대역";
+"translation_view.translation" = "번역문";
+"translation_view.original" = "원문";
+"translation.error.unchanged" = "모델이 원문을 그대로 반환했습니다. 원문이 이미 대상 언어일 수 있습니다.";

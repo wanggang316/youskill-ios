@@ -12,7 +12,6 @@
 "skill.favorite.add" = "お気に入りに追加";
 "skill.favorite.remove" = "お気に入りから削除";
 "detail.translate" = "翻訳";
-"detail.show_original" = "原文を表示";
 
 "detail.content_load_failed" = "コンテンツを読み込めませんでした";
 "detail.directory" = "目次";
@@ -27,7 +26,7 @@
 "detail.no_readable_files" = "この Skill には読めるファイルがありません。";
 "detail.open_source" = "ソースファイルを開く";
 "detail.read_failed" = "読み込みに失敗しました";
-"detail.translation_required_message" = "翻訳するには BASE_URL、API_KEY、Model を入力する必要があります。";
+"detail.translation_required_message" = "未入力：%@。翻訳するには入力してください。";
 "detail.translation_required_title" = "先に翻訳モデルを設定してください";
 "detail.type_label" = "種類";
 "detail.unsupported.message" = "このファイル形式用のビューアはまだありません。ソースファイルを開いて元の内容を確認できます。";
@@ -103,3 +102,13 @@
 "catalog.retry_message" = "下に引いて更新するか、後でもう一度お試しください。";
 "catalog.browse" = "ブラウズ";
 "catalog.count" = "%ld 件のスキル";
+"common.close" = "閉じる";
+"detail.retranslate" = "再翻訳";
+"detail.translating" = "翻訳中…";
+"detail.translation_failed" = "翻訳に失敗しました";
+"detail.translation_view" = "翻訳の表示";
+"settings.display_mode" = "表示モード";
+"translation_view.bilingual" = "対訳";
+"translation_view.translation" = "訳文";
+"translation_view.original" = "原文";
+"translation.error.unchanged" = "モデルが原文をそのまま返しました。原文がすでに翻訳先言語の可能性があります。";

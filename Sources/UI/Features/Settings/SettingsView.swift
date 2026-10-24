@@ -63,6 +63,16 @@ private struct SettingsFormView: View {
                         Text(language.localizedTitle).tag(language)
                     }
                 }
+
+                Picker(L10n.string("settings.display_mode"), selection: Binding(
+                    get: { settingsStore.translationSettings.displayMode },
+                    set: { settingsStore.updateDisplayMode($0) }
+                )) {
+                    ForEach(TranslationDisplayMode.allCases) { mode in
+                        Text(mode.localizedTitle).tag(mode)
+                    }
+                }
+                .accessibilityIdentifier("settings.display-mode")
             } header: {
                 sectionHeader(L10n.string("settings.section.model"))
             }

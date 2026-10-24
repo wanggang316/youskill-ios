@@ -15,6 +15,13 @@ actor DiskCache {
         try? fileManager.createDirectory(at: baseDirectory, withIntermediateDirectories: true)
     }
 
+    /// Deletes every entry in this namespace.
+    nonisolated func removeAll() {
+        let fileManager = FileManager.default
+        try? fileManager.removeItem(at: baseDirectory)
+        try? fileManager.createDirectory(at: baseDirectory, withIntermediateDirectories: true)
+    }
+
     func loadText(for key: String) -> String? {
         let url = fileURL(for: key)
         return try? String(contentsOf: url, encoding: .utf8)
