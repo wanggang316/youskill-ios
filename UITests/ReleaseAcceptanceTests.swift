@@ -132,8 +132,66 @@ final class ReleaseAcceptanceTests: XCTestCase {
         app.buttons["settings.done"].tap()
         app.buttons["detail.translate"].tap()
         XCTAssertTrue(app.staticTexts["Translated guide"].waitForExistence(timeout: 15))
-        app.buttons["detail.translate"].tap()
+        XCTAssertTrue(app.staticTexts["Skill guide"].exists, "The default display mode is bilingual")
+        chooseTranslationMenuItem("Original")
+        waitUntilGone(app.staticTexts["Translated guide"])
+        XCTAssertTrue(app.staticTexts["Skill guide"].exists)
+    }
+
+    func testTranslationViewsRetranslateAndFailureKeepTheReader() {
+        app.terminate()
+        app.launchArguments += ["--ui-translation-configured", "--ui-translation-fails-after-two"]
+        app.launch()
+        let settings = app.buttons["catalog.settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 30))
+        settings.tap()
+        XCTAssertTrue(app.buttons["settings.model"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.descendants(matching: .any)["settings.display-mode"].waitForExistence(timeout: 10))
+        attachScreenshot("settings-display-mode")
+        app.buttons["settings.done"].tap()
+
+        openResults()
+        firstCard.tap()
         XCTAssertTrue(app.staticTexts["Skill guide"].waitForExistence(timeout: 15))
+        app.buttons["detail.translate"].tap()
+        XCTAssertTrue(app.staticTexts["Translated guide"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["Skill guide"].exists, "First translation follows the bilingual default")
+        XCTAssertTrue(app.staticTexts["Translated step one."].exists)
+        attachScreenshot("bilingual")
+
+        chooseTranslationMenuItem("Translation")
+        waitUntilGone(app.staticTexts["Skill guide"])
+        XCTAssertTrue(app.staticTexts["Translated guide"].exists)
+        attachScreenshot("translation")
+
+        chooseTranslationMenuItem("Retranslate")
+        XCTAssertTrue(app.staticTexts["Retranslated guide"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.staticTexts["Skill guide"].exists, "Retranslating keeps the current view")
+
+        chooseTranslationMenuItem("Original")
+        waitUntilGone(app.staticTexts["Retranslated guide"])
+        XCTAssertTrue(app.staticTexts["Skill guide"].exists)
+        attachScreenshot("original")
+
+        chooseTranslationMenuItem("Bilingual")
+        XCTAssertTrue(app.staticTexts["Retranslated guide"].waitForExistence(timeout: 15))
+        chooseTranslationMenuItem("Retranslate")
+        XCTAssertTrue(app.staticTexts["Translation failed"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["Skill guide"].exists, "A failed translation keeps the original")
+        XCTAssertTrue(app.staticTexts["Retranslated guide"].exists, "A failed translation keeps the earlier translation")
+        XCTAssertFalse(app.staticTexts["Couldn't load content"].exists)
+        XCTAssertTrue(app.buttons["detail.translation-retry"].exists)
+        attachScreenshot("failure")
+
+        app.buttons["detail.files"].tap()
+        app.buttons["detail.file.example.swift"].tap()
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label == %@", "example.swift")).firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["detail.translate"].exists, "Another file starts without a translation")
+        app.buttons["detail.files"].tap()
+        app.buttons["detail.file.SKILL.md"].tap()
+        XCTAssertTrue(app.staticTexts["Retranslated guide"].waitForExistence(timeout: 15), "A cached translation is restored on open")
+        XCTAssertTrue(app.staticTexts["Skill guide"].exists)
+        XCTAssertTrue(app.buttons["detail.translation-menu"].exists)
     }
 
     func testCatalogScopesAndFailedLoadRetry() {
@@ -168,6 +226,32 @@ final class ReleaseAcceptanceTests: XCTestCase {
             field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count))
         }
         field.typeText(value)
+    }
+
+    private func chooseTranslationMenuItem(_ title: String) {
+        let menu = app.buttons["detail.translation-menu"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 15))
+        expectation(for: NSPredicate(format: "enabled == true"), evaluatedWith: menu)
+        waitForExpectations(timeout: 15)
+        menu.tap()
+        let item = app.buttons.matching(NSPredicate(
+            format: "label == %@ AND identifier != %@", title, "detail.translation-menu"
+        )).firstMatch
+        XCTAssertTrue(item.waitForExistence(timeout: 10))
+        item.tap()
+        waitUntilGone(item)
+    }
+
+    private func waitUntilGone(_ element: XCUIElement) {
+        expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: element)
+        waitForExpectations(timeout: 15)
+    }
+
+    private func attachScreenshot(_ name: String) {
+        let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        screenshot.name = "HAN-259-\(name)"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
     }
 
     private var firstCard: XCUIElement {

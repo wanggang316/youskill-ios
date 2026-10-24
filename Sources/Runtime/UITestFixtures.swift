@@ -4,14 +4,30 @@ import Foundation
 extension AppContainer {
     @MainActor
     static func uiTesting() -> AppContainer {
-        AppContainer(
+        let arguments = ProcessInfo.processInfo.arguments
+        let translationCache = DiskCache(namespace: "ui-test-translations")
+        if arguments.contains("--ui-testing") {
+            // Cached translations are restored on open, so each test starts without them.
+            translationCache.removeAll()
+        }
+        let settingsStore = AppSettingsStore()
+        if arguments.contains("--ui-translation-configured") {
+            settingsStore.update(TranslationSettings(
+                baseURL: "https://example.invalid/v1",
+                apiKey: "ui-test-key",
+                model: "ui-test-model",
+                targetLanguage: .chinese
+            ))
+        }
+
+        return AppContainer(
             favoritesStore: FavoritesStore(),
-            settingsStore: AppSettingsStore(),
+            settingsStore: settingsStore,
             skillCatalogService: SkillCatalogService(repository: UITestCatalog()),
             skillContentService: SkillContentService(repository: UITestContent()),
             translationService: TranslationService(
                 repository: UITestTranslation(),
-                cache: DiskCache(namespace: "ui-test-translations")
+                cache: translationCache
             )
         )
     }
@@ -71,11 +87,19 @@ private struct UITestContent: SkillContentRepositoryProtocol {
     }
 }
 
-private struct UITestTranslation: TranslationRepositoryProtocol {
+private actor UITestTranslation: TranslationRepositoryProtocol {
+    private let failsAfterTwoRequests = ProcessInfo.processInfo.arguments.contains("--ui-translation-fails-after-two")
+    private var requestCount = 0
+
     func validate(settings: TranslationSettings) async throws -> String { "Connection verified" }
 
     func translate(markdown: String, settings: TranslationSettings) async throws -> String {
-        "# Translated guide\n\nThis response verifies the translation UI workflow."
+        requestCount += 1
+        if failsAfterTwoRequests && requestCount > 2 {
+            throw URLError(.notConnectedToInternet)
+        }
+        let title = requestCount == 1 ? "Translated guide" : "Retranslated guide"
+        return "# \(title)\n\nThis response verifies the translation UI workflow.\n\n## Translated workflow\n\n1. Translated step one.\n2. Translated step two."
     }
 }
 #endif
