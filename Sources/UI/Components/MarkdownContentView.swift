@@ -57,13 +57,18 @@ struct MarkdownContentView: View {
             markdownView(original)
             markdownView(translated)
         case let .heading(level, original, translated):
-            // The translation reads as the heading's second line, so the first line drops its rule.
+            // The translation is the heading's second line. Sizes follow MarkdownUI's GitHub theme (16pt base).
             VStack(alignment: .leading, spacing: 4) {
-                Markdown(Self.heading(level: level, text: original), baseURL: baseURL, imageBaseURL: baseURL)
-                    .markdownTheme(.gitHubHeadingWithoutRule)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                markdownView(Self.heading(level: level, text: translated))
+                Text(Self.inlineMarkdown(original))
+                Text(Self.inlineMarkdown(translated))
+                if level <= 2 {
+                    Divider()
+                        .padding(.top, 4)
+                }
             }
+            .font(.system(size: 16 * Self.headingScale(level), weight: .semibold))
+            .foregroundStyle(.primary)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -73,29 +78,14 @@ struct MarkdownContentView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private static func heading(level: Int, text: String) -> String {
-        String(repeating: "#", count: min(max(level, 1), 6)) + " " + text
+    private static func inlineMarkdown(_ text: String) -> AttributedString {
+        (try? AttributedString(
+            markdown: text,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        )) ?? AttributedString(text)
     }
-}
 
-private extension Theme {
-    static var gitHubHeadingWithoutRule: Theme {
-        Theme.gitHub
-            .heading1 { configuration in
-                configuration.label
-                    .relativeLineSpacing(.em(0.125))
-                    .markdownTextStyle {
-                        FontWeight(.semibold)
-                        FontSize(.em(2))
-                    }
-            }
-            .heading2 { configuration in
-                configuration.label
-                    .relativeLineSpacing(.em(0.125))
-                    .markdownTextStyle {
-                        FontWeight(.semibold)
-                        FontSize(.em(1.5))
-                    }
-            }
+    private static func headingScale(_ level: Int) -> CGFloat {
+        [2, 1.5, 1.25, 1, 0.875, 0.85][min(max(level, 1), 6) - 1]
     }
 }

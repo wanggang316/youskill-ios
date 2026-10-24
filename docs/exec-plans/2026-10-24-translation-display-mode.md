@@ -46,8 +46,8 @@ Source of truth: the v1.0 product spec "youskill-ios 翻译显示模式与正文
 - **Decision:** Parse Markdown blocks with a small line-based parser instead of MarkdownUI internals.
   **Rationale:** MarkdownUI's block tree is internal; a Foundation-only parser is testable and covers the block kinds the spec names (heading, paragraph, list, quote, table, code, rule, HTML).
   **Date/Author:** 2026-10-24 / Claude
-- **Decision:** Headings render as two `Markdown` headings of the same level; the first drops the GitHub-theme rule under h1/h2.
-  **Rationale:** An ATX heading cannot contain a line break, and the spec asks for the translation as the heading's second line.
+- **Decision:** A bilingual heading renders as two SwiftUI `Text` lines (inline Markdown) at the GitHub theme's heading size, with one rule under h1/h2.
+  **Rationale:** An ATX heading cannot contain a line break, and the spec asks for the translation as the heading's second line. A custom MarkdownUI theme does not compile under Swift 6 strict concurrency (its style closures are nonisolated while SwiftUI modifiers are main-actor isolated).
   **Date/Author:** 2026-10-24 / Claude
 - **Decision:** List items pair only when item counts match; the translation is appended inside the item as an indented paragraph. Otherwise the whole lists stack.
   **Rationale:** Desktop behavior; spec §7.
