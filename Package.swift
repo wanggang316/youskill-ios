@@ -25,7 +25,7 @@ let package = Package(
             ],
             path: "Sources",
             exclude: ["App"],
-            sources: ["Config", "Repo", "Runtime", "Service", "Types", "UI"],
+            sources: ["Config", "Providers", "Repo", "Runtime", "Service", "Types", "UI"],
             resources: [
                 .process("Resources")
             ]
