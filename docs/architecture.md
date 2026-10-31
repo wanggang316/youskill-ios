@@ -18,6 +18,8 @@ The catalog uses `NavigationSplitView`: the sidebar contains the category/reposi
 - **Settings** — Local persistence of translation settings, target language preference, translation display mode (bilingual or translation only), version metadata, and external links.
 - **Favorites** — Local bookmark persistence and favorite-only filtering.
 
+> Planned: favorites will sync across the desktop and iOS apps through a server account (GitHub or Apple sign-in). Current favorites become local favorites and merge into the account at first sign-in. See `youskill-web/docs/decisions/0001` to `0004` and `youskill-web/docs/glossary.md`.
+
 ## Layer Structure
 
 Each domain follows a fixed set of layers with strictly validated dependency directions:
