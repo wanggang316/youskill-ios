@@ -4,6 +4,8 @@ protocol SkillCatalogRepositoryProtocol: Sendable {
     func fetchSkills(query: SkillQuery) async throws -> SkillsPage
     func fetchCategories() async throws -> [SkillCategory]
     func fetchHotRepositories() async throws -> [FeaturedRepository]
+    /// Returns nil when the skill is no longer in the marketplace.
+    func fetchSkill(id: Int) async throws -> Skill?
 }
 
 struct SkillCatalogRepository: SkillCatalogRepositoryProtocol, Sendable {
@@ -56,6 +58,14 @@ struct SkillCatalogRepository: SkillCatalogRepositoryProtocol, Sendable {
     func fetchHotRepositories() async throws -> [FeaturedRepository] {
         let response: RepositoriesResponse = try await fetchCatalog(path: "featured-repos")
         return response.items.filter { $0.enabled && $0.type == "hot" }
+    }
+
+    func fetchSkill(id: Int) async throws -> Skill? {
+        do {
+            return try await fetchCatalog(path: "skills/\(id)")
+        } catch HTTPClientError.badStatusCode(404, _) {
+            return nil
+        }
     }
 
     private func fetchCatalog<T: Decodable>(path: String) async throws -> T {

@@ -29,6 +29,10 @@ final class SkillListViewModel {
     private(set) var errorMessage: String?
     private var currentPage = 1
     private var favoritesRevision = UUID()
+    /// Live marketplace data of favorites, and the favorites whose skill left the marketplace.
+    private(set) var liveFavoriteSkills: [Int: Skill] = [:]
+    private(set) var unavailableFavoriteIDs: Set<Int> = []
+    @ObservationIgnored private var resolvingFavoriteIDs: Set<Int> = []
     private var hasLoadedInitially = false
     private var lastLoadedKey: String?
 
@@ -44,7 +48,7 @@ final class SkillListViewModel {
     var displayedSkills: [Skill] {
         _ = favoritesRevision
         if selectedSort == .favorites {
-            return favoritesStore.filteredFavorites(searchText: searchText)
+            return favoritesStore.filteredFavorites(searchText: searchText).map { liveFavoriteSkills[$0.id] ?? $0 }
         }
         return skills
     }
@@ -204,5 +208,28 @@ final class SkillListViewModel {
 
     func isFavorite(_ skill: Skill) -> Bool {
         favoritesStore.contains(skill)
+    }
+
+    func isUnavailable(_ skill: Skill) -> Bool {
+        unavailableFavoriteIDs.contains(skill.id)
+    }
+
+    /// Looks up a favorite in the marketplace once. Favorites from other devices have
+    /// no reader fields, so the live skill is needed to open them.
+    func resolveFavoriteIfNeeded(_ skill: Skill) async {
+        let id = skill.id
+        guard selectedSort == .favorites, liveFavoriteSkills[id] == nil, !unavailableFavoriteIDs.contains(id),
+              !resolvingFavoriteIDs.contains(id) else { return }
+        resolvingFavoriteIDs.insert(id)
+        defer { resolvingFavoriteIDs.remove(id) }
+        do {
+            if let live = try await service.fetchSkill(id: id) {
+                liveFavoriteSkills[id] = live
+            } else {
+                unavailableFavoriteIDs.insert(id)
+            }
+        } catch {
+            // Unknown until the next appearance; the saved snapshot stays on screen.
+        }
     }
 }

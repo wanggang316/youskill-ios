@@ -147,6 +147,34 @@ struct SkillListViewModelTests {
         #expect(!viewModel.canLoadMore)
     }
 
+    @Test
+    func favoritesResolveLiveSkillsOnceAndMarkMissingOnesUnavailable() async {
+        let repository = FakeSkillCatalogRepository()
+        let viewModel = makeViewModel(repository: repository)
+        viewModel.toggleFavorite(for: sampleSkill(1))
+        viewModel.toggleFavorite(for: sampleSkill(2))
+        var live = sampleSkill(1)
+        live = Skill(id: 1, name: "renamed", description: "live", url: "https://github.com/team/tools",
+                     path: "skills/one", starCount: 9, heatScore: 0, installCount: 0, source: live.source,
+                     branch: "main", skillPathSHA: nil, tags: [], createdAt: .now, updatedAt: .now)
+        await repository.setLiveSkill(live)
+        viewModel.selectedSort = .favorites
+
+        for skill in viewModel.displayedSkills {
+            await viewModel.resolveFavoriteIfNeeded(skill)
+            await viewModel.resolveFavoriteIfNeeded(skill)
+        }
+
+        #expect(await repository.lookups.sorted() == [1, 2])
+        #expect(viewModel.displayedSkills.first { $0.id == 1 }?.name == "renamed")
+        let missing = viewModel.displayedSkills.first { $0.id == 2 }
+        #expect(missing?.name == "skill-2")
+        #expect(missing.map(viewModel.isUnavailable) == true)
+
+        viewModel.toggleFavorite(for: missing!)
+        #expect(viewModel.displayedSkills.map(\.id) == [1])
+    }
+
     private func sampleSkill(_ id: Int) -> Skill {
         Skill(id: id, name: "skill-\(id)", description: nil, url: nil, path: nil,
               starCount: 120, heatScore: 10, installCount: 1, source: "team/tools",
@@ -168,9 +196,18 @@ struct SkillListViewModelTests {
 private actor FakeSkillCatalogRepository: SkillCatalogRepositoryProtocol {
     private(set) var fetchCount = 0
     private(set) var queries: [SkillQuery] = []
+    private(set) var lookups: [Int] = []
+    var liveSkills: [Int: Skill] = [:]
 
     func fetchCategories() async throws -> [SkillCategory] { [] }
     func fetchHotRepositories() async throws -> [FeaturedRepository] { [] }
+
+    func setLiveSkill(_ skill: Skill) { liveSkills[skill.id] = skill }
+
+    func fetchSkill(id: Int) async throws -> Skill? {
+        lookups.append(id)
+        return liveSkills[id]
+    }
 
     func fetchSkills(query: SkillQuery) async throws -> SkillsPage {
         fetchCount += 1
@@ -209,6 +246,8 @@ private actor ControlledCatalogRepository: SkillCatalogRepositoryProtocol {
     }
 
     func fetchCategories() async throws -> [SkillCategory] { throw URLError(.timedOut) }
+
+    func fetchSkill(id: Int) async throws -> Skill? { nil }
 
     func fetchHotRepositories() async throws -> [FeaturedRepository] {
         [FeaturedRepository(id: 1, name: "team/tools", icon: nil, skillCount: 2,
