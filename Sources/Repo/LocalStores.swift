@@ -108,13 +108,16 @@ final class FavoritesStore {
     /// Ends the account merge of a pushed favorite. The merge is a union, so a local
     /// favorite wins over an account tombstone even when the tombstone is later: the
     /// favorite gets a time after the tombstone and is pushed again. Returns true then.
+    /// The current record decides, so a favorite removed and added again while the
+    /// push was on the way is kept too; a removal made meanwhile is not protected.
     func keepFavoriteForAccountMerge(_ change: LocalFavorite, over remote: RemoteFavorite) -> Bool {
         guard accountMergeIDs.remove(change.skillID) != nil else { return false }
         defer { persist() }
-        guard change.isFavorited, remote.state == .removed,
+        guard remote.state == .removed,
               let index = records.firstIndex(where: { $0.skillID == change.skillID }),
-              records[index].updatedAt == change.updatedAt else { return false }
-        records[index].updatedAt = max(now(), remote.updatedAt.addingTimeInterval(0.001))
+              records[index].isFavorited, records[index].isPending else { return false }
+        records[index].updatedAt = max(now(), records[index].updatedAt,
+                                       remote.updatedAt.addingTimeInterval(0.001))
         records[index].isPending = true
         sortRecords()
         return true

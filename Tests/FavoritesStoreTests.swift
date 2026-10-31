@@ -203,6 +203,23 @@ struct FavoritesStoreTests {
     }
 
     @Test
+    func accountMergeKeepsAFavoriteAddedAgainAfterThePushedChange() {
+        var clock = Date(timeIntervalSince1970: 100)
+        let store = FavoritesStore(userDefaults: makeDefaults(), now: { clock })
+        store.toggle(makeSkill(id: 1))
+        store.prepareForAccountMerge()
+        let pushed = store.record(for: 1)!
+        clock = Date(timeIntervalSince1970: 200)
+        store.toggle(makeSkill(id: 1))
+        store.toggle(makeSkill(id: 1))
+
+        #expect(store.keepFavoriteForAccountMerge(pushed, over: remote(1, .removed, at: 900)))
+        #expect(store.contains(makeSkill(id: 1)))
+        #expect(store.record(for: 1)!.updatedAt > Date(timeIntervalSince1970: 900))
+        #expect(store.record(for: 1)?.isPending == true)
+    }
+
+    @Test
     func clearAllRemovesFavoritesCursorAndLegacyData() {
         let defaults = makeDefaults()
         defaults.set(Data("[]".utf8), forKey: FavoritesStore.legacyStorageKey)

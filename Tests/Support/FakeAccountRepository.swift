@@ -21,6 +21,8 @@ final class FakeAccountRepository: AccountRepositoryProtocol, @unchecked Sendabl
     var signOutFails = false
     var refreshCount = 0
     var nextSession = FakeAccountRepository.session("access-1", refresh: "refresh-1")
+    /// Runs while a push is on the way, before the server answers it.
+    var duringPush: (@Sendable () async -> Void)?
 
     var calls: [String] { lock.withLock { _calls } }
     var pushed: [[LocalFavorite]] { lock.withLock { _pushed } }
@@ -87,6 +89,12 @@ final class FakeAccountRepository: AccountRepositoryProtocol, @unchecked Sendabl
 
     func pushFavorites(_ changes: [LocalFavorite], accessToken: String) async throws -> [FavoriteChangeResult] {
         try authorize("push", accessToken)
+        if let hook = lock.withLock({ () -> (@Sendable () async -> Void)? in
+            defer { duringPush = nil }
+            return duringPush
+        }) {
+            await hook()
+        }
         return lock.withLock {
             _pushed.append(changes)
             var count = stored.values.filter { $0.record.state == .favorited }.count

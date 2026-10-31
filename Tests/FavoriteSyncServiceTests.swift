@@ -55,6 +55,48 @@ struct FavoriteSyncServiceTests {
     }
 
     @Test
+    func firstSignInKeepsAFavoriteRemovedAndAddedAgainDuringThePush() async throws {
+        let (store, sync, _) = makeSync(signedIn: false)
+        clock.set(100)
+        store.toggle(makeSkill(id: 1))
+        repository.seed(1, .removed, at: 10_000)
+        clock.set(300)
+        let clock = clock
+        repository.duringPush = { @MainActor in
+            clock.set(301)
+            store.toggle(makeSkill(id: 1))
+            clock.set(302)
+            store.toggle(makeSkill(id: 1))
+        }
+
+        try await sync.signIn(with: .github, authenticate: callback)
+
+        #expect(store.favorites.map(\.skillID) == [1])
+        #expect(repository.record(1)?.state == .favorited)
+        #expect(store.pendingChanges.isEmpty)
+        #expect(store.accountMergeIDs.isEmpty)
+    }
+
+    @Test
+    func firstSignInAppliesARemovalMadeDuringThePush() async throws {
+        let (store, sync, _) = makeSync(signedIn: false)
+        clock.set(100)
+        store.toggle(makeSkill(id: 1))
+        repository.seed(1, .removed, at: 10_000)
+        clock.set(300)
+        let clock = clock
+        repository.duringPush = { @MainActor in
+            clock.set(301)
+            store.toggle(makeSkill(id: 1))
+        }
+
+        try await sync.signIn(with: .github, authenticate: callback)
+
+        #expect(store.favorites.isEmpty)
+        #expect(repository.record(1)?.state == .removed)
+    }
+
+    @Test
     func lastWriteWinsInBothDirections() async {
         let (store, sync, _) = makeSync()
         repository.seed(1, .favorited, at: 10)

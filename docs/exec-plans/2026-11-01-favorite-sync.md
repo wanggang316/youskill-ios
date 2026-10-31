@@ -36,7 +36,7 @@ Favorites were local to the phone. Now they are local records that work without 
 - [x] 2026-11-01 Sync service (`8ded99e`), triggers and marketplace lookup (`ecf39d6`)
 - [x] 2026-11-01 Account settings, unavailable favorite, limit alert (`2860cf6`)
 - [x] 2026-11-01 Privacy manifest, docs, UI tests
-- [x] 2026-11-01 Review: first merge keeps local favorites over account tombstones; App Store privacy details prepared as a release gate
+- [x] 2026-11-01 Review: first merge keeps local favorites over account tombstones; App Store privacy details prepared as a release gate; merge protection follows the current record (round 2)
 - [ ] Remaining outside this repository: final server routes (youskill-web#68), redirect URI registration, App Store Connect privacy details, real Apple and GitHub sign-in on a device
 
 ## Surprises & Discoveries
@@ -62,6 +62,9 @@ Favorites were local to the phone. Now they are local records that work without 
   **Date/Author:** 2026-11-01 / Claude
 - **Decision:** In the first sync with an account, a local favorite wins over an account tombstone, even a later one. The store keeps the merge set (`favorite-account-merge`); when the push answer is a tombstone, the favorite gets a time after it and is pushed again. After that answer, last write wins again.
   **Rationale:** Review of the first version: with the saved `updatedAt`, a later tombstone from another device removed the local favorite, so the merge was not a union as issue #5 requires. The set is persisted so an interrupted first sync still merges as a union.
+  **Date/Author:** 2026-11-01 / Claude
+- **Decision:** The current record decides the merge protection, not the pushed change: a favorite that is favorited and pending when the tombstone answer arrives is kept, even if the person removed and added it again during the push. A removal made during the push is not protected.
+  **Rationale:** Review round 2: the first fix compared the pushed time with the current record, so an in-flight remove and re-add lost the protection and the tombstone removed the favorite.
   **Date/Author:** 2026-11-01 / Claude
 - **Decision:** The sign-in page opens through SwiftUI `WebAuthenticationSession`, passed into `AuthProvider` as a closure.
   **Rationale:** It is `ASWebAuthenticationSession` with the presentation anchor handled by SwiftUI, and tests pass a fake closure.
