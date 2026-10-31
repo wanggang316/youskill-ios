@@ -62,6 +62,20 @@ bundle exec fastlane ios release
 
 The preparation lane requires a clean commit. It runs acceptance and screenshot capture, archives with automatic signing, and records SHA-256 hashes for the IPA and images. The release lane requires API credentials and checks that the commit and artifacts still match. It uploads those artifacts and requests review with automatic release after approval. Upload, review submission, approval, and public availability are separate states. Do not report a release as public from an upload result.
 
+## App privacy details
+
+App Store privacy details apply to the whole app, and App Store Connect shows them as soon as they are published. `fastlane/app_privacy_details.json` holds the details for account sign-in and favorite sync (User ID, Name, Email Address, and Other User Content; linked to the person; used for app functionality; not used for tracking). It matches `Sources/App/PrivacyInfo.xcprivacy`; change both together.
+
+Publish them in the same release as the first build with account sign-in, after the server account API is live and before you submit that build for review. Do not publish them earlier: the version on the App Store collects no data until then.
+
+```bash
+bundle exec fastlane run upload_app_privacy_details_to_app_store \
+  username:'<App Store Connect Apple ID>' team_id:'<App Store Connect team ID>' \
+  app_identifier:com.gumpw.youskill json_path:fastlane/app_privacy_details.json
+```
+
+This action signs in with an Apple ID; the App Store Connect API key cannot change privacy details. Confirm the published details in App Store Connect, under App Privacy, before you submit the build for review.
+
 ## Simulator failures
 
 - Run simulator tools in an environment that can access CoreSimulator. A sandbox connection error does not prove that the service failed.
