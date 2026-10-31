@@ -33,6 +33,8 @@ private struct SettingsFormView: View {
 
     var body: some View {
         Form {
+            AccountSection(authProvider: container.authProvider, syncService: container.favoriteSyncService)
+
             Section {
                 Picker(L10n.string("settings.app_language"), selection: Binding(
                     get: { settingsStore.appLanguage },

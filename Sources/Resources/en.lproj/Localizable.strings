@@ -112,3 +112,23 @@
 "translation_view.translation" = "Translation";
 "translation_view.original" = "Original";
 "translation.error.unchanged" = "The model returned the original text unchanged. It may already be in the target language.";
+
+"account.section" = "Account";
+"account.signed_out_message" = "Favorites work without an account. Sign in to sync them with YouSkill Desktop and your other devices.";
+"account.sign_in_apple" = "Sign in with Apple";
+"account.sign_in_github" = "Sign in with GitHub";
+"account.sign_in_failed" = "Couldn't sign in";
+"account.signed_in_with" = "Signed in with %@";
+"account.identity_hint" = "Other devices show the same favorites only when they sign in with the same identity.";
+"account.provider.apple" = "Apple";
+"account.provider.github" = "GitHub";
+"account.sign_out" = "Sign Out";
+"account.sign_out_confirm_title" = "Sign out?";
+"account.sign_out_confirm_message" = "Favorites will be removed from this device. They stay in your account.";
+"account.delete" = "Delete Account";
+"account.delete_confirm_title" = "Delete your account?";
+"account.delete_confirm_message" = "Your account and its favorites will be removed from the server. You can't undo this.";
+"account.delete_failed" = "Couldn't delete the account";
+"favorite.limit_reached_title" = "Favorite not saved";
+"favorite.limit_reached_message" = "Your account has 1,000 favorites, the maximum. Remove a favorite to add another.";
+"skill.unavailable" = "No longer in the marketplace";

@@ -50,6 +50,11 @@ struct SkillListView: View {
         }
         .navigationSplitViewStyle(.balanced)
         .sheet(isPresented: $isShowingSettings) { SettingsView(container: container) }
+        .alert(L10n.string("favorite.limit_reached_title"), isPresented: favoriteNoticeBinding) {
+            Button(L10n.string("common.done"), role: .cancel) {}
+        } message: {
+            Text(L10n.string("favorite.limit_reached_message"))
+        }
         .task { await viewModel.loadNavigationIfNeeded() }
     }
 
@@ -181,15 +186,12 @@ struct SkillListView: View {
                 ScrollView {
                     LazyVGrid(columns: resultColumns, spacing: 16) {
                         ForEach(viewModel.displayedSkills) { skill in
-                            NavigationLink(value: skill) {
-                                SkillCard(skill: skill, showsSource: !isRepositoryScope,
-                                          isFavorite: viewModel.isFavorite(skill),
-                                          favoriteAction: { viewModel.toggleFavorite(for: skill) })
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("skill.card.\(skill.id)")
-                            .id(skill.id)
-                            .task { await viewModel.loadMoreIfNeeded(currentSkill: skill) }
+                            resultCard(skill)
+                                .id(skill.id)
+                                .task {
+                                    await viewModel.resolveFavoriteIfNeeded(skill)
+                                    await viewModel.loadMoreIfNeeded(currentSkill: skill)
+                                }
                         }
                         if viewModel.isLoadingMore {
                             ProgressView().padding(.vertical, 12)
@@ -259,6 +261,31 @@ struct SkillListView: View {
         .task(id: viewModel.reloadKey) {
             await viewModel.reloadIfNeeded(for: viewModel.reloadKey)
         }
+    }
+
+    @ViewBuilder
+    private func resultCard(_ skill: Skill) -> some View {
+        let isUnavailable = viewModel.isUnavailable(skill)
+        let card = SkillCard(skill: skill, showsSource: !isRepositoryScope,
+                             isFavorite: viewModel.isFavorite(skill), isUnavailable: isUnavailable,
+                             favoriteAction: { viewModel.toggleFavorite(for: skill) })
+        // A favorite from another device has no reader fields until its live skill loads.
+        if isUnavailable || skill.url == nil && viewModel.selectedSort == .favorites {
+            card
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("skill.card.\(skill.id)")
+        } else {
+            NavigationLink(value: skill) { card }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("skill.card.\(skill.id)")
+        }
+    }
+
+    private var favoriteNoticeBinding: Binding<Bool> {
+        Binding(
+            get: { container.favoriteSyncService.notice != nil },
+            set: { if !$0 { container.favoriteSyncService.notice = nil } }
+        )
     }
 
     private var resultColumns: [GridItem] {
