@@ -87,10 +87,11 @@ final class FavoriteSyncService {
                 needsAnotherPass = false
                 await syncPass()
             } while needsAnotherPass
+            // Same main-actor turn as the last check, so no request falls between them.
+            syncTask = nil
         }
         syncTask = task
         await task.value
-        syncTask = nil
     }
 
     private func syncPass() async {

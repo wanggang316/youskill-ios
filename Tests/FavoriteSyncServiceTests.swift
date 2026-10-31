@@ -178,6 +178,22 @@ struct FavoriteSyncServiceTests {
     }
 
     @Test
+    func concurrentSyncRequestsShareOneRunAndAddOnePass() async {
+        let (store, sync, _) = makeSync()
+        store.toggle(makeSkill(id: 1))
+
+        async let first: Void = sync.sync()
+        async let second: Void = sync.sync()
+        async let third: Void = sync.sync()
+        _ = await (first, second, third)
+
+        #expect(repository.pushed.count == 1)
+        // Requests made before the first pass starts are covered by it.
+        #expect((1 ... 2).contains(repository.pulledCursors.count))
+        #expect(store.pendingChanges.isEmpty)
+    }
+
+    @Test
     func signedOutSyncDoesNothing() async {
         let (store, sync, _) = makeSync(signedIn: false)
         store.toggle(makeSkill(id: 1))
