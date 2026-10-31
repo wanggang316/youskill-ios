@@ -166,6 +166,43 @@ struct FavoritesStoreTests {
     }
 
     @Test
+    func accountMergeKeepsLocalFavoriteOverTombstoneOnceAndSurvivesRelaunch() {
+        let defaults = makeDefaults()
+        let store = FavoritesStore(userDefaults: defaults, now: { Date(timeIntervalSince1970: 100) })
+        store.toggle(makeSkill(id: 1))
+        store.toggle(makeSkill(id: 2))
+        store.prepareForAccountMerge()
+
+        let reloaded = FavoritesStore(userDefaults: defaults, now: { Date(timeIntervalSince1970: 100) })
+        #expect(reloaded.accountMergeIDs == [1, 2])
+        let change = reloaded.record(for: 1)!
+
+        #expect(reloaded.keepFavoriteForAccountMerge(change, over: remote(1, .removed, at: 500)))
+        #expect(reloaded.record(for: 1)?.updatedAt == Date(timeIntervalSince1970: 500.001))
+        #expect(reloaded.record(for: 1)?.isPending == true)
+        // The merge of skill 1 is over; the next answer follows last write wins.
+        #expect(!reloaded.keepFavoriteForAccountMerge(reloaded.record(for: 1)!, over: remote(1, .removed, at: 900)))
+        // A favorited answer ends the merge without keeping anything.
+        #expect(!reloaded.keepFavoriteForAccountMerge(reloaded.record(for: 2)!, over: remote(2, .favorited, at: 100)))
+        #expect(reloaded.accountMergeIDs.isEmpty)
+    }
+
+    @Test
+    func accountMergeDoesNotOverrideALaterLocalChange() {
+        var clock = Date(timeIntervalSince1970: 100)
+        let store = FavoritesStore(userDefaults: makeDefaults(), now: { clock })
+        store.toggle(makeSkill(id: 1))
+        store.prepareForAccountMerge()
+        let pushed = store.record(for: 1)!
+        clock = Date(timeIntervalSince1970: 200)
+        store.toggle(makeSkill(id: 1))
+
+        #expect(!store.keepFavoriteForAccountMerge(pushed, over: remote(1, .removed, at: 150)))
+        #expect(store.record(for: 1)?.state == .removed)
+        #expect(store.accountMergeIDs.isEmpty)
+    }
+
+    @Test
     func clearAllRemovesFavoritesCursorAndLegacyData() {
         let defaults = makeDefaults()
         defaults.set(Data("[]".utf8), forKey: FavoritesStore.legacyStorageKey)
@@ -177,6 +214,7 @@ struct FavoritesStoreTests {
 
         #expect(store.records.isEmpty)
         #expect(store.syncCursor == nil)
+        #expect(store.accountMergeIDs.isEmpty)
         #expect(defaults.data(forKey: FavoritesStore.legacyStorageKey) == nil)
         let reloaded = FavoritesStore(userDefaults: defaults)
         #expect(reloaded.records.isEmpty)

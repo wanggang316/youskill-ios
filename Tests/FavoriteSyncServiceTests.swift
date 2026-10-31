@@ -30,6 +30,31 @@ struct FavoriteSyncServiceTests {
     }
 
     @Test
+    func firstSignInKeepsLocalFavoritesOverNewerAccountTombstones() async throws {
+        let (store, sync, _) = makeSync(signedIn: false)
+        clock.set(100)
+        store.toggle(makeSkill(id: 1))
+        store.toggle(makeSkill(id: 2))
+        // Removed on another device after the local add, and with that device's clock
+        // ahead of this one, so even the sign-in time is earlier.
+        repository.seed(1, .removed, at: 200)
+        repository.seed(2, .removed, at: 10_000)
+        clock.set(300)
+
+        try await sync.signIn(with: .github, authenticate: callback)
+
+        #expect(Set(store.favorites.map(\.skillID)) == [1, 2])
+        #expect(repository.record(1)?.state == .favorited)
+        #expect(repository.record(2)?.state == .favorited)
+        #expect(store.pendingChanges.isEmpty)
+
+        // After the merge, last write wins again: a later removal elsewhere applies.
+        repository.seed(1, .removed, at: 400)
+        await sync.sync()
+        #expect(store.favorites.map(\.skillID) == [2])
+    }
+
+    @Test
     func lastWriteWinsInBothDirections() async {
         let (store, sync, _) = makeSync()
         repository.seed(1, .favorited, at: 10)

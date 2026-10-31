@@ -119,10 +119,15 @@ final class FavoriteSyncService {
                 guard let result = resultsByID[change.skillID] else { continue }
                 switch result.status {
                 case .applied, .ignored:
-                    favorites.apply(result.record ?? RemoteFavorite(
+                    let record = result.record ?? RemoteFavorite(
                         skillID: change.skillID, state: change.state,
                         updatedAt: change.updatedAt, snapshot: change.snapshot
-                    ))
+                    )
+                    if favorites.keepFavoriteForAccountMerge(change, over: record) {
+                        needsAnotherPass = true
+                    } else {
+                        favorites.apply(record)
+                    }
                 case .rejected:
                     favorites.revert(change, to: result.record)
                     if result.error == FavoriteChangeResult.limitReachedError {

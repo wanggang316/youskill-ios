@@ -9,6 +9,7 @@ final class FavoritesStore {
     static let legacyStorageKey = "favorite-skills"
     static let storageKey = "local-favorites"
     static let cursorStorageKey = "favorite-sync-cursor"
+    static let accountMergeStorageKey = "favorite-account-merge"
 
     private let userDefaults: UserDefaults
     private let now: () -> Date
@@ -16,6 +17,8 @@ final class FavoritesStore {
     /// All records, tombstones included, newest first.
     private(set) var records: [LocalFavorite] = []
     private(set) var syncCursor: Int?
+    /// Favorites of the first sync with an account that the server has not answered yet.
+    private(set) var accountMergeIDs: Set<Int> = []
 
     /// Called after a person changes a favorite on this device.
     @ObservationIgnored var onLocalChange: (() -> Void)?
@@ -84,6 +87,7 @@ final class FavoritesStore {
 
     /// Undoes a change that the server rejected. A later local change is kept.
     func revert(_ rejected: LocalFavorite, to remote: RemoteFavorite?) {
+        accountMergeIDs.remove(rejected.skillID)
         guard let index = records.firstIndex(where: { $0.skillID == rejected.skillID }),
               records[index].updatedAt == rejected.updatedAt else { return }
         if let remote {
@@ -101,6 +105,21 @@ final class FavoritesStore {
         persist()
     }
 
+    /// Ends the account merge of a pushed favorite. The merge is a union, so a local
+    /// favorite wins over an account tombstone even when the tombstone is later: the
+    /// favorite gets a time after the tombstone and is pushed again. Returns true then.
+    func keepFavoriteForAccountMerge(_ change: LocalFavorite, over remote: RemoteFavorite) -> Bool {
+        guard accountMergeIDs.remove(change.skillID) != nil else { return false }
+        defer { persist() }
+        guard change.isFavorited, remote.state == .removed,
+              let index = records.firstIndex(where: { $0.skillID == change.skillID }),
+              records[index].updatedAt == change.updatedAt else { return false }
+        records[index].updatedAt = max(now(), remote.updatedAt.addingTimeInterval(0.001))
+        records[index].isPending = true
+        sortRecords()
+        return true
+    }
+
     /// Prepares the first sync of an account: every local favorite is pushed, local
     /// tombstones are dropped (the merge is a union), and the next pull starts from the beginning.
     func prepareForAccountMerge() {
@@ -109,6 +128,7 @@ final class FavoritesStore {
             record.isPending = true
             return record
         }
+        accountMergeIDs = Set(records.map(\.skillID))
         syncCursor = nil
         persist()
     }
@@ -117,6 +137,7 @@ final class FavoritesStore {
     func clearAll() {
         records = []
         syncCursor = nil
+        accountMergeIDs = []
         persist()
         userDefaults.removeObject(forKey: Self.legacyStorageKey)
     }
@@ -173,6 +194,7 @@ final class FavoritesStore {
         }
         sortRecords()
         syncCursor = userDefaults.object(forKey: Self.cursorStorageKey) as? Int
+        accountMergeIDs = Set(userDefaults.array(forKey: Self.accountMergeStorageKey) as? [Int] ?? [])
     }
 
     private func persist() {
@@ -184,6 +206,7 @@ final class FavoritesStore {
         } else {
             userDefaults.removeObject(forKey: Self.cursorStorageKey)
         }
+        userDefaults.set(accountMergeIDs.sorted(), forKey: Self.accountMergeStorageKey)
     }
 }
 
