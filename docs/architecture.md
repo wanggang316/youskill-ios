@@ -16,7 +16,8 @@ The catalog uses `NavigationSplitView`: the sidebar contains the category/reposi
 - **Skill Content** — GitHub repository resolution, skill directory tree construction, raw file retrieval, and file-type aware rendering.
 - **Translation** — Chat Completion API model configuration, connectivity validation, translation requests, and translation caching.
 - **Settings** — Local persistence of translation settings, target language preference, translation display mode (bilingual or translation only), version metadata, and external links.
-- **Favorites** — Local bookmark persistence and favorite-only filtering.
+- **Favorites** — Local favorite records (state, `updatedAt`, snapshot, pending flag), favorite-only filtering, and sync with the account favorites on the server. A favorite whose skill left the marketplace shows from its snapshot as unavailable.
+- **Account** — Optional sign-in with Apple or GitHub through the server (OAuth with PKCE), Keychain session, sign-out, and account deletion. See [Account API](references/account-api.md).
 
 ## Layer Structure
 
@@ -38,7 +39,7 @@ Types → Config → Repo → Service → Runtime → UI
 ## Dependency Rules
 
 - Code may only depend **forward** through layers (Types → Config → ... → UI)
-- Cross-cutting concerns (auth, telemetry, feature flags) enter through **Providers**
+- Cross-cutting concerns (auth, telemetry, feature flags) enter through **Providers** (`Sources/Providers/`). `AuthProvider` is the only owner of account tokens; other code gets a token through `withAccessToken`.
 - No circular dependencies between domains
 - Shared utilities live in a `utils/` package outside domain boundaries
 
@@ -46,7 +47,8 @@ Types → Config → Repo → Service → Runtime → UI
 
 - **Repository protocols** — `SkillCatalogRepositoryProtocol`, `SkillContentRepositoryProtocol`, and `TranslationRepositoryProtocol` define the system edges for remote APIs and GitHub content access.
 - **Services** — `SkillCatalogService`, `SkillContentService`, and `TranslationService` orchestrate repository calls and cache-aware workflows without leaking transport details into UI.
-- **Stores** — `FavoritesStore` and `AppSettingsStore` own user-defaults-backed local state and expose it to the UI.
+- **Stores** — `FavoritesStore` and `AppSettingsStore` own user-defaults-backed local state and expose it to the UI. `FavoritesStore` knows nothing about accounts; it keeps pending changes and applies server records.
+- **Favorite sync** — `FavoriteSyncService` pushes pending changes, then pulls from the stored cursor (last write wins on `updatedAt`, tombstones apply, a rejected add reverts). It runs on launch, on return to the app, after a local change (debounced), and when the network comes back. It also runs sign-in (local favorites merge as a union), sign-out, and account deletion, which clear the favorites on the device.
 - **App container** — `AppContainer` wires stores, repositories, and services into a single runtime composition root.
 - **File tree builder** — `FileTreeBuilder` converts flat GitHub paths into a hierarchical drawer model for the detail screen.
 
@@ -57,4 +59,6 @@ Types → Config → Repo → Service → Runtime → UI
 - **XcodeGen** — Declarative project generation keeps the repo readable and reproducible from `project.yml`.
 - **Direct GitHub access** — Uses Git Trees API for directory discovery and `raw.githubusercontent.com` for file reads instead of cloning repositories.
 - **Disk-backed caches** — File tree, file content, and translation results cache to the app cache directory using hashed keys.
-- **UserDefaults persistence** — Sufficient for MVP settings and local favorites, with room to upgrade later if sync or richer storage is added.
+- **UserDefaults persistence** — Settings and local favorite records (at most about 1000 favorites plus tombstones). Favorites saved before account sync migrate once from the `favorite-skills` key; each record decodes on its own.
+- **Keychain** — Account access and refresh tokens, available after first unlock on this device only.
+- **ASWebAuthenticationSession** — Sign-in runs the server OAuth flow in the system browser, so iOS and the desktop app use the same flow.
