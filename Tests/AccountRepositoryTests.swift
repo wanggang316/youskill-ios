@@ -28,8 +28,9 @@ struct AccountRepositoryTests {
             let body = try #require(try JSONSerialization.jsonObject(with: bodyData(of: request)) as? [String: String])
             #expect(body == ["code": "code-1", "code_verifier": "verifier", "redirect_uri": "youskill-ios://auth/callback"])
             return respond(request, 200, """
-            {"access_token": "access", "refresh_token": "refresh", "token_type": "bearer", "expires_in": 900,
-             "account": {"id": 5, "provider": "github", "display_name": "Ada", "email": null}}
+            {"access_token": "access", "refresh_token": "refresh", "token_type": "Bearer", "expires_in": 900,
+             "account": {"id": 5, "display_name": "Ada", "email": null, "created_at": "2026-11-01T10:00:00Z",
+                         "identities": [{"provider": "github", "display_name": "Ada", "email": null}]}}
             """)
         }
 
@@ -44,8 +45,29 @@ struct AccountRepositoryTests {
     }
 
     @Test
+    func refreshSendsRefreshTokenAndParsesSession() async throws {
+        MockURLProtocol.register(url: "\(base)/api/account/refresh") { request in
+            #expect(request.httpMethod == "POST")
+            #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
+            let body = try #require(try JSONSerialization.jsonObject(with: bodyData(of: request)) as? [String: String])
+            #expect(body == ["refresh_token": "old"])
+            return respond(request, 200, """
+            {"access_token": "access-2", "refresh_token": "refresh-2", "token_type": "Bearer", "expires_in": 900,
+             "account": {"id": 6, "display_name": null, "email": null,
+                         "identities": [{"provider": "apple", "display_name": null, "email": "a@privaterelay.appleid.com"}]}}
+            """)
+        }
+
+        let session = try await makeRepository().refresh(refreshToken: "old")
+
+        #expect(session.refreshToken == "refresh-2")
+        #expect(session.identity == AccountIdentity(provider: .apple, displayName: nil,
+                                                    email: "a@privaterelay.appleid.com"))
+    }
+
+    @Test
     func unauthorizedRefreshThrowsUnauthorized() async throws {
-        MockURLProtocol.register(url: "\(base)/api/account/token/refresh") { request in
+        MockURLProtocol.register(url: "\(base)/api/account/refresh") { request in
             respond(request, 401, #"{"detail": "Refresh token revoked"}"#)
         }
 
@@ -64,14 +86,17 @@ struct AccountRepositoryTests {
             #expect(changes.count == 2)
             #expect(changes[0]["skill_id"] as? Int == 1)
             #expect(changes[0]["state"] as? String == "favorited")
-            #expect(changes[0]["name"] as? String == "skill-1")
+            let snapshot = try #require(changes[0]["snapshot"] as? [String: Any])
+            #expect(snapshot["name"] as? String == "skill-1")
+            #expect(snapshot["source"] as? String == "demo/repo")
+            #expect(changes[0]["name"] == nil)
             #expect(changes[0]["updated_at"] as? String == "1970-01-01T00:01:40.000Z")
             #expect(changes[1]["state"] as? String == "removed")
             return respond(request, 200, """
             {"results": [
               {"skill_id": 1, "status": "applied", "error": null,
-               "record": {"skill_id": 1, "state": "favorited", "updated_at": "1970-01-01T00:01:40Z",
-                          "name": "skill-1", "source": "demo/repo", "description": null}},
+               "record": {"skill_id": 1, "state": "favorited", "updated_at": "1970-01-01T00:01:40Z", "change_seq": 4,
+                          "snapshot": {"name": "skill-1", "source": "demo/repo", "description": null}}},
               {"skill_id": 2, "status": "rejected", "error": "favorite_limit_reached", "record": null}
             ]}
             """)
@@ -96,8 +121,11 @@ struct AccountRepositoryTests {
     @Test
     func pullSendsCursorOnlyWhenPresentAndParsesTombstones() async throws {
         let page = """
-        {"records": [{"skill_id": 3, "state": "removed", "updated_at": "2026-04-01T12:00:00Z",
-                      "name": "gone", "source": "x/y", "description": "old"}],
+        {"favorites": [
+           {"skill_id": 4, "state": "favorited", "updated_at": "2026-04-01T11:00:00Z", "change_seq": 11,
+            "snapshot": {"name": "kept", "source": "x/y", "description": "old"}},
+           {"skill_id": 3, "state": "removed", "updated_at": "2026-04-01T12:00:00Z", "change_seq": 12,
+            "snapshot": null}],
          "cursor": 12, "has_more": false}
         """
         MockURLProtocol.register(url: "\(base)/api/account/favorites?limit=500") { request in
@@ -114,8 +142,9 @@ struct AccountRepositoryTests {
         #expect(first == next)
         #expect(first.cursor == 12)
         #expect(!first.hasMore)
-        #expect(first.records.first?.state == .removed)
-        #expect(first.records.first?.snapshot == FavoriteSnapshot(name: "gone", source: "x/y", description: "old"))
+        #expect(first.records.map(\.skillID) == [4, 3])
+        #expect(first.records[0].snapshot == FavoriteSnapshot(name: "kept", source: "x/y", description: "old"))
+        #expect(first.records[1].state == .removed)
     }
 
     @Test

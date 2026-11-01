@@ -50,13 +50,13 @@ struct AccountRepository: AccountRepositoryProtocol {
     func exchange(code: String, codeVerifier: String, redirectURI: String) async throws -> AccountSession {
         let body = ["code": code, "code_verifier": codeVerifier, "redirect_uri": redirectURI]
         let response: TokenResponse = try await send("POST", "/api/account/token", body: body)
-        return response.session(receivedAt: now())
+        return try response.session(receivedAt: now())
     }
 
     func refresh(refreshToken: String) async throws -> AccountSession {
-        let response: TokenResponse = try await send("POST", "/api/account/token/refresh",
+        let response: TokenResponse = try await send("POST", "/api/account/refresh",
                                                      body: ["refresh_token": refreshToken])
-        return response.session(receivedAt: now())
+        return try response.session(receivedAt: now())
     }
 
     func signOut(accessToken: String) async throws {
@@ -81,7 +81,7 @@ struct AccountRepository: AccountRepositoryProtocol {
         }
         let response: PullResponse = try await send("GET", "/api/account/favorites", query: query,
                                                     body: Optional<String>.none, accessToken: accessToken)
-        return FavoriteChangesPage(records: try response.records.map { try $0.remote() },
+        return FavoriteChangesPage(records: try response.favorites.map { try $0.remote() },
                                    cursor: response.cursor, hasMore: response.hasMore)
     }
 
@@ -129,7 +129,7 @@ struct AccountRepository: AccountRepositoryProtocol {
 }
 
 private struct TokenResponse: Decodable {
-    struct Account: Decodable {
+    struct Identity: Decodable {
         let provider: SignInProvider
         let displayName: String?
         let email: String?
@@ -139,6 +139,10 @@ private struct TokenResponse: Decodable {
             case displayName = "display_name"
             case email
         }
+    }
+
+    struct Account: Decodable {
+        let identities: [Identity]
     }
 
     let accessToken: String
@@ -153,41 +157,48 @@ private struct TokenResponse: Decodable {
         case account
     }
 
-    func session(receivedAt date: Date) -> AccountSession {
-        AccountSession(
+    func session(receivedAt date: Date) throws -> AccountSession {
+        // Identities are never linked in v1, so an account has exactly one.
+        guard let identity = account.identities.first else {
+            throw DecodingError.dataCorrupted(.init(codingPath: [CodingKeys.account],
+                                                    debugDescription: "Account has no sign-in identity"))
+        }
+        return AccountSession(
             accessToken: accessToken,
             refreshToken: refreshToken,
             accessTokenExpiresAt: date.addingTimeInterval(TimeInterval(expiresIn)),
-            identity: AccountIdentity(provider: account.provider, displayName: account.displayName,
-                                      email: account.email)
+            identity: AccountIdentity(provider: identity.provider, displayName: identity.displayName,
+                                      email: identity.email)
         )
     }
 }
 
 private struct FavoriteDTO: Codable {
+    struct Snapshot: Codable {
+        let name: String
+        let source: String?
+        let description: String?
+    }
+
     let skillID: Int
     let state: String
     let updatedAt: Date
-    let name: String?
-    let source: String?
-    let description: String?
+    /// Required for `favorited`; the server returns null for most tombstones.
+    let snapshot: Snapshot?
 
     enum CodingKeys: String, CodingKey {
         case skillID = "skill_id"
         case state
         case updatedAt = "updated_at"
-        case name
-        case source
-        case description
+        case snapshot
     }
 
     init(_ favorite: LocalFavorite) {
         skillID = favorite.skillID
         state = favorite.state.rawValue
         updatedAt = favorite.updatedAt
-        name = favorite.snapshot.name
-        source = favorite.snapshot.source
-        description = favorite.snapshot.description
+        snapshot = Snapshot(name: favorite.snapshot.name, source: favorite.snapshot.source,
+                            description: favorite.snapshot.description)
     }
 
     func remote() throws -> RemoteFavorite {
@@ -199,7 +210,8 @@ private struct FavoriteDTO: Codable {
             skillID: skillID,
             state: state,
             updatedAt: updatedAt,
-            snapshot: FavoriteSnapshot(name: name ?? String(skillID), source: source, description: description)
+            snapshot: FavoriteSnapshot(name: snapshot?.name ?? String(skillID), source: snapshot?.source,
+                                       description: snapshot?.description)
         )
     }
 }
@@ -235,12 +247,12 @@ private struct PushResponse: Decodable {
 }
 
 private struct PullResponse: Decodable {
-    let records: [FavoriteDTO]
+    let favorites: [FavoriteDTO]
     let cursor: Int
     let hasMore: Bool
 
     enum CodingKeys: String, CodingKey {
-        case records
+        case favorites
         case cursor
         case hasMore = "has_more"
     }
