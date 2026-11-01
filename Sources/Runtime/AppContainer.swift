@@ -2,19 +2,27 @@ import Foundation
 
 final class AppContainer {
     let favoritesStore: FavoritesStore
+    let authProvider: AuthProvider
+    let favoriteSyncService: FavoriteSyncService
     let settingsStore: AppSettingsStore
     let skillCatalogService: SkillCatalogService
     let skillContentService: SkillContentService
     let translationService: TranslationService
 
+    private let networkMonitor = NetworkMonitor()
+
     init(
         favoritesStore: FavoritesStore,
+        authProvider: AuthProvider,
+        favoriteSyncService: FavoriteSyncService,
         settingsStore: AppSettingsStore,
         skillCatalogService: SkillCatalogService,
         skillContentService: SkillContentService,
         translationService: TranslationService
     ) {
         self.favoritesStore = favoritesStore
+        self.authProvider = authProvider
+        self.favoriteSyncService = favoriteSyncService
         self.settingsStore = settingsStore
         self.skillCatalogService = skillCatalogService
         self.skillContentService = skillContentService
@@ -35,9 +43,15 @@ final class AppContainer {
         let favoritesStore = FavoritesStore()
         let settingsStore = AppSettingsStore()
         let httpClient = HTTPClient()
+        let accountRepository = AccountRepository(httpClient: httpClient)
+        let authProvider = AuthProvider(repository: accountRepository, sessionStore: KeychainAccountSessionStore())
 
-        return AppContainer(
+        let container = AppContainer(
             favoritesStore: favoritesStore,
+            authProvider: authProvider,
+            favoriteSyncService: FavoriteSyncService(
+                favorites: favoritesStore, auth: authProvider, repository: accountRepository
+            ),
             settingsStore: settingsStore,
             skillCatalogService: SkillCatalogService(
                 repository: SkillCatalogRepository(httpClient: httpClient)
@@ -49,5 +63,12 @@ final class AppContainer {
                 repository: ChatCompletionTranslationRepository(httpClient: httpClient)
             )
         )
+        container.startNetworkMonitor()
+        return container
+    }
+
+    @MainActor
+    private func startNetworkMonitor() {
+        networkMonitor.start { [weak self] in self?.favoriteSyncService.scheduleSync() }
     }
 }

@@ -118,6 +118,27 @@ struct SkillCatalogRepositoryTests {
         }
     }
 
+    @Test
+    func fetchSkillReturnsNilWhenTheSkillLeftTheMarketplace() async throws {
+        let repository = SkillCatalogRepository(httpClient: HTTPClient(session: makeSession()))
+        MockURLProtocol.register(url: "https://api.youskill.cc/api/public/skills/404") { request in
+            (HTTPURLResponse(url: request.url!, statusCode: 404, httpVersion: nil, headerFields: nil)!,
+             Data(#"{"detail": "Skill not found"}"#.utf8))
+        }
+        MockURLProtocol.register(url: "https://api.youskill.cc/api/public/skills/7") { request in
+            let json = """
+            {"id": 7, "name": "live", "description": null, "url": null, "path": null, "star_count": 1,
+             "heat_score": 0, "install_count": 0, "source": "a/b", "branch": null, "skill_path_sha": null,
+             "tags": [], "created_at": "2026-04-01T12:00:00Z", "updated_at": "2026-04-01T12:00:00Z"}
+            """
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    Data(json.utf8))
+        }
+
+        #expect(try await repository.fetchSkill(id: 404) == nil)
+        #expect(try await repository.fetchSkill(id: 7)?.name == "live")
+    }
+
     private func makeSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]

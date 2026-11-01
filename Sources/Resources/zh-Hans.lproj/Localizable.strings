@@ -112,3 +112,23 @@
 "translation_view.translation" = "译文";
 "translation_view.original" = "原文";
 "translation.error.unchanged" = "模型返回的内容与原文相同，未翻译。原文可能已是目标语言。";
+
+"account.section" = "账号";
+"account.signed_out_message" = "无需账号也能使用收藏。登录后，收藏会与 YouSkill 桌面版和你的其他设备同步。";
+"account.sign_in_apple" = "通过 Apple 登录";
+"account.sign_in_github" = "通过 GitHub 登录";
+"account.sign_in_failed" = "登录失败";
+"account.signed_in_with" = "已通过 %@ 登录";
+"account.identity_hint" = "其他设备使用相同的登录方式时，才会显示相同的收藏。";
+"account.provider.apple" = "Apple";
+"account.provider.github" = "GitHub";
+"account.sign_out" = "退出登录";
+"account.sign_out_confirm_title" = "退出登录？";
+"account.sign_out_confirm_message" = "此设备上的收藏将被移除，账号中的收藏会保留。";
+"account.delete" = "删除账号";
+"account.delete_confirm_title" = "删除你的账号？";
+"account.delete_confirm_message" = "你的账号及其收藏将从服务器删除，且无法恢复。";
+"account.delete_failed" = "无法删除账号";
+"favorite.limit_reached_title" = "收藏未保存";
+"favorite.limit_reached_message" = "你的账号已有 1,000 个收藏，达到上限。请先移除一个收藏再添加。";
+"skill.unavailable" = "已从市场下架";

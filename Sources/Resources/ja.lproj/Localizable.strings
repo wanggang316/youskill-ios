@@ -112,3 +112,23 @@
 "translation_view.translation" = "訳文";
 "translation_view.original" = "原文";
 "translation.error.unchanged" = "モデルが原文をそのまま返しました。原文がすでに翻訳先言語の可能性があります。";
+
+"account.section" = "アカウント";
+"account.signed_out_message" = "お気に入りはアカウントなしでも使えます。サインインすると YouSkill デスクトップ版やほかのデバイスと同期します。";
+"account.sign_in_apple" = "Appleでサインイン";
+"account.sign_in_github" = "GitHubでサインイン";
+"account.sign_in_failed" = "サインインできませんでした";
+"account.signed_in_with" = "%@ でサインイン中";
+"account.identity_hint" = "ほかのデバイスで同じ方法でサインインした場合にのみ、同じお気に入りが表示されます。";
+"account.provider.apple" = "Apple";
+"account.provider.github" = "GitHub";
+"account.sign_out" = "サインアウト";
+"account.sign_out_confirm_title" = "サインアウトしますか？";
+"account.sign_out_confirm_message" = "このデバイスのお気に入りは削除されます。アカウントには残ります。";
+"account.delete" = "アカウントを削除";
+"account.delete_confirm_title" = "アカウントを削除しますか？";
+"account.delete_confirm_message" = "アカウントとそのお気に入りはサーバーから削除されます。元に戻せません。";
+"account.delete_failed" = "アカウントを削除できませんでした";
+"favorite.limit_reached_title" = "お気に入りを保存できませんでした";
+"favorite.limit_reached_message" = "お気に入りが上限の 1,000 件に達しています。追加するには、ほかのお気に入りを削除してください。";
+"skill.unavailable" = "マーケットから削除されました";

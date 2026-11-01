@@ -4,6 +4,7 @@ struct SkillCard: View {
     let skill: Skill
     var showsSource = true
     let isFavorite: Bool
+    var isUnavailable = false
     let favoriteAction: () -> Void
 
     var body: some View {
@@ -21,8 +22,10 @@ struct SkillCard: View {
                             if let source = skill.source {
                                 Text(source).lineLimit(1)
                             }
-                            Label(skill.starCount.formatted(), systemImage: "star")
-                                .fixedSize()
+                            if !isUnavailable {
+                                Label(skill.starCount.formatted(), systemImage: "star")
+                                    .fixedSize()
+                            }
                         }
                         .font(.footnote)
                         .foregroundStyle(AppTheme.secondaryText)
@@ -42,7 +45,12 @@ struct SkillCard: View {
                 .accessibilityLabel(L10n.string(isFavorite ? "skill.favorite.remove" : "skill.favorite.add"))
             }
 
-            if let description = skill.description, !description.isEmpty {
+            if isUnavailable {
+                Label(L10n.string("skill.unavailable"), systemImage: "exclamationmark.circle")
+                    .font(.footnote)
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .accessibilityIdentifier("skill.unavailable.\(skill.id)")
+            } else if let description = skill.description, !description.isEmpty {
                 Text(description)
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.secondaryText)

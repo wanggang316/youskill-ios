@@ -20,8 +20,26 @@ extension AppContainer {
             ))
         }
 
+        let favoritesStore = FavoritesStore()
+        if arguments.contains("--ui-unavailable-favorite") {
+            // Skill 99 is not in the fixture catalog, like a skill that left the marketplace.
+            favoritesStore.apply(RemoteFavorite(
+                skillID: 99, state: .favorited, updatedAt: Date(timeIntervalSince1970: 0),
+                snapshot: FavoriteSnapshot(name: "retired-skill", source: "example/archive")
+            ))
+        }
+        let accountRepository = UITestAccount()
+        let authProvider = AuthProvider(
+            repository: accountRepository,
+            sessionStore: UITestSessionStore(signedIn: arguments.contains("--ui-signed-in"))
+        )
+
         return AppContainer(
-            favoritesStore: FavoritesStore(),
+            favoritesStore: favoritesStore,
+            authProvider: authProvider,
+            favoriteSyncService: FavoriteSyncService(
+                favorites: favoritesStore, auth: authProvider, repository: accountRepository
+            ),
             settingsStore: settingsStore,
             skillCatalogService: SkillCatalogService(repository: UITestCatalog()),
             skillContentService: SkillContentService(repository: UITestContent()),
@@ -61,6 +79,14 @@ private actor UITestCatalog: SkillCatalogRepositoryProtocol {
                             starCount: 120, enabled: true, type: "hot")]
     }
 
+    func fetchSkill(id: Int) async throws -> Skill? {
+        switch id {
+        case 1: makeSkill(id: 1, name: "find-skills", stars: 80, heat: 100)
+        case 2: makeSkill(id: 2, name: "review-code", stars: 120, heat: 50)
+        default: nil
+        }
+    }
+
     private func makeSkill(id: Int, name: String, stars: Int, heat: Int) -> Skill {
         Skill(id: id, name: name, description: "A sample skill for UI acceptance tests.",
               url: "https://github.com/example/skills", path: "skills/\(name)",
@@ -68,6 +94,50 @@ private actor UITestCatalog: SkillCatalogRepositoryProtocol {
               branch: "main", skillPathSHA: "ui-test", tags: ["Development"],
               createdAt: Date(timeIntervalSince1970: 0), updatedAt: Date(timeIntervalSince1970: 0))
     }
+}
+
+private struct UITestAccount: AccountRepositoryProtocol {
+    func signInURL(provider: SignInProvider, redirectURI: String, codeChallenge: String, state: String) -> URL {
+        URL(string: "https://example.invalid/sign-in/\(provider.rawValue)")!
+    }
+
+    func exchange(code: String, codeVerifier: String, redirectURI: String) async throws -> AccountSession {
+        UITestSessionStore.session
+    }
+
+    func refresh(refreshToken: String) async throws -> AccountSession { UITestSessionStore.session }
+    func signOut(accessToken: String) async throws {}
+    func deleteAccount(accessToken: String) async throws {}
+
+    func pushFavorites(_ changes: [LocalFavorite], accessToken: String) async throws -> [FavoriteChangeResult] {
+        changes.map { change in
+            FavoriteChangeResult(skillID: change.skillID, status: .applied, error: nil, record: RemoteFavorite(
+                skillID: change.skillID, state: change.state, updatedAt: change.updatedAt, snapshot: change.snapshot
+            ))
+        }
+    }
+
+    func pullFavorites(cursor: Int?, accessToken: String) async throws -> FavoriteChangesPage {
+        FavoriteChangesPage(records: [], cursor: cursor ?? 0, hasMore: false)
+    }
+}
+
+private final class UITestSessionStore: AccountSessionStoring, @unchecked Sendable {
+    static let session = AccountSession(
+        accessToken: "ui-test-access", refreshToken: "ui-test-refresh", accessTokenExpiresAt: .distantFuture,
+        identity: AccountIdentity(provider: .github, displayName: "Ada Lovelace", email: "ada@example.com")
+    )
+
+    private let lock = NSLock()
+    private var session: AccountSession?
+
+    init(signedIn: Bool) {
+        session = signedIn ? Self.session : nil
+    }
+
+    func load() -> AccountSession? { lock.withLock { session } }
+    func save(_ session: AccountSession) throws { lock.withLock { self.session = session } }
+    func delete() { lock.withLock { session = nil } }
 }
 
 private struct UITestContent: SkillContentRepositoryProtocol {

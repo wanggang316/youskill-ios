@@ -19,4 +19,8 @@ struct SkillCatalogService: Sendable {
         try await repository.fetchHotRepositories()
     }
 
+    func fetchSkill(id: Int) async throws -> Skill? {
+        try await repository.fetchSkill(id: id)
+    }
+
 }
