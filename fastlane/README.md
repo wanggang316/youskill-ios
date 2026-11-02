@@ -55,6 +55,22 @@ Verify, capture screenshots, and archive the committed release
 
 Upload the inspected, verified release and request App Store review
 
+### ios beta
+
+```sh
+[bundle exec] fastlane ios beta
+```
+
+Test on iPhone 17, then upload the current commit to TestFlight for internal testers
+
+### ios beta_distribute
+
+```sh
+[bundle exec] fastlane ios beta_distribute
+```
+
+Wait for processing and distribute an uploaded TestFlight build without a second upload
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
