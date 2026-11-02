@@ -22,8 +22,12 @@ TESTFLIGHT_GROUP = "Internal".freeze
 TESTFLIGHT_PROCESSING_TIMEOUT = 30 * 60
 TESTFLIGHT_POLL_INTERVAL = 30
 
+def project_yml_path
+  File.expand_path("../project.yml", __dir__)
+end
+
 def project_version
-  YAML.load_file(File.expand_path("../project.yml", __dir__)).fetch("settings").fetch("base")
+  YAML.load_file(project_yml_path).fetch("settings").fetch("base")
 end
 
 def source_revision
@@ -250,6 +254,56 @@ rescue StandardError => error
   UI.user_error!("TestFlight distribution of #{version} (#{build_number}) failed: #{error.message} #{hint}")
 end
 
+# Latest build number of the marketing version in App Store Connect. It
+# includes TestFlight builds, whose numbers are not committed to project.yml.
+def latest_connect_build_number(version)
+  latest_testflight_build_number(api_key: connect_api_key, app_identifier: testflight_app_identifier, version: version, initial_build_number: 0)
+end
+
+def release_bump_hint
+  "Run ./scripts/bump-build.sh, commit project.yml and YouSkill.xcodeproj, then run ios prepare_release again."
+end
+
+def require_release_build_number!
+  version = project_version.fetch("MARKETING_VERSION").to_s
+  committed = project_version.fetch("CURRENT_PROJECT_VERSION").to_s
+  remote = latest_connect_build_number(version)
+  begin
+    greater = TestFlightBuild.greater_build_number?(committed, latest: [remote])
+  rescue TestFlightBuild::Error => error
+    UI.user_error!(error.message)
+  end
+  return if greater
+  UI.user_error!("Build #{committed} is not greater than the latest App Store Connect build #{remote} of version #{version}. #{release_bump_hint}")
+end
+
+# Writes the next release build number to project.yml with the TestFlight rule,
+# so the release build is greater than every uploaded build of the version.
+def bump_release_build(dry_run: false)
+  require_api_key_environment!("a release build number bump")
+  version = project_version.fetch("MARKETING_VERSION").to_s
+  committed = project_version.fetch("CURRENT_PROJECT_VERSION").to_s
+  remote = latest_connect_build_number(version)
+  begin
+    build_number = TestFlightBuild.next_build_number(date: Time.now.strftime("%Y%m%d"), latest: [committed, remote])
+  rescue TestFlightBuild::Error => error
+    UI.user_error!(error.message)
+  end
+  UI.message("Release build #{version}: #{committed} -> #{build_number}, latest App Store Connect build #{remote}.")
+  if dry_run
+    UI.success("Dry run: project.yml is unchanged.")
+    return build_number
+  end
+
+  pattern = /^([ \t]*CURRENT_PROJECT_VERSION:[ \t]*)\S+[ \t]*$/
+  text = File.read(project_yml_path)
+  UI.user_error!("project.yml must contain exactly one CURRENT_PROJECT_VERSION line.") unless text.scan(pattern).length == 1
+  File.write(project_yml_path, text.sub(pattern) { "#{Regexp.last_match(1)}#{build_number}" })
+  generate_project
+  UI.success("Build number is now #{build_number}. Commit project.yml and YouSkill.xcodeproj before ios prepare_release.")
+  build_number
+end
+
 def run_testflight_build(dry_run: false)
   require_testflight_environment!
   root = File.expand_path("..", __dir__)
@@ -437,6 +491,8 @@ platform :ios do
     if options[:build] && options[:build].to_s != build_number
       UI.user_error!("Set CURRENT_PROJECT_VERSION in project.yml and commit it before release.")
     end
+    require_api_key_environment!("release")
+    require_release_build_number!
     version = project_version.fetch("MARKETING_VERSION").to_s
     revision = source_revision
     verify
@@ -513,6 +569,11 @@ platform :ios do
       precheck_include_in_app_purchases: false,
       force: true
     )
+  end
+
+  desc "Set the next release build number in project.yml from App Store Connect and regenerate the project"
+  lane :bump_build do |options|
+    bump_release_build(dry_run: options[:dry_run].to_s == "true")
   end
 
   desc "Test on iPhone 17, then upload the current commit to TestFlight for internal testers"
