@@ -1,6 +1,6 @@
 # iOS test and release workflow
 
-`project.yml` is the source of truth for the app version, build number, orientations, and test targets. Commit the build number before release. Tests, screenshots, and the archive must use that commit.
+`project.yml` is the source of truth for the app version, build number, orientations, and test targets. Commit the build number before an App Store release. A TestFlight build sets its build number at archive time only; see [TestFlight builds](#testflight-builds). Tests, screenshots, and the archive must use that commit.
 
 ## Setup
 
@@ -60,11 +60,44 @@ export ASC_KEY_PATH='/absolute/path/to/AuthKey.p8'
 bundle exec fastlane ios release
 ```
 
+TestFlight builds also upload date-based build numbers for the marketing version in `project.yml`. App Store Connect rejects an upload whose build number is not greater than every earlier build of that version. `scripts/bump-build.sh` reads only `project.yml`, so before you commit, check that the new number is greater than the latest TestFlight build. For example, after TestFlight build `202611021`, a release on the same day needs `202611022` or greater.
+
 The preparation lane requires a clean commit. It runs acceptance and screenshot capture, archives with automatic signing, and records SHA-256 hashes for the IPA and images. The release lane requires API credentials and checks that the commit and artifacts still match. It uploads those artifacts and requests review with automatic release after approval. Upload, review submission, approval, and public availability are separate states. Do not report a release as public from an upload result.
 
 ## TestFlight builds
 
-No lane uploads a TestFlight build yet. The approved design is in [TestFlight builds](../design-docs/testflight-builds.md). A TestFlight build is not an App Store release, and it does not establish iPhone Duo support.
+A TestFlight build is a build for internal testing only. It is not an App Store release, and it does not establish iPhone Duo support. The design and its reasons are in [TestFlight builds](../design-docs/testflight-builds.md).
+
+```bash
+export ASC_KEY_ID='your-key-id'
+export ASC_ISSUER_ID='your-issuer-id'
+export ASC_KEY_PATH='/absolute/path/to/AuthKey.p8'
+bundle exec fastlane ios beta dry_run:true   # gate, build number, and notes; no archive or upload
+bundle exec fastlane ios beta
+```
+
+The lane runs on the local Mac with automatic signing for team `HC438T2B8P`. It does these steps in order:
+
+1. It stops if the working tree is not clean, or if `ASC_KEY_ID`, `ASC_ISSUER_ID` or `ASC_KEY_PATH` is missing.
+2. It runs the logic tests and the UI tests on iPhone 17 only. It does not use iPhone Duo and does not capture screenshots. A failure stops the lane before the archive. Results go to `build/test-results/<timestamp>-testflight/`, without an `acceptance.json`, so the App Store release gate never uses them.
+3. It sets a date-based build number: `YYYYMMDD`, then `YYYYMMDD1`, `YYYYMMDD2`, and so on. The number is the first one in that sequence that is greater than both `CURRENT_PROJECT_VERSION` in `project.yml` and the latest App Store Connect build for the marketing version in `project.yml`. The lane passes the number to the archive only. It does not change `project.yml` and does not commit.
+4. It writes What to Test. The notes start with `Source revision: <commit>`. They list the commit subjects since the source revision of the newest earlier build whose notes have that line. If no build has it, or the revision is not in the current history, they list the last 20 commits.
+5. It archives to `build/testflight/<build>/`, uploads the IPA, and keeps `build/testflight/<build>/build.json` with the version, build, revision, and notes.
+6. It waits up to 30 minutes for App Store Connect processing. Then it sets the notes and adds the build to the internal group `Internal`. If that group does not exist, the lane creates it; add testers to it in App Store Connect.
+
+The lane reports `State: uploaded`, `State: processed`, and `State: available to testers` as separate states. An upload is not a processed build, and a processed build is not available to testers until the last state.
+
+If processing takes longer than 30 minutes, or distribution fails after the upload, the lane fails and prints the command to distribute again without a second upload:
+
+```bash
+bundle exec fastlane ios beta_distribute build:<build>
+```
+
+Run it on the Mac that uploaded the build, because it reads `build/testflight/<build>/build.json`. It does not need a clean working tree.
+
+The lane runs only when a person asks for a TestFlight build. An agent can propose one for device acceptance, but it uploads only after the person agrees.
+
+Run `ruby scripts/test-testflight-build.rb` to check the build number, notes, and wait rules. Run `bundle exec ruby scripts/test-testflight-lane.rb` to check the lane order, the stops before the archive, and the distribution states with App Store Connect replaced by fakes. Neither uses the network.
 
 ## App privacy details
 

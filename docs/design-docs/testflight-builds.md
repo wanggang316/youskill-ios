@@ -1,6 +1,6 @@
 # Design Doc: TestFlight builds
 
-**Status:** Approved (not implemented)
+**Status:** Implemented
 **Author:** Gump
 **Date:** 2026-11-02
 

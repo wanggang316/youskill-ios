@@ -47,7 +47,7 @@ puts "Release preflight checks passed."
 
 commands = []
 devices = [device.merge("state" => "Booted"), { "name" => "iPhone 17", "udid" => "phone", "state" => "Booted" }]
-flow.define_singleton_method(:selected_simulators) { devices }
+flow.define_singleton_method(:selected_simulators) { |*| devices }
 flow.define_singleton_method(:sh) do |command, **|
   commands << command
   "Finished"
