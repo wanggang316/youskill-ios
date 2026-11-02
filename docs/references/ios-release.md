@@ -62,6 +62,10 @@ bundle exec fastlane ios release
 
 The preparation lane requires a clean commit. It runs acceptance and screenshot capture, archives with automatic signing, and records SHA-256 hashes for the IPA and images. The release lane requires API credentials and checks that the commit and artifacts still match. It uploads those artifacts and requests review with automatic release after approval. Upload, review submission, approval, and public availability are separate states. Do not report a release as public from an upload result.
 
+## TestFlight builds
+
+No lane uploads a TestFlight build yet. The approved design is in [TestFlight builds](../design-docs/testflight-builds.md). A TestFlight build is not an App Store release, and it does not establish iPhone Duo support.
+
 ## App privacy details
 
 App Store privacy details apply to the whole app, and App Store Connect shows them as soon as they are published. `fastlane/app_privacy_details.json` holds the details for account sign-in and favorite sync (User ID, Name, Email Address, and Other User Content; linked to the person; used for app functionality; not used for tracking). It matches `Sources/App/PrivacyInfo.xcprivacy`; change both together.

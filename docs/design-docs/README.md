@@ -19,3 +19,4 @@ Use [_template.md](_template.md) as a starting point.
 <!-- Format: [Title](filename.md) — one-line summary -->
 
 - [YouSkill iOS MVP](youskill-ios-mvp.md) — 移动端 Skill 浏览、详情阅读、翻译与设置的首版技术设计
+- [TestFlight builds](testflight-builds.md) — Local `ios beta` lane: short gate, uncommitted build number, internal testers
