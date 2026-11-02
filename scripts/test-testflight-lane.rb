@@ -9,7 +9,8 @@ ROOT = File.expand_path("..", __dir__)
 Dir.chdir(File.join(ROOT, "fastlane"))
 flow = Fastlane::FastFile.new(File.expand_path("../fastlane/Fastfile", __dir__))
 head = `git -C #{ROOT} rev-parse HEAD`.strip
-parent = `git -C #{ROOT} rev-parse HEAD~1`.strip
+# CI checks out one commit, so the previous build uses HEAD itself.
+parent = head
 today = Time.now.strftime("%Y%m%d")
 version = flow.project_version.fetch("MARKETING_VERSION").to_s
 distribute = flow.method(:distribute_testflight_build)

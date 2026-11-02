@@ -40,6 +40,10 @@ jobs:
         run: brew install xcodegen
       - name: Check release preflight guards
         run: bundle exec ruby scripts/test-release-preflight.rb
+      - name: Check TestFlight build rules and lane
+        run: |
+          ruby scripts/test-testflight-build.rb
+          bundle exec ruby scripts/test-testflight-lane.rb
       - name: Run simulator regression suite
         run: bundle exec fastlane ios verify
       - name: Preserve test evidence
