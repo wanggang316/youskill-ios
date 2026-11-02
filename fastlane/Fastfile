@@ -224,21 +224,30 @@ end
 def distribute_testflight_build(record, timeout: TESTFLIGHT_PROCESSING_TIMEOUT, interval: TESTFLIGHT_POLL_INTERVAL)
   version = record.fetch("version")
   build_number = record.fetch("build")
+  hint = testflight_rerun_hint(build_number)
   app = testflight_app
   UI.message("Waiting up to #{timeout / 60} minutes for App Store Connect to process #{version} (#{build_number}).")
   build = begin
     TestFlightBuild.wait_until(timeout: timeout, interval: interval) { processed_testflight_build(app, version, build_number) }
   rescue TestFlightBuild::Timeout
-    UI.user_error!("App Store Connect did not finish processing #{version} (#{build_number}) in #{timeout / 60} minutes. The upload is kept. #{testflight_rerun_hint(build_number)}")
+    UI.user_error!("App Store Connect did not finish processing #{version} (#{build_number}) in #{timeout / 60} minutes. The upload is kept. #{hint}")
   end
   UI.success("State: processed. #{version} (#{build_number}) is ready for internal testing.")
   set_testflight_notes(build, record.fetch("notes"))
   group = internal_testflight_group(app)
-  build.add_beta_groups(beta_groups: [group])
-  unless testflight_group_ids(app, build).include?(group.id)
-    UI.user_error!("App Store Connect does not list #{version} (#{build_number}) in #{TESTFLIGHT_GROUP}. #{testflight_rerun_hint(build_number)}")
+  # A group with access to all builds receives every build; App Store Connect rejects an explicit add.
+  unless group.has_access_to_all_builds
+    build.add_beta_groups(beta_groups: [group])
+    unless testflight_group_ids(app, build).include?(group.id)
+      UI.user_error!("App Store Connect does not list #{version} (#{build_number}) in #{TESTFLIGHT_GROUP}. #{hint}")
+    end
   end
   UI.success("State: available to testers. #{version} (#{build_number}) is in the internal group #{TESTFLIGHT_GROUP}.")
+rescue FastlaneCore::Interface::FastlaneError => error
+  raise if hint.nil? || error.message.include?(hint)
+  UI.user_error!("#{error.message} #{hint}")
+rescue StandardError => error
+  UI.user_error!("TestFlight distribution of #{version} (#{build_number}) failed: #{error.message} #{hint}")
 end
 
 def run_testflight_build(dry_run: false)

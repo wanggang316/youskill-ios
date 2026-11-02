@@ -60,6 +60,8 @@ export ASC_KEY_PATH='/absolute/path/to/AuthKey.p8'
 bundle exec fastlane ios release
 ```
 
+TestFlight builds also upload date-based build numbers for the marketing version in `project.yml`. App Store Connect rejects an upload whose build number is not greater than every earlier build of that version. `scripts/bump-build.sh` reads only `project.yml`, so before you commit, check that the new number is greater than the latest TestFlight build. For example, after TestFlight build `202611021`, a release on the same day needs `202611022` or greater.
+
 The preparation lane requires a clean commit. It runs acceptance and screenshot capture, archives with automatic signing, and records SHA-256 hashes for the IPA and images. The release lane requires API credentials and checks that the commit and artifacts still match. It uploads those artifacts and requests review with automatic release after approval. Upload, review submission, approval, and public availability are separate states. Do not report a release as public from an upload result.
 
 ## TestFlight builds

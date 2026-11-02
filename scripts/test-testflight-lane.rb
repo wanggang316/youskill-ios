@@ -121,7 +121,7 @@ Dir.mktmpdir("testflight-lane") do |directory|
 end
 
 # Distribution with App Store Connect replaced by fakes.
-Group = Struct.new(:id, :name, :is_internal_group)
+Group = Struct.new(:id, :name, :is_internal_group, :has_access_to_all_builds)
 Detail = Struct.new(:internal_build_state)
 FakeBuild = Struct.new(:id, :processing_state, :build_beta_detail, :groups) do
   def add_beta_groups(beta_groups:)
@@ -134,7 +134,7 @@ FakeApp = Struct.new(:groups, :created) do
   end
 
   def create_beta_group(group_name:, is_internal_group:, has_access_to_all_builds:)
-    self.created = Group.new("new-group", group_name, is_internal_group)
+    self.created = Group.new("new-group", group_name, is_internal_group, has_access_to_all_builds)
   end
 end
 
@@ -164,20 +164,38 @@ expect_error("MISSING_EXPORT_COMPLIANCE") { flow.distribute_testflight_build(rec
 messages.clear
 remote = FakeBuild.new("build", "VALID", Detail.new("READY_FOR_BETA_TESTING"), [])
 flow.distribute_testflight_build(record, timeout: 0, interval: 0)
-check("missing Internal group is created as an internal group") { app.created == Group.new("new-group", "Internal", true) }
+check("missing Internal group is created as an internal group") { app.created == Group.new("new-group", "Internal", true, false) }
 check("build is added to the Internal group") { remote.groups == [app.created] }
 check("notes are set") { notes == record.fetch("notes") }
 check("processed and available are separate states") do
   messages.index { |text| text.start_with?("State: processed.") } < messages.index { |text| text.start_with?("State: available to testers.") }
 end
 
-existing = Group.new("internal-group", "Internal", true)
+existing = Group.new("internal-group", "Internal", true, false)
 app = FakeApp.new([existing], nil)
 remote = FakeBuild.new("build", "VALID", Detail.new("IN_BETA_TESTING"), [])
 flow.distribute_testflight_build(record, timeout: 0, interval: 0)
 check("existing Internal group is reused") { app.created.nil? && remote.groups == [existing] }
 
-app = FakeApp.new([Group.new("external-group", "Internal", false)], nil)
+automatic = Group.new("automatic-group", "Internal", true, true)
+app = FakeApp.new([automatic], nil)
+messages.clear
+remote = FakeBuild.new("build", "VALID", Detail.new("IN_BETA_TESTING"), [])
+flow.distribute_testflight_build(record, timeout: 0, interval: 0)
+check("group with access to all builds is not added again") { remote.groups.empty? }
+check("group with access to all builds reports availability") { messages.any? { |text| text.start_with?("State: available to testers.") } }
+
+app = FakeApp.new([existing], nil)
+remote = FakeBuild.new("build", "VALID", Detail.new("READY_FOR_BETA_TESTING"), [])
+remote.define_singleton_method(:add_beta_groups) { |**| raise "Service unavailable" }
+expect_error("Service unavailable Run `bundle exec fastlane ios beta_distribute build:#{today}1`") do
+  flow.distribute_testflight_build(record, timeout: 0, interval: 0)
+end
+remote = FakeBuild.new("build", "INVALID", nil, [])
+expect_error("as INVALID. Run `bundle exec fastlane ios beta_distribute") { flow.distribute_testflight_build(record, timeout: 0, interval: 0) }
+remote = FakeBuild.new("build", "VALID", Detail.new("READY_FOR_BETA_TESTING"), [])
+
+app = FakeApp.new([Group.new("external-group", "Internal", false, false)], nil)
 expect_error("is an external group") { flow.distribute_testflight_build(record, timeout: 0, interval: 0) }
 
 app = FakeApp.new([existing], nil)
