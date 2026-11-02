@@ -114,7 +114,7 @@ final class ReleaseAcceptanceTests: XCTestCase {
         XCTAssertEqual(favorite.label, "Remove favorite")
         attachScreenshot("detail-favorited")
 
-        files.tap()
+        openFilesDrawer()
         XCTAssertTrue(app.buttons["detail.files.close"].waitForExistence(timeout: 10))
         waitUntilGone(files)
         attachScreenshot("detail-drawer-open")
@@ -137,18 +137,13 @@ final class ReleaseAcceptanceTests: XCTestCase {
         openResults()
         firstCard.tap()
         XCTAssertTrue(app.scrollViews["skill.detail"].waitForExistence(timeout: 15))
-        app.buttons["detail.files"].tap()
-        let sourceFile = app.buttons["detail.file.example.swift"]
-        XCTAssertTrue(sourceFile.waitForExistence(timeout: 10))
-        sourceFile.tap()
+        openFile("example.swift")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label == %@", "example.swift")).firstMatch.waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["detail.translate"].isEnabled)
 
-        app.buttons["detail.files"].tap()
-        app.buttons["detail.file.archive.zip"].tap()
+        openFile("archive.zip")
         XCTAssertTrue(app.staticTexts["Preview not available"].waitForExistence(timeout: 10))
-        app.buttons["detail.files"].tap()
-        app.buttons["detail.file.SKILL.md"].tap()
+        openFile("SKILL.md")
         XCTAssertTrue(app.staticTexts["Skill guide"].waitForExistence(timeout: 10))
         app.buttons["detail.translate"].tap()
         let setup = app.alerts.firstMatch
@@ -227,12 +222,10 @@ final class ReleaseAcceptanceTests: XCTestCase {
         XCTAssertTrue(app.buttons["Retry"].exists)
         attachScreenshot("failure")
 
-        app.buttons["detail.files"].tap()
-        app.buttons["detail.file.example.swift"].tap()
+        openFile("example.swift")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label == %@", "example.swift")).firstMatch.waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["detail.translate"].exists, "Another file starts without a translation")
-        app.buttons["detail.files"].tap()
-        app.buttons["detail.file.SKILL.md"].tap()
+        openFile("SKILL.md")
         XCTAssertTrue(app.staticTexts["Retranslated guide"].waitForExistence(timeout: 15), "A cached translation is restored on open")
         XCTAssertTrue(app.staticTexts["Skill guide"].exists)
         XCTAssertTrue(app.buttons["detail.translation-menu"].exists)
@@ -284,6 +277,23 @@ final class ReleaseAcceptanceTests: XCTestCase {
         XCTAssertTrue(item.waitForExistence(timeout: 10))
         item.tap()
         waitUntilGone(item)
+    }
+
+    /// The files button floats over the reader and returns with a transition after the drawer closes,
+    /// so wait until it can take a tap.
+    private func openFilesDrawer() {
+        let files = app.buttons["detail.files"]
+        XCTAssertTrue(files.waitForExistence(timeout: 15))
+        expectation(for: NSPredicate(format: "hittable == true"), evaluatedWith: files)
+        waitForExpectations(timeout: 15)
+        files.tap()
+    }
+
+    private func openFile(_ name: String) {
+        openFilesDrawer()
+        let row = app.buttons["detail.file.\(name)"]
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        row.tap()
     }
 
     private func waitUntilGone(_ element: XCUIElement) {
