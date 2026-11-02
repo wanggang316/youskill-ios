@@ -28,7 +28,9 @@ extension AppContainer {
                 snapshot: FavoriteSnapshot(name: "retired-skill", source: "example/archive")
             ))
         }
-        let accountRepository = UITestAccount()
+        let accountRepository = UITestAccount(
+            addsRemoteFavoriteAfterFirstPull: arguments.contains("--ui-remote-favorite-later")
+        )
         let authProvider = AuthProvider(
             repository: accountRepository,
             sessionStore: UITestSessionStore(signedIn: arguments.contains("--ui-signed-in"))
@@ -96,7 +98,15 @@ private actor UITestCatalog: SkillCatalogRepositoryProtocol {
     }
 }
 
-private struct UITestAccount: AccountRepositoryProtocol {
+private final class UITestAccount: AccountRepositoryProtocol, @unchecked Sendable {
+    private let addsRemoteFavoriteAfterFirstPull: Bool
+    private let lock = NSLock()
+    private var pullCount = 0
+
+    init(addsRemoteFavoriteAfterFirstPull: Bool) {
+        self.addsRemoteFavoriteAfterFirstPull = addsRemoteFavoriteAfterFirstPull
+    }
+
     func signInURL(provider: SignInProvider, redirectURI: String, codeChallenge: String, state: String) -> URL {
         URL(string: "https://example.invalid/sign-in/\(provider.rawValue)")!
     }
@@ -117,8 +127,18 @@ private struct UITestAccount: AccountRepositoryProtocol {
         }
     }
 
+    /// With `--ui-remote-favorite-later`, the launch sync pulls nothing and later pulls
+    /// return a favorite added on another device.
     func pullFavorites(cursor: Int?, accessToken: String) async throws -> FavoriteChangesPage {
-        FavoriteChangesPage(records: [], cursor: cursor ?? 0, hasMore: false)
+        let count = lock.withLock { pullCount += 1; return pullCount }
+        guard addsRemoteFavoriteAfterFirstPull, count > 1, (cursor ?? 0) < 1 else {
+            return FavoriteChangesPage(records: [], cursor: cursor ?? 0, hasMore: false)
+        }
+        let record = RemoteFavorite(
+            skillID: 2, state: .favorited, updatedAt: Date(timeIntervalSince1970: 1),
+            snapshot: FavoriteSnapshot(name: "review-code", source: "example/review")
+        )
+        return FavoriteChangesPage(records: [record], cursor: 1, hasMore: false)
     }
 }
 

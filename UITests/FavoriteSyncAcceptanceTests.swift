@@ -58,6 +58,22 @@ final class FavoriteSyncAcceptanceTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["No favorites yet"].waitForExistence(timeout: 15))
     }
 
+    func testPullToRefreshShowsAFavoriteAddedOnAnotherDevice() {
+        launch("--ui-signed-in", "--ui-remote-favorite-later")
+        app.buttons["catalog.favorites"].tap()
+        XCTAssertTrue(app.staticTexts["No favorites yet"].waitForExistence(timeout: 15))
+        attachScreenshot("favorites-before-pull")
+
+        let empty = app.scrollViews["catalog.empty"]
+        XCTAssertTrue(empty.waitForExistence(timeout: 10))
+        let start = empty.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2))
+        start.press(forDuration: 0.1, thenDragTo: start.withOffset(CGVector(dx: 0, dy: 400)))
+
+        XCTAssertTrue(app.staticTexts["review-code"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.staticTexts["No favorites yet"].exists)
+        attachScreenshot("favorites-after-pull")
+    }
+
     func testSignedInSettingsShowIdentityAndDeleteAfterConfirmation() {
         launch("--ui-signed-in")
         openSettings()
