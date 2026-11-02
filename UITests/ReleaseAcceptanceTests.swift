@@ -92,6 +92,47 @@ final class ReleaseAcceptanceTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["No favorites yet"].waitForExistence(timeout: 15))
     }
 
+    func testDetailFavoriteAndFloatingFilesButton() {
+        openResults()
+        let cardID = firstCard.identifier
+        let skillID = String(cardID.dropFirst("skill.card.".count))
+        firstCard.tap()
+        XCTAssertTrue(app.scrollViews["skill.detail"].waitForExistence(timeout: 15))
+
+        let favorite = app.buttons["detail.favorite"]
+        XCTAssertTrue(favorite.waitForExistence(timeout: 10))
+        XCTAssertEqual(favorite.label, "Add favorite")
+        let files = app.buttons["detail.files"]
+        XCTAssertTrue(files.exists)
+        XCTAssertEqual(files.label, "Catalog")
+        XCTAssertGreaterThan(files.frame.midY, app.frame.midY, "The files button floats at the bottom")
+        XCTAssertGreaterThan(files.frame.midX, app.frame.midX, "The files button floats on the trailing side")
+        XCTAssertTrue(app.windows.firstMatch.frame.contains(files.frame))
+        attachScreenshot("detail-floating-files")
+
+        favorite.tap()
+        XCTAssertEqual(favorite.label, "Remove favorite")
+        attachScreenshot("detail-favorited")
+
+        files.tap()
+        XCTAssertTrue(app.buttons["detail.files.close"].waitForExistence(timeout: 10))
+        waitUntilGone(files)
+        attachScreenshot("detail-drawer-open")
+        app.buttons["detail.files.close"].tap()
+        XCTAssertTrue(files.waitForExistence(timeout: 10))
+
+        app.buttons["BackButton"].tap()
+        let listFavorite = app.buttons["skill.favorite.\(skillID)"]
+        XCTAssertTrue(listFavorite.waitForExistence(timeout: 15))
+        XCTAssertEqual(listFavorite.label, "Remove favorite", "The list shows the change made on the detail page")
+        listFavorite.tap()
+        XCTAssertEqual(listFavorite.label, "Add favorite")
+
+        app.buttons[cardID].tap()
+        XCTAssertTrue(favorite.waitForExistence(timeout: 15))
+        XCTAssertEqual(favorite.label, "Add favorite", "The detail page shows the change made on the list")
+    }
+
     func testFilesAndTranslationSettingsCompleteTheReadingFlow() {
         openResults()
         firstCard.tap()

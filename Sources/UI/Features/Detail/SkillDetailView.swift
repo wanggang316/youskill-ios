@@ -42,6 +42,14 @@ struct SkillDetailView: View {
                 }
             }
             .background(AppTheme.groupedBackground.ignoresSafeArea())
+            // Scoped to the reader: on the outer stack it would replace the identifiers of the floating button and drawer.
+            .accessibilityIdentifier("skill.detail")
+            .overlay(alignment: .bottomTrailing) {
+                if !viewModel.isDrawerOpen {
+                    filesButton
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
 
             FileTreeDrawer(
                 isPresented: drawerBinding,
@@ -52,20 +60,12 @@ struct SkillDetailView: View {
                 }
             )
         }
-        .accessibilityIdentifier("skill.detail")
         .navigationTitle(viewModel.displayTitle)
         .platformInlineNavigationTitle()
         .toolbar {
             ToolbarItemGroup(placement: PlatformToolbarPlacement.trailing) {
                 translationControl
-
-                Button {
-                    drawerBinding.wrappedValue = true
-                } label: {
-                    Label(L10n.string("detail.directory"), systemImage: "sidebar.right")
-                }
-                .disabled(viewModel.fileTree.isEmpty)
-                .accessibilityIdentifier("detail.files")
+                favoriteButton
             }
         }
         .alert(L10n.string("detail.translation_required_title"), isPresented: $viewModel.needsTranslationSettings) {
@@ -85,6 +85,37 @@ struct SkillDetailView: View {
         .task {
             await viewModel.loadIfNeeded()
         }
+    }
+
+    private var favoriteButton: some View {
+        Button {
+            viewModel.toggleFavorite()
+        } label: {
+            Image(systemName: viewModel.isFavorite ? "bookmark.fill" : "bookmark")
+        }
+        .accessibilityLabel(L10n.string(viewModel.isFavorite ? "skill.favorite.remove" : "skill.favorite.add"))
+        .accessibilityIdentifier("detail.favorite")
+    }
+
+    /// Floats over the reader so the toolbar keeps room for reading actions.
+    private var filesButton: some View {
+        Button {
+            drawerBinding.wrappedValue = true
+        } label: {
+            Image(systemName: "list.bullet")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 52, height: 52)
+                .background(AppTheme.accent, in: Circle())
+                .shadow(color: Color.black.opacity(0.18), radius: 10, x: 0, y: 6)
+        }
+        .buttonStyle(.plain)
+        .disabled(viewModel.fileTree.isEmpty)
+        .opacity(viewModel.fileTree.isEmpty ? 0.4 : 1)
+        .padding(.trailing, 20)
+        .padding(.bottom, 20)
+        .accessibilityLabel(L10n.string("detail.directory"))
+        .accessibilityIdentifier("detail.files")
     }
 
     @ViewBuilder
