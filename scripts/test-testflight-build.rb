@@ -25,6 +25,11 @@ expect('remote build greater than local build', next_build.call(['202610221', '2
 expect('local build greater than remote build', next_build.call(['202611025', '20261102']), '202611026')
 expect('remote build from a later day', next_build.call(['202611051']), '2026110210')
 expect_error('build number that no date-based number can exceed') { next_build.call(['99999999999999']) }
+expect('build greater than every known build', TestFlightBuild.greater_build_number?('202611022', latest: ['202611021', nil]), true)
+expect('build equal to a known build', TestFlightBuild.greater_build_number?('202611021', latest: ['202611021']), false)
+expect('build lower than a TestFlight build', TestFlightBuild.greater_build_number?('20261102', latest: ['202611021']), false)
+expect('build with no known build', TestFlightBuild.greater_build_number?('20261102', latest: [0]), true)
+expect_error('unsupported build number in the check') { TestFlightBuild.greater_build_number?('1.0', latest: []) }
 expect_error('invalid date') { TestFlightBuild.next_build_number(date: '2026-11-02', latest: []) }
 
 revision = 'a' * 40

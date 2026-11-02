@@ -55,6 +55,14 @@ Verify, capture screenshots, and archive the committed release
 
 Upload the inspected, verified release and request App Store review
 
+### ios bump_build
+
+```sh
+[bundle exec] fastlane ios bump_build
+```
+
+Set the next release build number in project.yml from App Store Connect and regenerate the project
+
 ### ios beta
 
 ```sh

@@ -44,6 +44,8 @@ jobs:
         run: |
           ruby scripts/test-testflight-build.rb
           bundle exec ruby scripts/test-testflight-lane.rb
+      - name: Check release build number bump and check
+        run: bundle exec ruby scripts/test-release-build.rb
       - name: Run simulator regression suite
         run: bundle exec fastlane ios verify
       - name: Preserve test evidence

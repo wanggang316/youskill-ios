@@ -15,11 +15,21 @@ module TestFlightBuild
   # YYYYMMDD2, ... that is greater than every known build number.
   def self.next_build_number(date:, latest:)
     raise Error, "Invalid build date: #{date}" unless date.to_s.match?(/\A\d{8}\z/)
-    highest = latest.compact.map { |value| parse_build_number(value) }.max || 0
+    highest = highest_build_number(latest)
     candidates = [date.to_s] + (1..MAX_SUFFIX).map { |suffix| "#{date}#{suffix}" }
     candidate = candidates.find { |value| Integer(value, 10) > highest }
     raise Error, "No build number for #{date} is greater than #{highest}." unless candidate
     candidate
+  end
+
+  # True when build is greater than every known build number. App Store Connect
+  # accepts an upload of a version only with such a number.
+  def self.greater_build_number?(build, latest:)
+    parse_build_number(build) > highest_build_number(latest)
+  end
+
+  def self.highest_build_number(latest)
+    latest.compact.map { |value| parse_build_number(value) }.max || 0
   end
 
   def self.parse_build_number(value)
@@ -85,5 +95,5 @@ module TestFlightBuild
     kept.pop until kept.empty? || (header + kept + ['- ...']).join("\n").bytesize <= max_bytes
     (header + kept + ['- ...']).join("\n")
   end
-  private_class_method :parse_build_number, :ancestor?, :git, :fit
+  private_class_method :parse_build_number, :highest_build_number, :ancestor?, :git, :fit
 end
