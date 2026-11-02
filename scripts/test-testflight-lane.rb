@@ -14,6 +14,7 @@ parent = head
 today = Time.now.strftime("%Y%m%d")
 version = flow.project_version.fetch("MARKETING_VERSION").to_s
 distribute = flow.method(:distribute_testflight_build)
+previous_notes = flow.method(:previous_testflight_notes)
 calls = []
 messages = []
 status = ""
@@ -201,4 +202,23 @@ expect_error("is an external group") { flow.distribute_testflight_build(record, 
 app = FakeApp.new([existing], nil)
 flow.define_singleton_method(:testflight_group_ids) { |_app, _build| [] }
 expect_error("does not list") { flow.distribute_testflight_build(record, timeout: 0, interval: 0) }
+
+# App Store Connect rejects the betaBuildMetrics relationship that get_builds includes by default.
+flow.define_singleton_method(:previous_testflight_notes, previous_notes)
+builds_request = nil
+NotesBuild = Struct.new(:notes) do
+  def get_beta_build_localizations
+    notes.map { |text| Struct.new(:whats_new).new(text) }
+  end
+end
+Spaceship::ConnectAPI.define_singleton_method(:get_builds) do |**options|
+  builds_request = options
+  Struct.new(:to_models).new([NotesBuild.new(["Source revision: #{head}"])])
+end
+check("previous notes are read from recent builds") do
+  flow.previous_testflight_notes(Struct.new(:id).new("app")).first == ["Source revision: #{head}"]
+end
+check("previous notes request does not include betaBuildMetrics") do
+  builds_request.key?(:includes) && !builds_request[:includes].to_s.include?("betaBuildMetrics")
+end
 puts "TestFlight lane checks passed."
