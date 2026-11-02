@@ -147,12 +147,45 @@ struct SkillDetailViewModelTests {
 
         #expect(context.viewModel.translationView == .original)
     }
+
+    @Test
+    func favoriteToggleWritesTheSharedStoreWithASnapshot() {
+        let context = Context(mode: .bilingual)
+        let skill = context.viewModel.skill
+        var localChanges = 0
+        context.favorites.onLocalChange = { localChanges += 1 }
+
+        #expect(!context.viewModel.isFavorite)
+
+        context.viewModel.toggleFavorite()
+
+        #expect(context.viewModel.isFavorite)
+        #expect(context.favorites.contains(skill))
+        #expect(context.favorites.record(for: skill.id)?.snapshot.name == "demo")
+        #expect(localChanges == 1, "A detail change syncs like any other local change")
+
+        context.viewModel.toggleFavorite()
+
+        #expect(!context.viewModel.isFavorite)
+        #expect(!context.favorites.contains(skill))
+        #expect(localChanges == 2)
+    }
+
+    @Test
+    func favoriteStateFollowsChangesMadeElsewhere() {
+        let context = Context(mode: .bilingual)
+
+        context.favorites.toggle(context.viewModel.skill)
+
+        #expect(context.viewModel.isFavorite)
+    }
 }
 
 @MainActor
 private struct Context {
     let settings: AppSettingsStore
     let translations: ScriptedTranslationRepository
+    let favorites: FavoritesStore
     let viewModel: SkillDetailViewModel
 
     init(
@@ -171,6 +204,8 @@ private struct Context {
         let repository = ScriptedTranslationRepository(results: results)
         settings = store
         translations = repository
+        let favoritesStore = FavoritesStore(userDefaults: UserDefaults(suiteName: UUID().uuidString)!)
+        favorites = favoritesStore
         viewModel = SkillDetailViewModel(
             skill: Skill(
                 id: Int.random(in: 1 ... Int.max),
@@ -193,7 +228,8 @@ private struct Context {
                 repository: repository,
                 cache: DiskCache(namespace: "tests-\(UUID().uuidString)")
             ),
-            translationSettings: { store.translationSettings }
+            translationSettings: { store.translationSettings },
+            favoritesStore: favoritesStore
         )
     }
 }

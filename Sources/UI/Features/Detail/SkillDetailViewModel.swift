@@ -9,6 +9,7 @@ final class SkillDetailViewModel {
     private let contentService: SkillContentService
     private let translationService: TranslationService
     private let translationSettings: @MainActor () -> TranslationSettings
+    private let favoritesStore: FavoritesStore
     /// Bumped whenever the open file changes so late translation results for another file are dropped.
     private var fileGeneration = 0
     private var lastTranslationWasForced = false
@@ -40,12 +41,22 @@ final class SkillDetailViewModel {
         skill: Skill,
         contentService: SkillContentService,
         translationService: TranslationService,
-        translationSettings: @escaping @MainActor () -> TranslationSettings
+        translationSettings: @escaping @MainActor () -> TranslationSettings,
+        favoritesStore: FavoritesStore
     ) {
         self.skill = skill
         self.contentService = contentService
         self.translationService = translationService
         self.translationSettings = translationSettings
+        self.favoritesStore = favoritesStore
+    }
+
+    var isFavorite: Bool {
+        favoritesStore.contains(skill)
+    }
+
+    func toggleFavorite() {
+        favoritesStore.toggle(skill)
     }
 
     var hasTranslation: Bool {
