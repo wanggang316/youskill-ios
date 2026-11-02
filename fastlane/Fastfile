@@ -169,9 +169,10 @@ def testflight_app
 end
 
 # What to Test texts of recent builds, newest first. Fetched lazily so the
-# search stops at the first build that has a source revision.
+# search stops at the first build that has a source revision. No includes:
+# the default includes betaBuildMetrics, which App Store Connect rejects.
 def previous_testflight_notes(app)
-  Spaceship::ConnectAPI.get_builds(filter: { app: app.id }, sort: "-uploadedDate", limit: 20).to_models.lazy.map do |build|
+  Spaceship::ConnectAPI.get_builds(filter: { app: app.id }, includes: nil, sort: "-uploadedDate", limit: 20).to_models.lazy.map do |build|
     build.get_beta_build_localizations.map(&:whats_new)
   end
 end
