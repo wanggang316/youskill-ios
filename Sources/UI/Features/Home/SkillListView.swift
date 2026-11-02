@@ -18,7 +18,8 @@ struct SkillListView: View {
         self.container = container
         _viewModel = State(initialValue: SkillListViewModel(
             service: container.skillCatalogService,
-            favoritesStore: container.favoritesStore
+            favoritesStore: container.favoritesStore,
+            favoriteSync: container.favoriteSyncService
         ))
     }
 
@@ -179,9 +180,15 @@ struct SkillListView: View {
                                message: error, actionTitle: L10n.string("common.retry"),
                                action: { Task { await viewModel.refresh() } })
             } else if viewModel.displayedSkills.isEmpty {
-                EmptyStateView(systemImage: "magnifyingglass",
-                               title: L10n.string(viewModel.selectedSort == .favorites ? "home.empty.no_favorites_title" : "home.empty.no_results_title"),
-                               message: L10n.string(viewModel.selectedSort == .favorites ? "home.empty.no_favorites_message" : "home.empty.no_results_message"))
+                // Scrollable so pull to refresh can sync favorites from other devices.
+                ScrollView {
+                    EmptyStateView(systemImage: "magnifyingglass",
+                                   title: L10n.string(viewModel.selectedSort == .favorites ? "home.empty.no_favorites_title" : "home.empty.no_results_title"),
+                                   message: L10n.string(viewModel.selectedSort == .favorites ? "home.empty.no_favorites_message" : "home.empty.no_results_message"))
+                        .containerRelativeFrame(.vertical)
+                }
+                .accessibilityIdentifier("catalog.empty")
+                .refreshable { await viewModel.refresh() }
             } else {
                 ScrollView {
                     LazyVGrid(columns: resultColumns, spacing: 16) {

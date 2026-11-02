@@ -6,6 +6,7 @@ import Observation
 final class SkillListViewModel {
     private let service: SkillCatalogService
     private let favoritesStore: FavoritesStore
+    private let favoriteSync: FavoriteSyncService
 
     private(set) var searchText = ""
     var selectedSort: SkillSortOption = .heatScore {
@@ -36,9 +37,10 @@ final class SkillListViewModel {
     private var hasLoadedInitially = false
     private var lastLoadedKey: String?
 
-    init(service: SkillCatalogService, favoritesStore: FavoritesStore) {
+    init(service: SkillCatalogService, favoritesStore: FavoritesStore, favoriteSync: FavoriteSyncService) {
         self.service = service
         self.favoritesStore = favoritesStore
+        self.favoriteSync = favoriteSync
     }
 
     var reloadKey: String {
@@ -77,10 +79,16 @@ final class SkillListViewModel {
         await reload()
     }
 
+    /// Pull to refresh: reloads the list and syncs favorites, which does nothing when signed out.
+    /// A failed sync keeps its pending changes for the next sync and does not fail the refresh.
     func refresh() async {
         hasLoadedInitially = true
         lastLoadedKey = reloadKey
+        async let synced: Void = favoriteSync.sync()
         await reload()
+        await synced
+        // Show the pulled records in the favorites view and in the favorite marks.
+        favoritesRevision = UUID()
     }
 
     func applySearch(_ text: String) {

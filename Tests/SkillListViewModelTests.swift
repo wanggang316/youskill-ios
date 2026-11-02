@@ -175,6 +175,51 @@ struct SkillListViewModelTests {
         #expect(viewModel.displayedSkills.map(\.id) == [1])
     }
 
+    @Test
+    func pullToRefreshShowsAFavoriteAddedOnTheServer() async {
+        let account = FakeAccountRepository()
+        let viewModel = makeViewModel(repository: FakeSkillCatalogRepository(), account: account, signedIn: true)
+        viewModel.selectedSort = .favorites
+        await viewModel.loadIfNeeded()
+        #expect(viewModel.displayedSkills.isEmpty)
+
+        account.seed(5, .favorited, at: 100, name: "from-another-device")
+        await viewModel.refresh()
+
+        #expect(viewModel.displayedSkills.map(\.id) == [5])
+        #expect(viewModel.displayedSkills.first?.name == "from-another-device")
+        #expect(account.calls.contains("pull:access-1"))
+    }
+
+    @Test
+    func pullToRefreshSignedOutDoesNotSync() async {
+        let account = FakeAccountRepository()
+        let repository = FakeSkillCatalogRepository()
+        let viewModel = makeViewModel(repository: repository, account: account, signedIn: false)
+        account.seed(5, .favorited, at: 100)
+
+        await viewModel.refresh()
+
+        #expect(account.calls.isEmpty)
+        #expect(await repository.fetchCount == 1)
+    }
+
+    @Test
+    func pullToRefreshKeepsPendingChangesWhenTheSyncFails() async {
+        let account = FakeAccountRepository()
+        account.isOffline = true
+        let repository = FakeSkillCatalogRepository()
+        let store = FavoritesStore(userDefaults: UserDefaults(suiteName: UUID().uuidString)!)
+        let viewModel = makeViewModel(repository: repository, account: account, signedIn: true, favoritesStore: store)
+        viewModel.toggleFavorite(for: sampleSkill(1))
+
+        await viewModel.refresh()
+
+        #expect(await repository.fetchCount == 1)
+        #expect(viewModel.isFavorite(sampleSkill(1)))
+        #expect(store.pendingChanges.map(\.skillID) == [1])
+    }
+
     private func sampleSkill(_ id: Int) -> Skill {
         Skill(id: id, name: "skill-\(id)", description: nil, url: nil, path: nil,
               starCount: 120, heatScore: 10, installCount: 1, source: "team/tools",
@@ -185,11 +230,21 @@ struct SkillListViewModelTests {
         SkillsPage(skills: skills, total: total ?? skills.count, page: 1, pageSize: 30)
     }
 
-    private func makeViewModel(repository: some SkillCatalogRepositoryProtocol) -> SkillListViewModel {
-        let defaults = UserDefaults(suiteName: UUID().uuidString)!
-        let favoritesStore = FavoritesStore(userDefaults: defaults)
+    private func makeViewModel(
+        repository: some SkillCatalogRepositoryProtocol,
+        account: FakeAccountRepository = FakeAccountRepository(),
+        signedIn: Bool = false,
+        favoritesStore: FavoritesStore = FavoritesStore(userDefaults: UserDefaults(suiteName: UUID().uuidString)!)
+    ) -> SkillListViewModel {
+        let auth = AuthProvider(
+            repository: account,
+            sessionStore: InMemorySessionStore(signedIn ? FakeAccountRepository.session("access-1", refresh: "r") : nil)
+        )
+        let favoriteSync = FavoriteSyncService(
+            favorites: favoritesStore, auth: auth, repository: account, debounce: .seconds(60)
+        )
         let service = SkillCatalogService(repository: repository)
-        return SkillListViewModel(service: service, favoritesStore: favoritesStore)
+        return SkillListViewModel(service: service, favoritesStore: favoritesStore, favoriteSync: favoriteSync)
     }
 }
 
