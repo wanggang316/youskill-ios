@@ -18,7 +18,8 @@ struct SkillDetailView: View {
             skill: skill,
             contentService: container.skillContentService,
             translationService: container.translationService,
-            translationSettings: { [settingsStore = container.settingsStore] in settingsStore.translationSettings }
+            translationSettings: { [settingsStore = container.settingsStore] in settingsStore.translationSettings },
+            favoritesStore: container.favoritesStore
         ))
     }
 
