@@ -32,7 +32,7 @@ Use the repository Ruby version, Bundler, selected Xcode, and existing local con
 | Build VALID, assets ready, no review requested | Select the exact existing build and submit without binary or asset upload. |
 | Review requested, no requested changes | Verify selection and release mode, then create the submission tag if missing. Do not submit again. |
 | Review requested, user asks to change screenshots | Cancel that submission, wait until the version is editable, update the requested assets, then resubmit the same valid build. |
-| No prepared candidate | Commit release inputs and use `prepare_release`; inspect its output before submission. |
+| No prepared candidate | Run `./scripts/bump-build.sh` (next build number above every App Store Connect build of the version), commit release inputs, and use `prepare_release`; inspect its output before submission. |
 | Public release confirmed | Record public availability separately from the existing submission tag. |
 
 `prepare_release` runs acceptance, capture, and archive; it is not a resume command and rejects an existing capture directory. Preserve valid outputs. Repair only the failed stage, with a narrow tested lane change if required.

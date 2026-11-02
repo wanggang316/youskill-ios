@@ -62,7 +62,7 @@ Decisions:
 
 - **GitHub Actions upload on push or tag.** This needs distribution certificates in CI, through match or cloud signing with an API key. It adds a secret store and more failure modes. We do not need it for internal testing now.
 - **Full release gate.** This would run the Duo matrix and screenshots. It is too slow and too fragile for test builds. The App Store release keeps this gate.
-- **Committed build number.** This would bump `project.yml` and push to `main` for each TestFlight build. It adds noise commits and needs push access. App Store releases still commit their build number. A TestFlight build number is a date-based number that the next App Store build number also exceeds, so the two do not collide.
+- **Committed build number.** This would bump `project.yml` and push to `main` for each TestFlight build. It adds noise commits and needs push access. App Store releases still commit their build number. A TestFlight build number is a date-based number. The release bump (`ios bump_build`) applies the same rule to the committed number and the latest App Store Connect build, and `prepare_release` stops when the committed number is not greater. Thus the release build number exceeds every TestFlight build of the version.
 
 ## Dependencies
 

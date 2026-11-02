@@ -50,19 +50,20 @@ The screenshot lane first runs acceptance. It captures five screens in English, 
 Capture uses the separate `YouSkillScreenshots` XCTest scheme through fastlane `run_tests`. The pinned snapshot launcher shuts down all booted simulators, so it cannot preserve a selected Duo posture. The native test target reads a temporary host configuration, sets the app language and posture, and signals when each page is ready. A host worker uses sim-use to capture the active display at its native resolution, then returns the PNG for the test result attachment. This avoids black images and rounded dimensions from XCTest screen capture on Duo. Open-display screenshots use landscape to show both catalog columns. The workflow removes that configuration after capture and validates both image counts and Duo display dimensions.
 
 ```bash
-./scripts/bump-build.sh
-# Review and commit the generated version change before release.
-bundle exec fastlane ios prepare_release
-# Inspect fastlane/screenshots before submission.
 export ASC_KEY_ID='your-key-id'
 export ASC_ISSUER_ID='your-issuer-id'
 export ASC_KEY_PATH='/absolute/path/to/AuthKey.p8'
+./scripts/bump-build.sh --dry-run   # show the next build number; no change
+./scripts/bump-build.sh
+# Review and commit project.yml and YouSkill.xcodeproj before release.
+bundle exec fastlane ios prepare_release
+# Inspect fastlane/screenshots before submission.
 bundle exec fastlane ios release
 ```
 
-TestFlight builds also upload date-based build numbers for the marketing version in `project.yml`. App Store Connect rejects an upload whose build number is not greater than every earlier build of that version. `scripts/bump-build.sh` reads only `project.yml`, so before you commit, check that the new number is greater than the latest TestFlight build. For example, after TestFlight build `202611021`, a release on the same day needs `202611022` or greater.
+`scripts/bump-build.sh` runs `bundle exec fastlane ios bump_build` (`dry_run:true` for `--dry-run`). TestFlight builds upload date-based build numbers for the marketing version but do not commit them, and App Store Connect rejects an upload whose build number is not greater than every earlier build of that version. So the bump uses the TestFlight rule, `TestFlightBuild.next_build_number`: the new number is the first one in `YYYYMMDD`, `YYYYMMDD1`, `YYYYMMDD2`, ... that is greater than both `CURRENT_PROJECT_VERSION` in `project.yml` and the latest App Store Connect build for `MARKETING_VERSION`. For example, after TestFlight build `202611021`, a bump on the same day writes `202611022`. The lane needs `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_PATH`. It writes only the build number line in `project.yml` and regenerates the Xcode project. It does not commit.
 
-The preparation lane requires a clean commit. It runs acceptance and screenshot capture, archives with automatic signing, and records SHA-256 hashes for the IPA and images. The release lane requires API credentials and checks that the commit and artifacts still match. It uploads those artifacts and requests review with automatic release after approval. Upload, review submission, approval, and public availability are separate states. Do not report a release as public from an upload result.
+The preparation lane requires a clean commit and the same API key variables. Before tests, it stops when the committed build number is not greater than the latest App Store Connect build of the marketing version, and tells you to run `./scripts/bump-build.sh`. It runs acceptance and screenshot capture, archives with automatic signing, and records SHA-256 hashes for the IPA and images. The release lane requires API credentials and checks that the commit and artifacts still match. It uploads those artifacts and requests review with automatic release after approval. Upload, review submission, approval, and public availability are separate states. Do not report a release as public from an upload result.
 
 ## TestFlight builds
 
@@ -97,7 +98,7 @@ Run it on the Mac that uploaded the build, because it reads `build/testflight/<b
 
 The lane runs only when a person asks for a TestFlight build. An agent can propose one for device acceptance, but it uploads only after the person agrees.
 
-Run `ruby scripts/test-testflight-build.rb` to check the build number, notes, and wait rules. Run `bundle exec ruby scripts/test-testflight-lane.rb` to check the lane order, the stops before the archive, and the distribution states with App Store Connect replaced by fakes. Neither uses the network.
+Run `ruby scripts/test-testflight-build.rb` to check the build number, notes, and wait rules. Run `bundle exec ruby scripts/test-testflight-lane.rb` to check the lane order, the stops before the archive, and the distribution states with App Store Connect replaced by fakes. Run `bundle exec ruby scripts/test-release-build.rb` to check the release build number bump and the `prepare_release` check. None of them uses the network.
 
 ## App privacy details
 
